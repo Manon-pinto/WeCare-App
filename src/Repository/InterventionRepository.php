@@ -19,6 +19,8 @@ class InterventionRepository extends ServiceEntityRepository
         parent::__construct($registry, Intervention::class);
     }
 
+    // ── Intervenant ──────────────────────────────────────────────────────────
+
     /** @return Intervention[] */
     public function findByIntervenantAndDateRange(
         Intervenant $intervenant,
@@ -56,14 +58,14 @@ class InterventionRepository extends ServiceEntityRepository
     /** @return Beneficiaire[] */
     public function findDistinctBeneficiairesByIntervenant(Intervenant $intervenant): array
     {
-        $interventions = $this->createQueryBuilder('i')
+        $rows = $this->createQueryBuilder('i')
             ->select('DISTINCT IDENTITY(i.beneficiaire) as bid')
             ->andWhere('i.intervenant = :intervenant')
             ->setParameter('intervenant', $intervenant)
             ->getQuery()
             ->getScalarResult();
 
-        $ids = array_column($interventions, 'bid');
+        $ids = array_column($rows, 'bid');
         if (empty($ids)) {
             return [];
         }
@@ -136,6 +138,95 @@ class InterventionRepository extends ServiceEntityRepository
             ->andWhere('i.intervenant = :intervenant')
             ->setParameter('intervenant', $intervenant)
             ->orderBy('inc.dateSignalement', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ── Bénéficiaire ─────────────────────────────────────────────────────────
+
+    public function findNextByBeneficiaire(Beneficiaire $beneficiaire, \DateTimeInterface $from): ?Intervention
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.beneficiaire = :beneficiaire')
+            ->andWhere('i.dateDebut >= :from')
+            ->setParameter('beneficiaire', $beneficiaire)
+            ->setParameter('from', $from)
+            ->orderBy('i.dateDebut', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /** @return Intervention[] */
+    public function findByBeneficiaireAndDateRange(
+        Beneficiaire $beneficiaire,
+        \DateTimeInterface $debut,
+        \DateTimeInterface $fin
+    ): array {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.beneficiaire = :beneficiaire')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->setParameter('beneficiaire', $beneficiaire)
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('i.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return Intervenant[] */
+    public function findDistinctIntervenantsByBeneficiaire(Beneficiaire $beneficiaire): array
+    {
+        $rows = $this->createQueryBuilder('i')
+            ->select('DISTINCT IDENTITY(i.intervenant) as iid')
+            ->andWhere('i.beneficiaire = :beneficiaire')
+            ->setParameter('beneficiaire', $beneficiaire)
+            ->getQuery()
+            ->getScalarResult();
+
+        $ids = array_column($rows, 'iid');
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->getEntityManager()
+            ->getRepository(\App\Entity\Intervenant::class)
+            ->findBy(['id' => $ids]);
+    }
+
+    /** @return Intervention[] */
+    public function findByIntervenantBeneficiaireAndDateRange(
+        Intervenant $intervenant,
+        Beneficiaire $beneficiaire,
+        \DateTimeInterface $debut,
+        \DateTimeInterface $fin
+    ): array {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.intervenant = :intervenant')
+            ->andWhere('i.beneficiaire = :beneficiaire')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->setParameter('intervenant', $intervenant)
+            ->setParameter('beneficiaire', $beneficiaire)
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('i.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return Intervention[] */
+    public function findWithCompteRenduByBeneficiaire(Beneficiaire $beneficiaire): array
+    {
+        return $this->createQueryBuilder('i')
+            ->leftJoin('i.compteRendu', 'cr')
+            ->addSelect('cr')
+            ->andWhere('i.beneficiaire = :beneficiaire')
+            ->andWhere('i.dateDebut < :now')
+            ->setParameter('beneficiaire', $beneficiaire)
+            ->setParameter('now', new \DateTime())
+            ->orderBy('i.dateDebut', 'DESC')
             ->getQuery()
             ->getResult();
     }
