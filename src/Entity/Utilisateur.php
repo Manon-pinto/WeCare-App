@@ -40,6 +40,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'utilisateur', targetEntity: Beneficiaire::class, cascade: ['persist', 'remove'])]
     private ?Beneficiaire $beneficiaire = null;
 
+    #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
+    private ?Entreprise $entreprise = null;
+
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Notification::class)]
     private Collection $notifications;
 
@@ -135,6 +138,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBeneficiaire(?Beneficiaire $beneficiaire): static
     {
         $this->beneficiaire = $beneficiaire;
+        return $this;
+    }
+
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): static
+    {
+        $this->entreprise = $entreprise;
         return $this;
     }
 
