@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% block stylesheets %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #F1FAF9;
+    --primary:    #0f004b;
+    --pink:       #ff91fd;
+    --teal:       #41a096;
+    --teal-mid:   #3fcdc0;
+    --teal-light: #c5ebe6;
+    --teal-pale:  #e0f7f5;
+    --text-dark:  #0c0052;
+    --text-body:  #3a357f;
+    --text-muted: #8a85b0;
+    --white:      #ffffff;
+    --border:     #e2ddf0;
+    --card-shadow:0 2px 12px rgba(65,160,150,0.13);
+    --radius:     12px;
+    --sidebar-w:  210px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text-body); display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w); display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    overflow: visible; background: var(--primary); border-radius: 0 40px 40px 0;
+  }
+  .sidebar-logo-wrap { padding: 28px 20px 20px; display: flex; align-items: center; justify-content: center; }
+  .sidebar-logo-wrap img { width: 120px; height: auto; }
+  .sidebar-nav { flex: 1; padding: 8px 0; overflow: visible; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+    color: rgba(255,255,255,0.6); font-size: 0.83rem; font-weight: 500;
+    cursor: pointer; border-radius: 30px; margin: 2px 10px;
+    text-decoration: none; transition: background 0.14s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item svg { opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active {
+    background: #CC75CA; color: #fff; font-weight: 700; border-radius: 30px;
+    margin-left: 14px; padding-left: 18px;
+    width: calc(100% - 14px + 28px); position: relative; z-index: 101;
+  }
+  .nav-item.active svg { opacity: 1; stroke: #fff; }
+  .nav-badge { background: var(--pink); color: var(--primary); border-radius: 20px; padding: 1px 7px; font-size: 0.65rem; font-weight: 800; margin-left: auto; }
+
+  .sidebar-user {
+    padding: 16px 18px; display: flex; align-items: center; gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.1); text-decoration: none;
+    transition: background 0.14s; border-radius: 0 0 40px 0;
+  }
+  .sidebar-user:hover { background: rgba(255,255,255,0.07); }
+  .sidebar-user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--teal-mid); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+  .sidebar-user-name { color: #fff; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-user-role { color: rgba(255,255,255,0.5); font-size: 0.68rem; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .page-content { padding: 28px 32px; flex: 1; }
+
+  /* Cards */
+  .card { background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: var(--card-shadow); }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 700; cursor: pointer; border: none; transition: opacity 0.15s; text-decoration: none; }
+  .btn:hover { opacity: 0.88; }
+  .btn-pink { background: var(--pink); color: var(--primary); }
+  .btn-teal { background: var(--teal-mid); color: #fff; }
+  .btn-outline { background: #fff; color: var(--text-dark); border: 1.5px solid var(--teal-mid); }
+</style>
+{% endblock %}
+
+<div class="sidebar">
+  <div class="sidebar-logo-wrap">
+    <img src="/images/Logo-fond-nuit.png" alt="WeCare">
+  </div>
+  <nav class="sidebar-nav">
+    {% set route = app.request.attributes.get('_route') %}
+    <a href="{{ path('beneficiaire_dashboard') }}" class="nav-item {{ route == 'beneficiaire_dashboard' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="{{ path('beneficiaire_planning') }}" class="nav-item {{ route == 'beneficiaire_planning' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Planning
+    </a>
+    <a href="{{ path('beneficiaire_comptes_rendus') }}" class="nav-item {{ route == 'beneficiaire_comptes_rendus' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Comptes rendu
+    </a>
+    <a href="{{ path('beneficiaire_soignants') }}" class="nav-item {{ route == 'beneficiaire_soignants' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Soignants
+    </a>
+    <a href="{{ path('beneficiaire_messages') }}" class="nav-item {{ route == 'beneficiaire_messages' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+      {% if nonLues is defined and nonLues > 0 %}<span class="nav-badge">{{ nonLues }}</span>{% endif %}
+    </a>
+    <a href="{{ path('beneficiaire_notifications') }}" class="nav-item {{ route == 'beneficiaire_notifications' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Notifications
+    </a>
+  </nav>
+  {% set u = app.user %}
+  {% set initiales = u ? u.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) : '?' %}
+  <a href="{{ path('beneficiaire_mon_compte') }}" class="sidebar-user">
+    <div class="sidebar-user-avatar">{{ initiales }}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="sidebar-user-name">{{ u ? u.nom : '' }}</div>
+      <div class="sidebar-user-role">Aidante</div>
+    </div>
+    <a href="{{ path('app_logout') }}" title="Déconnexion"
+       onclick="event.stopPropagation()"
+       style="color:rgba(255,255,255,0.4);display:flex;align-items:center;padding:4px;border-radius:6px;transition:color 0.14s;"
+       onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </a>
+  </a>
+</div>
+
+<main class="main">
+  <div class="page-content">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+{% endblock %}

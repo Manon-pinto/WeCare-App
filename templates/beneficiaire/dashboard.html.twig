@@ -1,0 +1,158 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Dashboard – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .dash-topbar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+  .dash-hello h1 { font-size:1.8rem; font-weight:800; color:var(--text-dark); }
+  .dash-hello p { font-size:0.85rem; color:var(--text-muted); margin-top:2px; }
+
+  .dash-grid { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
+  .dash-left { display:flex; flex-direction:column; gap:18px; }
+
+  /* Prochaine intervention */
+  .next-card {
+    background:var(--primary); border-radius:14px; padding:24px 28px;
+    display:flex; align-items:center; gap:20px; color:#fff;
+  }
+  .nc-avatar { width:64px; height:64px; border-radius:50%; background:var(--teal-mid); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .nc-label { font-size:0.7rem; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.5); text-transform:uppercase; margin-bottom:4px; }
+  .nc-name { font-size:1.2rem; font-weight:800; margin-bottom:4px; }
+  .nc-sub { font-size:0.82rem; color:rgba(255,255,255,0.7); margin-bottom:10px; }
+  .nc-badge { display:inline-flex; align-items:center; background:rgba(255,255,255,0.15); color:#fff; border-radius:20px; padding:4px 12px; font-size:0.72rem; font-weight:700; }
+  .nc-time { margin-left:auto; text-align:right; flex-shrink:0; }
+  .nc-time-range { font-size:1.6rem; font-weight:800; }
+  .nc-time-day { font-size:0.82rem; color:rgba(255,255,255,0.6); margin-top:2px; }
+
+  /* Notes */
+  .notes-card { background:#fff; border-radius:14px; padding:22px 24px; box-shadow:var(--card-shadow); }
+  .notes-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .notes-title { font-size:1.1rem; font-weight:800; color:var(--text-dark); }
+  .note-item { padding:16px 0; border-bottom:1px solid var(--border); }
+  .note-item:last-child { border-bottom:none; }
+  .note-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .note-type { font-size:0.85rem; font-weight:700; color:var(--text-dark); }
+  .note-date { font-size:0.75rem; color:var(--text-muted); }
+  .note-text { font-size:0.8rem; color:var(--text-muted); line-height:1.6; margin-bottom:8px; }
+  .note-author { display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--text-muted); }
+  .note-dot { width:12px; height:12px; border-radius:3px; background:var(--teal-light); flex-shrink:0; }
+
+  /* Semaine */
+  .semaine-card { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
+  .semaine-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:14px; }
+  .sem-row { display:flex; align-items:center; gap:10px; padding:7px 0; }
+  .sem-row + .sem-row { border-top:1px solid var(--border); }
+  .sem-day { font-size:0.78rem; font-weight:700; color:var(--text-muted); width:32px; flex-shrink:0; }
+  .sem-slots { display:flex; flex-direction:column; gap:3px; flex:1; }
+  .sem-slot { background:var(--teal-light); border-radius:6px; padding:4px 10px; font-size:0.72rem; font-weight:600; color:var(--text-dark); }
+  .sem-empty { font-size:0.72rem; color:var(--text-muted); }
+
+  /* Question */
+  .question-card { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
+  .question-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:8px; }
+  .question-text { font-size:0.78rem; color:var(--text-muted); line-height:1.6; margin-bottom:14px; }
+</style>
+
+<div class="dash-topbar">
+  <div class="dash-hello">
+    <h1>Bonjour {{ nom|split(' ')|first }}</h1>
+    <p>Voici le suivi de votre proche</p>
+  </div>
+</div>
+
+<div class="dash-grid">
+  <div class="dash-left">
+
+    {% if prochaine %}
+    {% set iv = prochaine.intervenant %}
+    {% set ini = iv.utilisateur.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+    <div class="next-card">
+      <div class="nc-avatar" style="font-size:1rem;font-weight:800;color:#fff">{{ ini }}</div>
+      <div>
+        <div class="nc-label">Prochain intervenant</div>
+        <div class="nc-name">{{ iv.utilisateur.nom }}</div>
+        <div class="nc-sub">S'occupe de "{{ prochaine.typeIntervention.value }}" de {{ nom|split(' ')|first }}.</div>
+        <span class="nc-badge">✓ Confirmé</span>
+      </div>
+      <div class="nc-time">
+        <div class="nc-time-range">{{ prochaine.dateDebut|date('H:i') }} – {{ prochaine.dateFin|date('H:i') }}</div>
+        <div class="nc-time-day">
+          {% if prochaine.dateDebut|date('Y-m-d') == "now"|date('Y-m-d') %}Aujourd'hui.
+          {% else %}{{ prochaine.dateDebut|date('d/m/Y') }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="next-card" style="justify-content:center;opacity:0.7">
+      <div style="text-align:center">
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)">Aucune intervention prévue prochainement</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="notes-card">
+      <div class="notes-header">
+        <div class="notes-title">Notes et observations</div>
+        <a href="{{ path('beneficiaire_comptes_rendus') }}" class="btn btn-pink" style="font-size:0.78rem;padding:7px 14px">Tout voir ↗</a>
+      </div>
+      {% set notesAffichees = 0 %}
+      {% for i in compteRendus %}
+        {% if i.compteRendu and notesAffichees < 3 %}
+          {% set notesAffichees = notesAffichees + 1 %}
+          {% set iv = i.intervenant %}
+          {% set ini = iv.utilisateur.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+          <div class="note-item">
+            <div class="note-top">
+              <div class="note-type">{{ i.typeIntervention.value }}</div>
+              <div class="note-date">
+                {% set d = i.dateDebut %}
+                {% if d|date('Y-m-d') == "now"|date('Y-m-d') %}Aujourd'hui {{ d|date('H:i') }}
+                {% elseif d|date('Y-m-d') == "yesterday"|date('Y-m-d') %}Hier {{ d|date('H:i') }}
+                {% else %}{{ d|date('l d/m') }} {{ d|date('H:i') }}{% endif %}
+              </div>
+            </div>
+            <div class="note-text">{{ i.compteRendu.contenu|default('–') }}</div>
+            <div class="note-author">
+              <div class="note-dot"></div>
+              {{ iv.utilisateur.nom }} · {{ iv.specialite }}
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div style="padding:16px 0;font-size:0.82rem;color:var(--text-muted)">Aucune note disponible pour le moment.</div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px;">
+
+    <div class="semaine-card">
+      <div class="semaine-title">Cette semaine</div>
+      {% for jour in joursSemaine %}
+        <div class="sem-row">
+          <div class="sem-day">{{ jour.label }}</div>
+          <div class="sem-slots">
+            {% if jour.interventions|length > 0 %}
+              {% for i in jour.interventions %}
+                <div class="sem-slot">
+                  {{ i.intervenant.utilisateur.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) }}. · {{ i.dateDebut|date('H:i') }}
+                </div>
+              {% endfor %}
+            {% else %}
+              <span class="sem-empty">Aucune visite</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="question-card">
+      <div class="question-title">Une question ?</div>
+      <div class="question-text">L'équipe WeCare est disponible pour répondre à vos questions du lundi au vendredi, de 8h à 18h.</div>
+      <a href="{{ path('beneficiaire_messages') }}" class="btn btn-pink" style="width:100%;justify-content:center">Contacter WeCare</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

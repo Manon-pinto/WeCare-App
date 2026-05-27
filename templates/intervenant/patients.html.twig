@@ -1,0 +1,88 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Mes patients – WeCare{% endblock %}
+{% block page_title %}Mes patients{% endblock %}
+
+{% block content %}
+<style>
+  .search-bar { display:flex; gap:10px; margin-bottom:18px; }
+  .search-bar input {
+    flex:1; padding:10px 16px;
+    border:1.5px solid var(--border); border-radius:var(--radius);
+    font-size:0.85rem; font-family:'Poppins',sans-serif;
+    color:var(--text-dark); background:#fff;
+  }
+  .search-bar input:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(65,160,150,0.15); }
+
+  .patient-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+
+  .patient-card {
+    background:#fff; border-radius:var(--radius);
+    padding:16px; box-shadow:var(--card-shadow);
+    cursor:pointer; text-decoration:none; color:var(--text-body);
+    display:block; transition:transform 0.12s, box-shadow 0.12s;
+    border-top:3px solid var(--teal-light);
+  }
+  .patient-card:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(65,160,150,0.2); }
+  .patient-card.eleve { border-top-color:#ef4444; }
+  .patient-card.moyen { border-top-color:#f59e0b; }
+  .patient-card.faible { border-top-color:var(--teal); }
+
+  .pc-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .pc-avatar { width:42px; height:42px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0; }
+  .pc-avatar.eleve { background:#ef4444; }
+  .pc-avatar.moyen { background:#f59e0b; }
+  .pc-nom { font-weight:700; font-size:0.9rem; color:var(--text-dark); }
+  .pc-patho { font-size:0.73rem; color:var(--text-muted); margin-top:2px; }
+
+  .pc-info { font-size:0.75rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px; }
+
+  .risk-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:0.68rem; font-weight:700; margin-top:10px; }
+  .risk-pill.eleve { background:#fee2e2; color:#991b1b; }
+  .risk-pill.moyen { background:#fef3c7; color:#92400e; }
+  .risk-pill.faible { background:var(--teal-light); color:var(--text-dark); }
+</style>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍 Rechercher un patient…" oninput="filter()">
+</div>
+
+<div id="wrap"><div class="loading"><div class="spinner"></div> Chargement…</div></div>
+
+<script>
+let all = [];
+
+const rc = r => ({ eleve:'eleve', moyen:'moyen', faible:'faible' })[(r||'').toLowerCase()] || 'faible';
+const init = n => (n||'?').split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2);
+
+function render(list) {
+  if (!list.length) return '<div class="empty"><div class="empty-icon">👤</div><div class="empty-title">Aucun patient trouvé</div></div>';
+  return '<div class="patient-grid">'+list.map(p=>`
+    <a class="patient-card ${rc(p.niveauRisque)}" href="/intervenant/patients/${p.id}">
+      <div class="pc-header">
+        <div class="pc-avatar ${rc(p.niveauRisque)}">${init(p.nom)}</div>
+        <div>
+          <div class="pc-nom">${p.nom||'–'}</div>
+          <div class="pc-patho">${p.pathologie||'Aucune pathologie'}</div>
+        </div>
+      </div>
+      <div class="pc-info">
+        ${p.adresse?`<span>📍 ${p.adresse}</span>`:''}
+        ${p.dateNaissance?`<span>🎂 ${p.dateNaissance}</span>`:''}
+        ${p.aidant?`<span>👨‍👩‍👦 Aidant : ${p.aidant}</span>`:''}
+      </div>
+      <div><span class="risk-pill ${rc(p.niveauRisque)}">⚡ Risque ${p.niveauRisque||'non défini'}</span></div>
+    </a>`).join('')+'</div>';
+}
+
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.getElementById('wrap').innerHTML = render(all.filter(p =>
+    (p.nom||'').toLowerCase().includes(q)||(p.pathologie||'').toLowerCase().includes(q)||(p.adresse||'').toLowerCase().includes(q)));
+}
+
+fetch('/api/intervenant/patients')
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(data=>{ all=data; document.getElementById('wrap').innerHTML=render(data); })
+  .catch(()=>{ document.getElementById('wrap').innerHTML='<div class="alert alert-danger">Impossible de charger les patients.</div>'; });
+</script>
+{% endblock %}

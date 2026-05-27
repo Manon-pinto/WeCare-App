@@ -30,6 +30,8 @@ class ProfilController extends AbstractController
             'telephone' => $intervenant->getTelephone(),
             'disponibilite' => $intervenant->isDisponibilite(),
             'rayonIntervention' => $intervenant->getRayonIntervention(),
+            'vehicule' => $intervenant->getVehicule(),
+            'membreDepuis' => $intervenant->getCreatedAt()?->format('d/m/Y'),
         ]);
     }
 
@@ -70,6 +72,9 @@ class ProfilController extends AbstractController
         }
         if (isset($data['rayonIntervention'])) {
             $intervenant->setRayonIntervention((float) $data['rayonIntervention']);
+        }
+        if (isset($data['vehicule'])) {
+            $intervenant->setVehicule($data['vehicule'] ?: null);
         }
 
         $em->flush();

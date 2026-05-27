@@ -17,18 +17,27 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            entry_point: form_login
+            form_login:
+                login_path: app_login
+                check_path: app_login
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: motDePasse
+                success_handler: App\Security\LoginSuccessHandler
             logout:
-                path: /api/logout
+                path: app_logout
+                target: app_login
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/intervenant, roles: ROLE_INTERVENANT }
         - { path: ^/api/beneficiaire, roles: ROLE_BENEFICIAIRE }
+        - { path: ^/intervenant, roles: ROLE_INTERVENANT }
+        - { path: ^/beneficiaire, roles: ROLE_BENEFICIAIRE }
 
 when@test:
     security:

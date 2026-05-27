@@ -1,0 +1,142 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Patient – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .pd-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .pd-back { display:inline-flex; align-items:center; gap:6px; background:var(--teal-light); color:var(--teal); padding:8px 16px; border-radius:10px; text-decoration:none; font-size:0.83rem; font-weight:600; }
+  .pd-back:hover { background:var(--teal-mid); color:#fff; }
+  .pd-banner { background:var(--primary); border-radius:14px; padding:20px 26px; display:flex; align-items:center; gap:20px; margin-bottom:20px; }
+  .pd-avatar { width:62px; height:62px; border-radius:50%; background:var(--teal-mid); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .pd-name { font-size:1.1rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+  .pd-sub { font-size:0.8rem; color:rgba(255,255,255,0.55); }
+  .pd-badge { background:rgba(255,145,253,0.18); color:var(--pink); padding:2px 10px; border-radius:20px; font-size:0.68rem; font-weight:700; }
+  .pd-right { margin-left:auto; text-align:right; }
+  .pd-right-label { font-size:0.72rem; color:rgba(255,255,255,0.5); }
+  .pd-right-val { font-size:0.95rem; font-weight:800; color:var(--teal-mid); margin-top:2px; }
+  .pd-tabs { display:flex; gap:0; border-bottom:1.5px solid var(--border); margin-bottom:20px; }
+  .pd-tab { padding:10px 24px; border:none; background:none; cursor:pointer; font-family:'Poppins',sans-serif; font-size:0.83rem; font-weight:500; color:var(--text-muted); border-bottom:2.5px solid transparent; margin-bottom:-1.5px; transition:all 0.14s; }
+  .pd-tab.active { color:var(--teal); border-bottom-color:var(--teal); font-weight:700; background:var(--teal-light); border-radius:8px 8px 0 0; }
+  .pd-panel { display:none; }
+  .pd-panel.active { display:block; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .ic { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
+  .ic-header { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--teal); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+  .ic-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.82rem; }
+  .ic-row:last-child { border-bottom:none; }
+  .ic-label { color:var(--text-muted); }
+  .ic-val { font-weight:700; color:var(--text-dark); text-align:right; max-width:58%; }
+  .notes-card { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
+  .tag-pills { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .tag-pill { padding:4px 12px; border-radius:20px; border:1px solid var(--border); font-size:0.75rem; color:var(--text-body); }
+  .soin-row { display:flex; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); font-size:0.83rem; gap:8px; }
+  .soin-row:last-child { border-bottom:none; }
+  .soin-date { font-weight:700; color:var(--text-dark); min-width:120px; }
+  .soin-type { flex:1; color:var(--text-body); }
+  .hist-item { padding:12px 0; border-bottom:1px solid var(--border); }
+  .hist-item:last-child { border-bottom:none; }
+  .doc-item { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); gap:12px; }
+  .doc-item:last-child { border-bottom:none; }
+  .doc-icon-box { width:36px; height:36px; border-radius:8px; background:var(--teal-light); flex-shrink:0; }
+  .doc-name { font-size:0.83rem; font-weight:700; color:var(--text-dark); }
+  .doc-sub { font-size:0.72rem; color:var(--text-muted); }
+</style>
+
+<div class="pd-topbar">
+  <a href="{{ path('intervenant_patients') }}" class="pd-back">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Patients
+  </a>
+  <button class="btn btn-pink" onclick="window.location.href='{{ path('intervenant_incidents') }}'">
+    Signaler un incident
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  </button>
+</div>
+
+<div id="pd-loading" class="loading"><div class="spinner"></div></div>
+
+<div id="pd-content" style="display:none">
+  <div class="pd-banner">
+    <div class="pd-avatar">
+      <svg width="36" height="36" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="14" r="8" fill="rgba(255,255,255,0.35)"/><path d="M4 36c0-8.837 7.163-14 16-14s16 5.163 16 14" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/></svg>
+    </div>
+    <div>
+      <div class="pd-name"><span id="pd-nom">–</span><span class="pd-badge" id="pd-niveau">–</span></div>
+      <div class="pd-sub" id="pd-info">–</div>
+    </div>
+    <div class="pd-right">
+      <div class="pd-right-label">Aujourd'hui</div>
+      <div class="pd-right-val" id="pd-attn">–</div>
+    </div>
+  </div>
+
+  <div class="pd-tabs">
+    <button class="pd-tab active" onclick="switchTab('infos',this)">Informations</button>
+    <button class="pd-tab" onclick="switchTab('soins',this)">Soins &amp; historique</button>
+    <button class="pd-tab" onclick="switchTab('docs',this)">Documents</button>
+  </div>
+
+  <div id="panel-infos" class="pd-panel active">
+    <div class="info-grid">
+      <div class="ic"><div class="ic-header">👤 Information personnel</div><div id="info-perso"></div></div>
+      <div class="ic"><div class="ic-header">⚕ Information médical</div><div id="info-med"></div></div>
+    </div>
+    <div class="notes-card">
+      <div class="ic-header">📋 Notes et observations</div>
+      <div class="tag-pills" id="notes-tags"></div>
+      <div style="font-size:0.82rem;color:var(--teal);margin-bottom:8px" id="notes-text"></div>
+      <div style="font-size:0.78rem;color:var(--text-body);display:flex;gap:6px" id="notes-warn"></div>
+    </div>
+  </div>
+
+  <div id="panel-soins" class="pd-panel">
+    <div class="ic" style="margin-bottom:16px">
+      <div class="ic-header" style="justify-content:space-between">
+        <span>📅 Soins planifiés</span>
+      </div>
+      <div id="soins-planifies"></div>
+    </div>
+    <div class="ic">
+      <div class="ic-header" style="justify-content:space-between">
+        <span>📅 Historique des soins</span>
+        <button class="btn btn-pink btn-sm" onclick="window.location.href='{{ path('intervenant_comptes_rendus') }}'">+ Nouveau CR</button>
+      </div>
+      <div id="soins-historique"></div>
+    </div>
+  </div>
+
+  <div id="panel-docs" class="pd-panel">
+    <div class="ic">
+      <div class="ic-header">📁 Documents médicaux</div>
+      <div id="docs-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const patientId = {{ patientId }};
+function switchTab(n,btn){ document.querySelectorAll('.pd-tab').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.pd-panel').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('panel-'+n).classList.add('active'); }
+function irow(l,v){ return `<div class="ic-row"><span class="ic-label">${l}</span><span class="ic-val">${v||'–'}</span></div>`; }
+
+fetch(`/api/intervenant/patients/${patientId}`).then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+  document.getElementById('pd-loading').style.display='none';
+  document.getElementById('pd-content').style.display='block';
+  document.getElementById('pd-nom').textContent=data.nom||'–';
+  document.getElementById('pd-niveau').textContent=data.niveauRisque||'–';
+  document.getElementById('pd-info').textContent=(data.note||'vous attend')+' · '+(data.adresse||'');
+  document.getElementById('pd-attn').textContent=(data.pointsAttention?.length||0)+' point'+(data.pointsAttention?.length!==1?'s':'')+' d\'attention';
+  document.getElementById('info-perso').innerHTML=[irow('Nom complet',data.nom),irow('Âge',data.age?data.age+' ans':'–'),irow('Adresse',data.adresse),irow('Médecin',data.medecin),irow('Aidant(e)',data.aidant)].join('');
+  document.getElementById('info-med').innerHTML=[irow('Allergies',data.allergies||'Aucune connue'),irow('Antécédents',data.antecedents),irow('Traitement',data.traitement),irow('Niveau',`<span style="background:var(--teal-light);color:var(--teal);padding:2px 10px;border-radius:20px;font-size:0.68rem;font-weight:700">${data.niveauRisque||'–'}</span>`)].join('');
+  const tags=data.services||[];
+  document.getElementById('notes-tags').innerHTML=tags.map(t=>`<span class="tag-pill">${t}</span>`).join('');
+  document.getElementById('notes-text').textContent=data.notes||'';
+  if(data.pointsAttention?.length) document.getElementById('notes-warn').innerHTML=`⚠ Point d'attention : ${data.pointsAttention[0]?.description||''}`;
+  const sp=data.soinsPlanifies||[];
+  document.getElementById('soins-planifies').innerHTML=sp.length?sp.map(s=>`<div class="soin-row"><span class="soin-date">${s.date||'–'}</span><span class="soin-type">${s.type||'–'}</span><span style="background:var(--teal-light);color:var(--teal);padding:3px 10px;border-radius:20px;font-size:0.68rem;font-weight:700">Prévu</span></div>`).join(''):'<div style="padding:12px 0;color:var(--text-muted);font-size:0.82rem">Aucun soin planifié</div>';
+  const sh=data.historique||[];
+  document.getElementById('soins-historique').innerHTML=sh.length?sh.map(h=>`<div class="hist-item"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="background:var(--teal-light);color:#0d6560;padding:2px 10px;border-radius:20px;font-size:0.68rem;font-weight:700;border:1px solid var(--teal-mid)">Rédigé</span><span style="font-size:0.75rem;color:var(--text-muted);margin-left:auto">${h.date||'–'}</span></div><div style="font-size:0.83rem;font-weight:700;color:var(--text-dark)">${h.type||'–'}</div><div style="font-size:0.78rem;color:var(--text-muted)">${h.contenu||''}</div></div>`).join(''):'<div style="padding:12px 0;color:var(--text-muted);font-size:0.82rem">Aucun historique</div>';
+  const docs=data.documents||[];
+  document.getElementById('docs-list').innerHTML=docs.length?docs.map(d=>`<div class="doc-item"><div class="doc-icon-box"></div><div><div class="doc-name">${d.nom||'–'}</div><div class="doc-sub">${d.medecin?d.medecin+' · ':''}${d.date||''} · ${d.type||'PDF'}</div></div><div style="margin-left:auto;cursor:pointer;color:var(--text-muted)">⬇</div></div>`).join(''):'<div style="padding:12px 0;color:var(--text-muted);font-size:0.82rem">Aucun document</div>';
+}).catch(()=>{ document.getElementById('pd-loading').innerHTML='<div class="alert alert-danger">Impossible de charger le patient.</div>'; });
+</script>
+{% endblock %}

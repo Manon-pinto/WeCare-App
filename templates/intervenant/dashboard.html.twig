@@ -1,0 +1,156 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Dashboard – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .dash-topbar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; }
+  .dash-greeting h1 { font-size:1.6rem; font-weight:800; color:var(--text-dark); }
+  .dash-greeting p { font-size:0.85rem; color:var(--text-dark); margin-top:2px; }
+  .dash-wrap { display:grid; grid-template-columns:1fr 272px; gap:22px; align-items:start; }
+
+  .next-visit { background:var(--primary); border-radius:14px; padding:20px 24px; display:flex; align-items:center; gap:18px; margin-bottom:18px; }
+  .nv-avatar { width:56px; height:56px; border-radius:50%; background:var(--teal-mid); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .nv-label { font-size:0.62rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.1em; font-weight:600; margin-bottom:4px; }
+  .nv-name { font-size:1.1rem; font-weight:800; color:#fff; }
+  .nv-sub { font-size:0.76rem; color:rgba(255,255,255,0.58); margin-top:2px; }
+  .nv-time { margin-left:auto; text-align:right; flex-shrink:0; }
+  .nv-time-range { font-size:1.25rem; font-weight:800; color:#fff; }
+
+  .dash-cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .dc { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
+  .dc-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:12px; padding-bottom:10px; border-bottom:1.5px solid var(--border); }
+
+  .stat-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.83rem; }
+  .stat-row:last-child { border-bottom:none; }
+  .stat-label { color:var(--text-body); }
+  .stat-val { font-weight:700; color:var(--text-dark); }
+  .stat-val.teal-link { color:var(--teal); text-decoration:underline; cursor:pointer; font-weight:600; }
+
+  .attn-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .attn-item:last-child { border-bottom:none; }
+  .attn-name { font-size:0.82rem; font-weight:700; color:var(--text-dark); margin-bottom:2px; }
+  .attn-desc { font-size:0.76rem; color:var(--text-muted); line-height:1.4; }
+
+  .patients-card { background:#fff; border-radius:14px; padding:18px 20px; box-shadow:var(--card-shadow); }
+  .pc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .pc-title { font-size:1rem; font-weight:800; color:var(--text-dark); }
+  .pat-item { padding:9px 0; border-bottom:1px solid var(--border); }
+  .pat-item:last-child { border-bottom:none; }
+  .pat-name { font-size:0.82rem; font-weight:700; color:var(--text-dark); }
+  .pat-sub { font-size:0.72rem; color:var(--text-muted); }
+</style>
+
+{% set jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'] %}
+{% set mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] %}
+{% set now = "now"|date("N") %}
+
+<div class="dash-topbar">
+  <div class="dash-greeting">
+    <h1>Bonjour {{ nom|split(' ')|first }}</h1>
+    <p><strong>{{ "now"|date("l d F Y") }}</strong> · Vous avez {{ total }} visite{{ total != 1 ? 's' : '' }} aujourd'hui</p>
+  </div>
+  <button class="btn btn-pink" onclick="window.location.href='{{ path('intervenant_incidents') }}'">
+    Signaler un incident
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  </button>
+</div>
+
+<div class="dash-wrap">
+  <div>
+    {% if prochaine %}
+    <div class="next-visit" id="nv-{{ prochaine.id }}">
+      <div class="nv-avatar">
+        <svg width="34" height="34" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="14" r="8" fill="rgba(255,255,255,0.35)"/><path d="M4 36c0-8.837 7.163-14 16-14s16 5.163 16 14" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/></svg>
+      </div>
+      <div>
+        <div class="nv-label">Prochaine visite</div>
+        <div class="nv-name">{{ prochaine.beneficiaire.utilisateur.nom }}</div>
+        <div class="nv-sub">{{ prochaine.typeIntervention.value }}</div>
+        <div class="nv-sub">{{ prochaine.beneficiaire.adresse }}</div>
+      </div>
+      <div class="nv-time">
+        <div class="nv-time-range">{{ prochaine.dateDebut|date('H:i') }} – {{ prochaine.dateFin|date('H:i') }}</div>
+        <button onclick="terminerVisite({{ prochaine.id }}, this)" style="margin-top:8px;background:#fff;color:var(--primary);border:none;border-radius:20px;padding:6px 14px;font-size:0.75rem;font-weight:700;cursor:pointer">✓ Terminer</button>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="dash-cards">
+      <div class="dc">
+        <div class="dc-title">Ma journée</div>
+        <div class="stat-row"><span class="stat-label">Visites effectuées</span><span class="stat-val">{{ effectuees }} / {{ total }}</span></div>
+        <div class="stat-row"><span class="stat-label">Distance totale</span><span class="stat-val">~18 km</span></div>
+        <div class="stat-row"><span class="stat-label">CR à rédiger</span><span class="stat-val teal-link" onclick="location.href='{{ path('intervenant_comptes_rendus') }}'">{{ crARediger }} restants</span></div>
+        <div class="stat-row"><span class="stat-label">Fin de tournée</span><span class="stat-val">{{ derniere ? derniere.dateFin|date('H:i') : '–' }}</span></div>
+      </div>
+      <div class="dc">
+        <div class="dc-title">Points d'attention</div>
+        {% if pointsAttention is empty %}
+          <div style="padding:16px 0;font-size:0.82rem;color:var(--text-muted)">Aucun point d'attention</div>
+        {% else %}
+          {% for p in pointsAttention %}
+          <div class="attn-item">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--pink);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0">
+              {{ p.beneficiaire.utilisateur.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) }}
+            </div>
+            <div>
+              <div class="attn-name">{{ p.beneficiaire.utilisateur.nom }}</div>
+              <div class="attn-desc">{{ p.typeIntervention.value }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="patients-card">
+    <div class="pc-header">
+      <div class="pc-title">Mes patients</div>
+      <a href="{{ path('intervenant_patients') }}" style="color:var(--text-muted)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+    {% if patients is empty %}
+      <div style="color:var(--text-muted);font-size:0.82rem;padding:10px 0">Aucun patient aujourd'hui</div>
+    {% else %}
+      {% for i in patients %}
+      <div class="pat-item" id="pat-{{ i.id }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div>
+          <div class="pat-name">{{ i.beneficiaire.utilisateur.nom }}</div>
+          <div class="pat-sub">{{ i.typeIntervention.value }}</div>
+          <div class="pat-sub">{{ i.beneficiaire.adresse }}</div>
+        </div>
+        {% if i.statut.value == 'terminee' %}
+          <span style="font-size:0.72rem;font-weight:700;color:var(--teal);white-space:nowrap">✓ Terminé</span>
+        {% else %}
+          <button onclick="terminerVisite({{ i.id }}, this)" style="background:var(--teal-light);color:var(--teal);border:none;border-radius:20px;padding:5px 12px;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap">✓ Terminer</button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+let effectuees = {{ effectuees }};
+const total = {{ total }};
+
+async function terminerVisite(id, btn) {
+  btn.disabled = true;
+  btn.textContent = '…';
+  const r = await fetch(`/api/intervenant/interventions/${id}/terminer`, {method:'PATCH'}).catch(()=>null);
+  if (!r || !r.ok) { btn.disabled = false; btn.textContent = '✓ Terminer'; return; }
+
+  effectuees++;
+  btn.replaceWith(Object.assign(document.createElement('span'), {
+    textContent: '✓ Terminé',
+    style: 'font-size:0.72rem;font-weight:700;color:var(--teal);white-space:nowrap'
+  }));
+
+  document.querySelectorAll('.stat-val').forEach(el => {
+    if (el.textContent.includes('/')) el.textContent = `${effectuees} / ${total}`;
+  });
+}
+</script>
+{% endblock %}

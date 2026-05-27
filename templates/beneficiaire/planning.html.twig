@@ -1,0 +1,369 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+
+{% block content %}
+<style>
+  /* ── Page layout ── */
+  .planning-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .planning-title { font-size: 1.6rem; font-weight: 800; color: var(--text-dark); }
+
+  .week-nav {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border-radius: 30px; padding: 6px 14px;
+    box-shadow: 0 2px 8px rgba(65,160,150,0.12);
+  }
+  .week-nav button {
+    background: none; border: none; cursor: pointer; color: var(--teal);
+    display: flex; align-items: center; padding: 2px 4px; border-radius: 6px;
+    transition: background 0.12s;
+  }
+  .week-nav button:hover { background: var(--teal-pale); }
+  .week-label { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); min-width: 180px; text-align: center; }
+
+  /* ── Calendar card ── */
+  .calendar-card {
+    background: #fff; border-radius: 18px; box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  /* ── Header row ── */
+  .cal-head {
+    display: grid; grid-template-columns: 48px repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-head-cell {
+    padding: 12px 6px 0; text-align: center;
+    border-left: 1px solid var(--border);
+  }
+  .cal-head-cell:first-child { border-left: none; }
+  .day-name { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); text-transform: capitalize; }
+  .day-num  { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); line-height: 1.1; }
+  .day-num.today-num {
+    background: var(--teal-mid); color: #fff;
+    border-radius: 50%; width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* Badge visites */
+  .visits-badge {
+    margin: 6px auto 0; display: block;
+    background: var(--teal-mid); color: #fff;
+    font-size: 0.65rem; font-weight: 700; border-radius: 4px;
+    padding: 3px 0; text-align: center;
+  }
+  .visits-badge.empty { background: #b8e8e3; color: var(--teal); }
+
+  /* ── Grid body ── */
+  .cal-body {
+    display: grid; grid-template-columns: 48px repeat(7, 1fr);
+    position: relative; overflow-y: auto; max-height: 520px;
+  }
+
+  /* Hour column */
+  .hour-col { position: relative; }
+  .hour-label {
+    height: 60px; display: flex; align-items: flex-start; justify-content: flex-end;
+    padding: 4px 8px 0 0; font-size: 0.68rem; color: var(--text-muted); font-weight: 500;
+  }
+
+  /* Day column */
+  .day-col {
+    border-left: 1px solid var(--border); position: relative;
+  }
+  .day-col.today-col { background: #e8f7fc; }
+  .day-col.weekend-col { background: #f0faf9; }
+
+  /* Hour rows inside day col */
+  .hour-slot { height: 60px; border-top: 1px dashed #e2ddf0; }
+
+  /* Now line */
+  .now-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: #3fcdc0; z-index: 5; pointer-events: none;
+  }
+  .now-dot {
+    width: 8px; height: 8px; background: #3fcdc0; border-radius: 50%;
+    position: absolute; left: -4px; top: -3px;
+  }
+
+  /* Event cards */
+  .cal-event {
+    position: absolute; left: 4px; right: 4px; border-radius: 8px;
+    padding: 4px 7px; z-index: 3; overflow: hidden; cursor: pointer;
+    transition: opacity 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+  .cal-event:hover { opacity: 0.88; }
+  .cal-event.type-toilette, .cal-event.type-soin { background: #3fcdc0; color: #fff; }
+  .cal-event.type-menage  { background: #b8e8e3; color: var(--teal); }
+  .cal-event.type-repas   { background: #c5ebe6; color: var(--teal); }
+  .cal-event.type-accompagnement { background: #a8d8ea; color: #1a5f7a; }
+  .cal-event.type-default { background: var(--teal-light); color: var(--teal); }
+  .event-type { font-size: 0.67rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .event-name { font-size: 0.63rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 18px; padding: 28px 32px;
+    max-width: 380px; width: 90%; box-shadow: 0 8px 40px rgba(15,0,75,0.18);
+  }
+  .modal-box h2 { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 16px; }
+  .modal-box textarea {
+    width: 100%; min-height: 100px; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; font-family: inherit; font-size: 0.83rem; resize: vertical;
+    outline: none;
+  }
+  .modal-box textarea:focus { border-color: var(--teal-mid); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+  .modal-cancel { background: #f3f3f8; color: var(--text-body); border: none; border-radius: 10px; padding: 9px 18px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
+  .modal-send { background: var(--pink); color: var(--primary); border: none; border-radius: 10px; padding: 9px 18px; font-family: inherit; font-size: 0.83rem; font-weight: 700; cursor: pointer; }
+</style>
+
+<div class="planning-header">
+  <h1 class="planning-title">Planning</h1>
+  <div class="week-nav">
+    <button id="prevWeek" title="Semaine précédente">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="week-label" id="weekLabel">…</span>
+    <button id="nextWeek" title="Semaine suivante">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+  <button class="btn btn-pink" id="openModifModal">Demander une modification</button>
+</div>
+
+<div class="calendar-card">
+  <div class="cal-head" id="calHead">
+    <div class="cal-head-cell"></div><!-- heure -->
+  </div>
+  <div class="cal-body" id="calBody">
+    <!-- hour column -->
+    <div class="hour-col" id="hourCol"></div>
+  </div>
+</div>
+
+<!-- Modal modification -->
+<div class="modal-overlay" id="modifModal">
+  <div class="modal-box">
+    <h2>Demander une modification</h2>
+    <textarea id="modifMsg" placeholder="Décrivez votre demande…"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="closeModifModal">Annuler</button>
+      <button class="modal-send" id="sendModif">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const HOUR_START = 7, HOUR_END = 20, HOUR_H = 60;
+
+  const FR_DAYS  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const FR_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const FR_MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+  // Monday of current week
+  function getMondayOf(d) {
+    const date = new Date(d);
+    const day  = date.getDay();
+    const diff = (day === 0 ? -6 : 1 - day);
+    date.setDate(date.getDate() + diff);
+    date.setHours(0,0,0,0);
+    return date;
+  }
+
+  function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+  }
+
+  function toISO(d) {
+    return d.toISOString().split('T')[0];
+  }
+
+  function fmtLabel(d) {
+    return d.getDate() + ' ' + FR_MONTHS[d.getMonth()];
+  }
+
+  function typeClass(type) {
+    if (!type) return 'type-default';
+    const t = type.toLowerCase();
+    if (t.includes('toilette') || t.includes('soin')) return 'type-toilette';
+    if (t.includes('ménage') || t.includes('menage') || t.includes('course')) return 'type-menage';
+    if (t.includes('repas')) return 'type-repas';
+    if (t.includes('accompagnement')) return 'type-accompagnement';
+    return 'type-default';
+  }
+
+  function typeLabel(type) {
+    if (!type) return 'Visite';
+    const map = {
+      toilette: 'Soin du matin',
+      soin: 'Soin du matin',
+      menage: 'Ménage',
+      ménage: 'Ménage',
+      courses: 'Courses',
+      repas: 'Repas',
+      accompagnement: 'Accompagnement',
+    };
+    const key = type.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    for (const [k, v] of Object.entries(map)) {
+      const kn = k.normalize('NFD').replace(/[̀-ͯ]/g,'');
+      if (key.includes(kn)) return v;
+    }
+    return type;
+  }
+
+  let currentMonday = getMondayOf(new Date());
+
+  async function loadWeek(monday) {
+    const iso = toISO(monday);
+    const resp = await fetch('/api/beneficiaire/planning?semaine=' + iso);
+    if (!resp.ok) return null;
+    return resp.json();
+  }
+
+  function buildHours() {
+    const col = document.getElementById('hourCol');
+    col.innerHTML = '';
+    for (let h = HOUR_START; h <= HOUR_END; h++) {
+      const d = document.createElement('div');
+      d.className = 'hour-label';
+      d.textContent = h + 'h';
+      col.appendChild(d);
+    }
+  }
+
+  function timeToOffset(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return ((h - HOUR_START) * 60 + m) * (HOUR_H / 60);
+  }
+
+  function render(monday, data) {
+    const sunday = addDays(monday, 6);
+    document.getElementById('weekLabel').textContent =
+      fmtLabel(monday) + ' – ' + fmtLabel(sunday) + ' ' + sunday.getFullYear();
+
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // HEAD
+    const head = document.getElementById('calHead');
+    head.innerHTML = '<div class="cal-head-cell"></div>';
+
+    // BODY — clear day cols (keep hour col)
+    const body = document.getElementById('calBody');
+    // remove old day cols
+    [...body.querySelectorAll('.day-col')].forEach(el => el.remove());
+    [...body.querySelectorAll('.now-line')].forEach(el => el.remove());
+
+    const jours = data.jours || [];
+
+    jours.forEach((jour, idx) => {
+      const date = new Date(jour.date + 'T00:00:00');
+      const isToday = date.getTime() === today.getTime();
+      const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      const count = jour.interventions.length;
+
+      // head cell
+      const hc = document.createElement('div');
+      hc.className = 'cal-head-cell';
+      const dayName = FR_DAYS[date.getDay()];
+      hc.innerHTML = `<div class="day-name">${dayName}</div>
+        <div class="day-num ${isToday ? 'today-num' : ''}">${date.getDate()}</div>
+        <div class="visits-badge ${count === 0 ? 'empty' : ''}">${count > 0 ? count + ' visite' + (count > 1 ? 's' : '') : '–'}</div>`;
+      head.appendChild(hc);
+
+      // body col
+      const col = document.createElement('div');
+      col.className = 'day-col' + (isToday ? ' today-col' : '') + (isWeekend ? ' weekend-col' : '');
+      const totalH = (HOUR_END - HOUR_START + 1) * HOUR_H;
+      col.style.height = totalH + 'px';
+
+      // hour slots
+      for (let h = HOUR_START; h <= HOUR_END; h++) {
+        const slot = document.createElement('div');
+        slot.className = 'hour-slot';
+        col.appendChild(slot);
+      }
+
+      // events
+      jour.interventions.forEach(iv => {
+        const top    = timeToOffset(iv.dateDebut);
+        const bottom = timeToOffset(iv.dateFin);
+        const height = Math.max(bottom - top, 30);
+
+        const ev = document.createElement('div');
+        ev.className = 'cal-event ' + typeClass(iv.type);
+        ev.style.top    = top + 'px';
+        ev.style.height = height + 'px';
+        ev.innerHTML = `<div class="event-type">${typeLabel(iv.type)}</div>
+          <div class="event-name">${iv.intervenant?.nom || ''}</div>`;
+        col.appendChild(ev);
+      });
+
+      // now line inside today col
+      if (isToday) {
+        const now = new Date();
+        const nowOffset = ((now.getHours() - HOUR_START) * 60 + now.getMinutes()) * (HOUR_H / 60);
+        if (nowOffset >= 0 && nowOffset <= totalH) {
+          const line = document.createElement('div');
+          line.className = 'now-line';
+          line.style.top = nowOffset + 'px';
+          line.innerHTML = '<div class="now-dot"></div>';
+          col.appendChild(line);
+        }
+      }
+
+      body.appendChild(col);
+    });
+
+    buildHours();
+  }
+
+  async function loadAndRender(monday) {
+    document.getElementById('weekLabel').textContent = '…';
+    const data = await loadWeek(monday);
+    if (data) render(monday, data);
+  }
+
+  document.getElementById('prevWeek').addEventListener('click', () => {
+    currentMonday = addDays(currentMonday, -7);
+    loadAndRender(currentMonday);
+  });
+  document.getElementById('nextWeek').addEventListener('click', () => {
+    currentMonday = addDays(currentMonday, 7);
+    loadAndRender(currentMonday);
+  });
+
+  // Modal
+  const modal = document.getElementById('modifModal');
+  document.getElementById('openModifModal').addEventListener('click', () => modal.classList.add('open'));
+  document.getElementById('closeModifModal').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  document.getElementById('sendModif').addEventListener('click', async () => {
+    const msg = document.getElementById('modifMsg').value.trim();
+    if (!msg) return;
+    const resp = await fetch('/api/beneficiaire/planning/demande-modification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg }),
+    });
+    if (resp.ok) {
+      modal.classList.remove('open');
+      document.getElementById('modifMsg').value = '';
+    }
+  });
+
+  loadAndRender(currentMonday);
+})();
+</script>
+{% endblock %}

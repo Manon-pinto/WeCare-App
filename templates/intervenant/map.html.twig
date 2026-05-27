@@ -1,0 +1,156 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Ma tournée – WeCare{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+<style>
+  .map-topbar { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .map-topbar-title { font-size:1.1rem; font-weight:800; color:var(--text-dark); display:flex; align-items:center; gap:8px; }
+  .map-topbar-title span { font-size:0.85rem; font-weight:500; color:var(--text-muted); }
+  .map-day-nav { display:flex; align-items:center; background:#fff; border-radius:20px; padding:4px 12px; box-shadow:var(--card-shadow); gap:4px; }
+  .map-day-btn { background:none; border:none; cursor:pointer; color:var(--teal); font-size:1rem; padding:0 6px; line-height:1; }
+  .map-day-label { font-size:0.85rem; font-weight:700; color:var(--text-dark); padding:0 6px; white-space:nowrap; }
+
+  .map-wrap { display:grid; grid-template-columns:1fr 290px; gap:20px; align-items:start; }
+  #map-canvas { height:calc(100vh - 200px); border-radius:14px; box-shadow:var(--card-shadow); overflow:hidden; }
+
+  .map-panel { background:#fff; border-radius:14px; box-shadow:var(--card-shadow); padding:20px; max-height:calc(100vh - 200px); overflow-y:auto; }
+  .mp-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:2px; }
+  .mp-sub { font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+  .mp-count { font-size:0.78rem; color:var(--text-muted); font-weight:600; margin-bottom:10px; }
+  .mp-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+  .mp-item:last-child { border-bottom:none; }
+  .mp-avatar { width:36px; height:36px; border-radius:50%; background:var(--teal-mid); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; flex-shrink:0; }
+  .mp-name { font-size:0.83rem; font-weight:700; color:var(--text-dark); margin-bottom:1px; }
+  .mp-info { font-size:0.72rem; color:var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set derniere = interventions|last %}
+{% set ini = interventions|length %}
+
+<div class="map-topbar">
+  <div class="map-topbar-title">
+    <svg width="16" height="16" fill="none" stroke="var(--teal)" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+    Ma tournée <span id="map-nb-visites">{{ interventions|length }} visite{{ interventions|length != 1 ? 's' : '' }}</span>
+  </div>
+  <div class="map-day-nav">
+    <button class="map-day-btn" onclick="changeDay(-1)">‹</button>
+    <span class="map-day-label" id="map-date-label">{{ "now"|date("d/m/Y") }}</span>
+    <button class="map-day-btn" onclick="changeDay(1)">›</button>
+  </div>
+</div>
+
+<div class="map-wrap">
+  <div id="map-canvas"></div>
+
+  <div class="map-panel">
+    <div class="mp-title">Tournée du jour</div>
+    <div class="mp-sub" id="mp-sub">~18 km · fin estimée {{ derniere ? derniere.dateFin|date('H:i') : '–' }}</div>
+    <div class="mp-count" id="mp-count">{{ interventions|length }} Aujourd'hui</div>
+    <div id="mp-list">
+      {% if interventions is empty %}
+        <div style="color:var(--text-muted);font-size:0.82rem;padding:10px 0">Aucune intervention aujourd'hui</div>
+      {% else %}
+        {% for i in interventions %}
+          {% set nom = i.beneficiaire.utilisateur.nom %}
+          {% set av = nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+          <div class="mp-item">
+            <div class="mp-avatar">{{ av }}</div>
+            <div style="flex:1">
+              <div class="mp-name">{{ nom }}</div>
+              <div class="mp-info">{{ i.typeIntervention.value }}</div>
+              <div class="mp-info">{{ i.dateDebut|date('H:i') }} – {{ i.dateFin|date('H:i') }} · {{ i.beneficiaire.adresse|split(',')|first }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script src="/vendor/leaflet/leaflet.js"></script>
+<script>
+const [cy,cm,cd] = '{{ "now"|date("Y-m-d") }}'.split('-').map(Number);
+let currentMapDate = new Date(cy, cm-1, cd);
+let lmap, markers=[], polyline=null;
+
+function fmtISO(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtFR(d){ return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; }
+function ini(n){ return (n||'?').split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2); }
+
+lmap = L.map('map-canvas').setView([44.837,-0.579],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(lmap);
+setTimeout(()=>lmap.invalidateSize(),300);
+
+const initData = {{ interventions|map(i => {
+  'nom': i.beneficiaire.utilisateur.nom,
+  'adresse': i.beneficiaire.adresse,
+  'lat': i.beneficiaire.latitude,
+  'lng': i.beneficiaire.longitude,
+  'debut': i.dateDebut|date('H:i'),
+  'fin': i.dateFin|date('H:i')
+})|json_encode|raw }};
+
+updateMap(initData);
+
+function updateMap(data){
+  markers.forEach(m=>m.remove()); markers=[];
+  if(polyline){polyline.remove();polyline=null;}
+  const coords=[];
+  data.forEach(i=>{
+    const lat=parseFloat(i.lat),lng=parseFloat(i.lng);
+    if(!lat||!lng) return;
+    coords.push([lat,lng]);
+    const m=L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#ff91fd;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>',iconSize:[16,16],iconAnchor:[8,8]})})
+      .bindPopup(`<b>${i.nom}</b><br>${i.debut} – ${i.fin}<br>${i.adresse}`).addTo(lmap);
+    markers.push(m);
+  });
+  if(coords.length>1){polyline=L.polyline(coords,{color:'#3fcdc0',weight:2,dashArray:'8,6',opacity:0.8}).addTo(lmap);lmap.fitBounds(polyline.getBounds(),{padding:[40,40]});}
+  else if(coords.length===1){lmap.setView(coords[0],14);}
+}
+
+function updatePanel(ints){
+  const derniere=ints.length?ints[ints.length-1]:null;
+  document.getElementById('mp-sub').textContent=`~18 km · fin estimée ${derniere?.dateFin||'–'}`;
+  document.getElementById('mp-count').textContent=`${ints.length} ce jour`;
+  document.getElementById('mp-nb-visites') && (document.getElementById('map-nb-visites').textContent=`${ints.length} visite${ints.length!==1?'s':''}`);
+  document.getElementById('mp-list').innerHTML=ints.length?ints.map(i=>`
+    <div class="mp-item">
+      <div class="mp-avatar">${ini(i.beneficiaire?.nom||'')}</div>
+      <div style="flex:1">
+        <div class="mp-name">${i.beneficiaire?.nom||'–'}</div>
+        <div class="mp-info">${i.type||'–'}</div>
+        <div class="mp-info">${i.dateDebut||'–'} – ${i.dateFin||'–'} · ${(i.beneficiaire?.adresse||'').split(',')[0]}</div>
+      </div>
+    </div>`).join(''):'<div style="color:var(--text-muted);font-size:0.82rem;padding:10px 0">Aucune intervention ce jour</div>';
+}
+
+function changeDay(delta){
+  currentMapDate.setDate(currentMapDate.getDate()+delta);
+  document.getElementById('map-date-label').textContent=fmtFR(currentMapDate);
+  document.getElementById('map-nb-visites').textContent='...';
+  const iso=fmtISO(currentMapDate);
+  fetch(`/api/intervenant/planning?semaine=${iso}`)
+    .then(r=>{
+      if(!r.ok) return r.text().then(t=>{throw new Error(r.status+': '+t.slice(0,200));});
+      return r.json();
+    })
+    .then(data=>{
+      const jours=data.jours||[];
+      const jour=jours.find(j=>j.date===iso);
+      const ints=jour?jour.interventions:[];
+      document.getElementById('map-nb-visites').textContent=`${ints.length} visite${ints.length!==1?'s':''}`;
+      updatePanel(ints);
+      updateMap(ints.map(i=>({nom:i.beneficiaire?.nom||'',adresse:i.beneficiaire?.adresse||'',lat:i.beneficiaire?.latitude,lng:i.beneficiaire?.longitude,debut:i.dateDebut,fin:i.dateFin})));
+    }).catch(e=>{
+      console.error('Map planning error:', e);
+      document.getElementById('map-nb-visites').textContent='0 visite';
+      updatePanel([]);
+      updateMap([]);
+    });
+}
+</script>
+{% endblock %}

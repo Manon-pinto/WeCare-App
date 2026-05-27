@@ -40,9 +40,6 @@ class Beneficiaire
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pathologie = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $aidant = null;
-
     #[ORM\Column(length: 50)]
     private ?string $niveauRisque = null;
 
@@ -52,10 +49,14 @@ class Beneficiaire
     #[ORM\OneToMany(mappedBy: 'beneficiaire', targetEntity: Message::class)]
     private Collection $messages;
 
+    #[ORM\OneToMany(mappedBy: 'beneficiaire', targetEntity: Aidant::class, cascade: ['persist', 'remove'])]
+    private Collection $aidants;
+
     public function __construct()
     {
         $this->interventions = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->aidants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,17 +141,6 @@ class Beneficiaire
         return $this;
     }
 
-    public function getAidant(): ?string
-    {
-        return $this->aidant;
-    }
-
-    public function setAidant(?string $aidant): static
-    {
-        $this->aidant = $aidant;
-        return $this;
-    }
-
     public function getNiveauRisque(): ?string
     {
         return $this->niveauRisque;
@@ -201,6 +191,27 @@ class Beneficiaire
     public function removeMessage(Message $message): static
     {
         $this->messages->removeElement($message);
+        return $this;
+    }
+
+    /** @return Collection<int, Aidant> */
+    public function getAidants(): Collection
+    {
+        return $this->aidants;
+    }
+
+    public function addAidant(Aidant $aidant): static
+    {
+        if (!$this->aidants->contains($aidant)) {
+            $this->aidants->add($aidant);
+            $aidant->setBeneficiaire($this);
+        }
+        return $this;
+    }
+
+    public function removeAidant(Aidant $aidant): static
+    {
+        $this->aidants->removeElement($aidant);
         return $this;
     }
 }

@@ -6,12 +6,18 @@ use App\Repository\InterventionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/intervenant', name: 'api_intervenant_')]
 class MapController extends AbstractController
 {
-    #[Route('/map', name: 'map', methods: ['GET'])]
+    #[Route('/intervenant/map', name: 'intervenant_map', methods: ['GET'])]
+    public function index(): Response
+    {
+        return $this->render('intervenant/map.html.twig');
+    }
+
+    #[Route('/api/intervenant/map', name: 'api_intervenant_map', methods: ['GET'])]
     public function map(
         Request $request,
         InterventionRepository $interventionRepo,

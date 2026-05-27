@@ -55,6 +55,8 @@ class PlanningController extends AbstractController
                         'id' => $b->getId(),
                         'nom' => $b->getUtilisateur()->getNom(),
                         'adresse' => $b->getAdresse(),
+                        'latitude' => $b->getLatitude(),
+                        'longitude' => $b->getLongitude(),
                     ],
                     'dateDebut' => $intervention->getDateDebut()->format('H:i'),
                     'dateFin' => $intervention->getDateFin()->format('H:i'),

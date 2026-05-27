@@ -1,0 +1,169 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Formulaire de signalement – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .sig-title { font-size:1.5rem; font-weight:800; color:var(--text-dark); margin-bottom:22px; }
+
+  .sig-top { display:grid; grid-template-columns:1fr 240px; gap:16px; margin-bottom:16px; align-items:start; }
+  .sig-patient { background:var(--primary); border-radius:14px; padding:18px 22px; display:flex; align-items:center; gap:16px; }
+  .sig-patient-avatar { width:52px; height:52px; border-radius:50%; background:var(--teal-mid); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .sig-patient-name { font-size:1rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px; }
+  .sig-patient-sub { font-size:0.78rem; color:rgba(255,255,255,0.55); margin-top:2px; }
+  .sig-type-card { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:var(--card-shadow); }
+  .sig-section-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--teal); font-weight:700; margin-bottom:8px; }
+
+  .sig-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .sig-card { background:#fff; border-radius:14px; padding:18px; box-shadow:var(--card-shadow); }
+
+  .toggle-group { display:flex; gap:10px; flex-wrap:wrap; }
+  .toggle-btn {
+    padding:9px 18px; border-radius:10px; border:1.5px solid var(--border);
+    background:#fff; font-family:'Poppins',sans-serif; font-size:0.83rem; font-weight:600;
+    cursor:pointer; color:var(--text-dark); transition:all 0.12s;
+  }
+  .toggle-btn.active { border-color:var(--teal-mid); background:var(--teal-pale); color:var(--teal); }
+
+  .date-input { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:'Poppins',sans-serif; font-size:0.85rem; color:var(--text-dark); }
+  .date-input:focus { outline:none; border-color:var(--teal-mid); }
+
+  .sig-bottom { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .upload-zone { border:2px dashed var(--border); border-radius:10px; padding:32px 20px; text-align:center; color:var(--text-muted); cursor:pointer; }
+  .upload-icon { font-size:1.6rem; margin-bottom:8px; color:var(--teal-mid); }
+  .upload-title { font-size:0.83rem; font-weight:700; color:var(--text-dark); margin-bottom:3px; }
+  .upload-sub { font-size:0.72rem; }
+
+  textarea.sig-textarea { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:10px 13px; font-family:'Poppins',sans-serif; font-size:0.83rem; color:var(--text-dark); resize:vertical; min-height:90px; }
+  textarea.sig-textarea:focus { outline:none; border-color:var(--teal-mid); }
+
+  .sig-footer { display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-top:1px solid var(--border); margin-top:4px; }
+  .sig-footer-note { font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .sig-footer-btns { display:flex; gap:12px; }
+  .btn-annuler { background:#fff; border:1.5px solid var(--border); color:var(--text-dark); padding:10px 22px; border-radius:10px; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; }
+  .btn-envoyer { background:var(--pink); color:var(--primary); padding:10px 22px; border-radius:10px; border:none; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; }
+
+  .form-select { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:'Poppins',sans-serif; font-size:0.85rem; color:var(--text-dark); background:#fff; cursor:pointer; }
+</style>
+
+<div class="sig-title">Formulaire de signalement</div>
+
+<div class="sig-top">
+  <div class="sig-patient">
+    <div class="sig-patient-avatar">
+      <svg width="30" height="30" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="14" r="8" fill="rgba(255,255,255,0.35)"/><path d="M4 36c0-8.837 7.163-14 16-14s16 5.163 16 14" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/></svg>
+    </div>
+    <div>
+      <div class="sig-patient-name">
+        <select id="sig-patient-sel" style="background:none;border:none;color:#fff;font-family:'Poppins',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;appearance:none;outline:none;" onchange="updatePatient()">
+          <option value="">Chargement…</option>
+        </select>
+        <span style="color:rgba(255,255,255,0.5)">⌃</span>
+      </div>
+      <div class="sig-patient-sub" id="sig-patient-sub">Patient concerné</div>
+    </div>
+  </div>
+  <div class="sig-type-card">
+    <div class="sig-section-label">Type d'incident</div>
+    <select class="form-select" id="sig-type">
+      <option value="medical">Médical</option>
+      <option value="securite">Sécurité</option>
+      <option value="comportement">Comportement</option>
+      <option value="materiel">Matériel</option>
+      <option value="autre">Autre</option>
+    </select>
+  </div>
+</div>
+
+<div class="sig-row">
+  <div class="sig-card">
+    <div class="sig-section-label">Niveau de gravité</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" onclick="toggle(this,'gravite')">Pas d'urgence</button>
+      <button class="toggle-btn" onclick="toggle(this,'gravite')">Modéré</button>
+      <button class="toggle-btn" onclick="toggle(this,'gravite')">Urgent</button>
+    </div>
+  </div>
+  <div class="sig-card">
+    <div class="sig-section-label">Surveillance requise</div>
+    <div class="toggle-group">
+      <button class="toggle-btn" onclick="toggle(this,'surveillance')">Élevée</button>
+      <button class="toggle-btn active" onclick="toggle(this,'surveillance')">Normale</button>
+      <button class="toggle-btn" onclick="toggle(this,'surveillance')">Intervention rapide</button>
+    </div>
+  </div>
+</div>
+
+<div class="sig-row">
+  <div class="sig-card">
+    <div class="sig-section-label">Date et heure</div>
+    <div class="form-group"><label class="form-label" style="font-size:0.75rem;color:var(--text-body);margin-bottom:4px">Dates</label><input type="date" class="date-input" id="sig-date"></div>
+    <div class="form-group"><label class="form-label" style="font-size:0.75rem;color:var(--text-body);margin-bottom:4px">Heure</label><input type="time" class="date-input" id="sig-heure"></div>
+    <div style="margin-top:12px"><div class="sig-section-label">Actions déjà effectuées</div><textarea class="sig-textarea" id="sig-actions" placeholder="Ex : J'ai prévenu la famille"></textarea></div>
+  </div>
+  <div class="sig-card">
+    <div class="sig-section-label">Description de l'incident</div>
+    <label style="font-size:0.75rem;color:var(--text-body);display:block;margin-bottom:6px">Que s'est-il passé ?</label>
+    <textarea class="sig-textarea" id="sig-desc" placeholder="Rédiger ici" style="min-height:120px;margin-bottom:12px"></textarea>
+    <div class="sig-section-label">Pièces jointes</div>
+    <div class="upload-zone">
+      <div class="upload-icon">⬆</div>
+      <div class="upload-title">Photo ou document</div>
+      <div class="upload-sub">JPG, PNG, PDF · Max 10 Mo</div>
+    </div>
+  </div>
+</div>
+
+<div id="sig-err" style="display:none" class="alert alert-danger"></div>
+
+<div class="sig-footer">
+  <div class="sig-footer-note">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Le coordinateur sera notifié immédiatement
+  </div>
+  <div class="sig-footer-btns">
+    <button class="btn-annuler" onclick="history.back()">Annuler</button>
+    <button class="btn-envoyer" id="sig-btn" onclick="envoyer()">Envoyer le signalement</button>
+  </div>
+</div>
+
+<script>
+function toggle(btn, group){
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Pre-fill date/time
+const now=new Date();
+document.getElementById('sig-date').value=now.toISOString().slice(0,10);
+document.getElementById('sig-heure').value=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+// Load interventions for patient selector
+fetch('/api/intervenant/comptes-rendus').then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+  const sel=document.getElementById('sig-patient-sel');
+  sel.innerHTML=data.length?data.map(d=>`<option value="${d.interventionId}">${d.beneficiaire}</option>`).join(''):'<option value="">Aucune intervention</option>';
+  updatePatient();
+}).catch(()=>{});
+
+function updatePatient(){
+  // Could fetch patient address from data
+}
+
+async function envoyer(){
+  const intId=document.getElementById('sig-patient-sel').value;
+  const desc=document.getElementById('sig-desc').value.trim();
+  const graviteBtn=document.querySelector('.toggle-group .toggle-btn.active');
+  const err=document.getElementById('sig-err');
+  const btn=document.getElementById('sig-btn');
+  if(!intId||!desc){ err.textContent='Veuillez sélectionner un patient et rédiger une description.'; err.style.display='flex'; return; }
+  btn.disabled=true; btn.textContent='Envoi…';
+  try {
+    const graviteMap={'Pas d\'urgence':'legere','Modéré':'moderee','Urgent':'grave'};
+    const gravite=graviteMap[graviteBtn?.textContent?.trim()]||'moderee';
+    const r=await fetch(`/api/intervenant/interventions/${intId}/incident`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,gravite,zone:document.getElementById('sig-actions').value||null})});
+    if(!r.ok){ const e=await r.json(); throw new Error(e.error||'Erreur'); }
+    window.location.href='{{ path('intervenant_dashboard') }}';
+  } catch(e){ err.textContent=e.message; err.style.display='flex'; }
+  finally{ btn.disabled=false; btn.textContent='Envoyer le signalement'; }
+}
+</script>
+{% endblock %}
