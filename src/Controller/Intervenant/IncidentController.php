@@ -3,8 +3,11 @@
 namespace App\Controller\Intervenant;
 
 use App\Entity\Incident;
+use App\Entity\Notification;
 use App\Enum\GraviteIncident;
 use App\Enum\StatutIncident;
+use App\Enum\TypeNotification;
+use App\Repository\AdministrateurRepository;
 use App\Repository\InterventionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,6 +55,49 @@ class IncidentController extends AbstractController
             'id' => $incident->getId(),
             'message' => 'Incident signalé avec succès',
         ], 201);
+    }
+
+    #[Route('/planning/probleme', name: 'planning_probleme', methods: ['POST'])]
+    public function signalerProbleme(
+        Request $request,
+        AdministrateurRepository $adminRepo,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        /** @var \App\Entity\Utilisateur $user */
+        $user = $this->getUser();
+        $intervenant = $user->getIntervenant();
+
+        if (!$intervenant) {
+            return $this->json(['error' => 'Intervenant non trouvé'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['description'])) {
+            return $this->json(['error' => 'La description est obligatoire'], 422);
+        }
+
+        $type = $data['type'] ?? 'autre';
+        $date = $data['date'] ?? null;
+        $nomIntervenant = $user->getNom();
+        $message = sprintf('[%s] %s%s : %s', $type, $nomIntervenant, $date ? ' – '.$date : '', $data['description']);
+
+        $admins = $adminRepo->findAll();
+        foreach ($admins as $admin) {
+            $adminUser = $admin->getUtilisateur();
+            if (!$adminUser) continue;
+            $notif = new Notification();
+            $notif->setUtilisateur($adminUser);
+            $notif->setType(TypeNotification::IncidentSignale);
+            $notif->setLu(false);
+            $notif->setMessage($message);
+            $notif->setCreatedAt(new \DateTimeImmutable());
+            $em->persist($notif);
+        }
+
+        $em->flush();
+
+        return $this->json(['message' => 'Problème signalé avec succès'], 201);
     }
 
     #[Route('/incidents', name: 'incidents_liste', methods: ['GET'])]

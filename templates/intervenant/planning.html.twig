@@ -60,7 +60,7 @@
     <a href="{{ path('intervenant_planning', {offset: offset + 1}) }}" class="week-nav-btn">›</a>
   </div>
   <div class="plan-topbar-right">
-    <button class="btn btn-pink">Signaler un problème</button>
+    <button class="btn btn-pink" onclick="openProblemeModal()">Signaler un problème</button>
   </div>
 </div>
 
@@ -132,5 +132,63 @@ function showModal(ci) {
   document.getElementById('int-modal').classList.add('open');
 }
 function closeModal() { document.getElementById('int-modal').classList.remove('open'); }
+
+function openProblemeModal() { document.getElementById('prob-modal').classList.add('open'); }
+function closeProblemeModal() { document.getElementById('prob-modal').classList.remove('open'); }
+
+async function envoyerProbleme() {
+  const type = document.getElementById('prob-type').value;
+  const date = document.getElementById('prob-date').value;
+  const desc = document.getElementById('prob-desc').value.trim();
+  const err = document.getElementById('prob-err');
+  const btn = document.getElementById('prob-btn');
+  if (!desc) { err.textContent = 'La description est obligatoire.'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Envoi…';
+  try {
+    const r = await fetch('/api/intervenant/planning/probleme', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type, date, description: desc})
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Erreur'); }
+    closeProblemeModal();
+    document.getElementById('prob-desc').value = '';
+    err.style.display = 'none';
+  } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
+  finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
+}
 </script>
+
+<div class="modal-overlay" id="prob-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Signaler un problème de planning</span>
+      <button class="modal-close" onclick="closeProblemeModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Type de problème</label>
+        <select id="prob-type" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark);background:#fff">
+          <option value="indisponibilite">Indisponibilité</option>
+          <option value="erreur_planning">Erreur de planning</option>
+          <option value="conflit_horaire">Conflit d'horaire</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Date concernée (optionnel)</label>
+        <input type="date" id="prob-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark)">
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Description</label>
+        <textarea id="prob-desc" rows="4" placeholder="Décrivez le problème…" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark);resize:vertical"></textarea>
+      </div>
+      <div id="prob-err" style="display:none;color:#e03e3e;font-size:0.8rem"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="modal-close" onclick="closeProblemeModal()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-dark)">Annuler</button>
+        <button id="prob-btn" onclick="envoyerProbleme()" style="padding:9px 18px;background:var(--pink);border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;color:var(--primary)">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
