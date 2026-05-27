@@ -51,6 +51,17 @@
   .cr-list { list-style:none; }
   .cr-list li { font-size:0.8rem; color:var(--text-body); line-height:1.7; padding-left:12px; position:relative; }
   .cr-list li::before { content:'•'; position:absolute; left:0; color:var(--teal); }
+
+  @media (max-width: 640px) {
+    .cr-topbar { flex-direction:column; align-items:flex-start; gap:10px; }
+    .cr-topbar .btn { width:100%; justify-content:center; }
+    .cr-header-row { grid-template-columns:1fr auto; }
+    .cr-header-row span:nth-child(2),
+    .cr-header-row span:nth-child(3) { display:none; }
+    .cr-row { grid-template-columns:1fr auto; }
+    .cr-row-intervenant, .cr-row-date { display:none; }
+    .cr-item.expanded .cr-detail { grid-template-columns:1fr; }
+  }
 </style>
 
 <div class="cr-topbar">

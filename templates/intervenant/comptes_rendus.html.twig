@@ -59,6 +59,13 @@
   .btn-valider { background:var(--pink); color:var(--primary); padding:10px 22px; border-radius:10px; border:none; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; }
 
   .alert-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; padding:10px 14px; border-radius:8px; font-size:0.82rem; margin-top:8px; }
+
+  @media (max-width: 640px) {
+    .cr-page { grid-template-columns:1fr; height:auto; }
+    .cr-list { max-height:280px; border-radius:14px; }
+    .cr-editor { min-height:400px; }
+    .vocal-zone { grid-template-columns:1fr; }
+  }
 </style>
 
 <h1 style="font-size:1.5rem;font-weight:800;color:var(--text-dark);margin-bottom:20px">Comptes rendus</h1>

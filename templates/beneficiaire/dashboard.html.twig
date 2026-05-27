@@ -51,6 +51,15 @@
   .question-card { background:#fff; border-radius:14px; padding:20px; box-shadow:var(--card-shadow); }
   .question-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:8px; }
   .question-text { font-size:0.78rem; color:var(--text-muted); line-height:1.6; margin-bottom:14px; }
+
+  @media (max-width: 640px) {
+    .dash-topbar { flex-direction:column; gap:8px; }
+    .dash-hello h1 { font-size:1.3rem; }
+    .dash-grid { grid-template-columns:1fr; }
+    .next-card { flex-direction:column; align-items:flex-start; gap:12px; }
+    .nc-time { margin-left:0; width:100%; display:flex; align-items:center; justify-content:space-between; }
+    .nc-time-range { font-size:1.3rem; }
+  }
 </style>
 
 <div class="dash-topbar">

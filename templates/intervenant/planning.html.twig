@@ -32,6 +32,57 @@
   .int-card .ic-name { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .int-card .ic-type { opacity:0.7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
+  /* ── Vue jour mobile ── */
+  .day-view { display:none; }
+
+  @media (max-width: 640px) {
+    .plan-topbar { flex-wrap:wrap; gap:10px; }
+    .plan-topbar-right { margin-left:0; width:100%; }
+    .plan-topbar-right .btn { width:100%; justify-content:center; }
+    .plan-card { display:none; }
+    .day-view { display:block; }
+
+    /* sélecteur de jours */
+    .dv-week-strip {
+      display:flex; gap:6px; overflow-x:auto; padding:0 2px 10px;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .dv-week-strip::-webkit-scrollbar { display:none; }
+    .dv-day-pill {
+      display:flex; flex-direction:column; align-items:center;
+      min-width:40px; padding:8px 6px; border-radius:20px;
+      cursor:pointer; border:none; background:none;
+      font-family:'Poppins',sans-serif; gap:4px; flex-shrink:0;
+    }
+    .dv-day-pill .dp-name { font-size:0.65rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; }
+    .dv-day-pill .dp-num  { font-size:1rem; font-weight:800; color:var(--text-dark); }
+    .dv-day-pill .dp-dot  { width:6px; height:6px; border-radius:50%; background:transparent; }
+    .dv-day-pill.has-visits .dp-dot { background:var(--teal-mid); }
+    .dv-day-pill.active { background:var(--primary); }
+    .dv-day-pill.active .dp-name,
+    .dv-day-pill.active .dp-num  { color:#fff; }
+    .dv-day-pill.active .dp-dot  { background:var(--pink); }
+
+    /* titre du jour */
+    .dv-day-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin:10px 0 14px; }
+
+    /* timeline */
+    .dv-timeline { display:flex; flex-direction:column; gap:10px; }
+    .dv-slot { display:flex; gap:12px; align-items:flex-start; }
+    .dv-hour { font-size:0.7rem; color:var(--text-muted); width:34px; flex-shrink:0; padding-top:12px; text-align:right; }
+    .dv-line { width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin-top:14px; }
+    .dv-interventions { flex:1; display:flex; flex-direction:column; gap:6px; padding-bottom:4px; }
+    .dv-card {
+      background:#fff; border-radius:12px; padding:12px 14px;
+      box-shadow:var(--card-shadow); cursor:pointer;
+      border-left:4px solid var(--teal-mid);
+    }
+    .dv-card-name { font-size:0.85rem; font-weight:700; color:var(--text-dark); }
+    .dv-card-type { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .dv-card-time { font-size:0.72rem; font-weight:600; color:var(--teal); margin-top:4px; }
+    .dv-empty { font-size:0.82rem; color:var(--text-muted); padding:10px 0; }
+  }
+
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,0,75,0.35); z-index:200; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
   .modal { background:#fff; border-radius:14px; padding:26px; width:440px; max-width:94vw; box-shadow:0 20px 60px rgba(15,0,75,0.2); }
@@ -110,6 +161,29 @@
   </div>
 </div>
 
+{% set JOURS_LONG = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'] %}
+{% set JOURS_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] %}
+{% set MOIS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] %}
+
+<div class="day-view">
+  <div class="dv-week-strip" id="dv-strip">
+    {% for j in jours %}
+      {% set isToday = j.date == todayStr %}
+      <button class="dv-day-pill{{ j.interventions|length > 0 ? ' has-visits' : '' }}{{ isToday ? ' active' : '' }}"
+        data-date="{{ j.date }}"
+        data-idx="{{ loop.index0 }}"
+        onclick="selectDay({{ loop.index0 }})">
+        <span class="dp-name">{{ JOURS_SHORT[loop.index0] }}</span>
+        <span class="dp-num">{{ j.date|date('d') }}</span>
+        <span class="dp-dot"></span>
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="dv-day-title" id="dv-day-title"></div>
+  <div class="dv-timeline" id="dv-timeline"></div>
+</div>
+
 <div class="modal-overlay" id="int-modal">
   <div class="modal">
     <div class="modal-header">
@@ -132,6 +206,72 @@ function showModal(ci) {
   document.getElementById('int-modal').classList.add('open');
 }
 function closeModal() { document.getElementById('int-modal').classList.remove('open'); }
+
+// ── Vue jour mobile ──
+const joursData = {{ jours|map(j => {
+  'date': j.date,
+  'interventions': j.interventions|map(i => {
+    'nom': i.beneficiaire.utilisateur.nom,
+    'type': i.typeIntervention.value,
+    'adresse': i.beneficiaire.adresse,
+    'heureDebut': i.dateDebut|date('H:i'),
+    'heureFin': i.dateFin|date('H:i'),
+    'hDebut': i.dateDebut|date('H')|number_format,
+    'statut': i.statut.value
+  })
+})|json_encode|raw }};
+
+const JOURS_LONG = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const MOIS_LONG  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const HOURS = [7,8,9,10,11,12,13,14,15,16];
+
+let activeIdx = joursData.findIndex(j => j.date === '{{ todayStr }}');
+if (activeIdx < 0) activeIdx = 0;
+
+function selectDay(idx) {
+  activeIdx = idx;
+  document.querySelectorAll('.dv-day-pill').forEach((p,i) => p.classList.toggle('active', i === idx));
+  renderDayView();
+}
+
+function renderDayView() {
+  const jour = joursData[activeIdx];
+  if (!jour) return;
+  const d = new Date(jour.date + 'T00:00:00');
+  const nomJour = JOURS_LONG[activeIdx] || '';
+  const nomMois = MOIS_LONG[d.getMonth()];
+  document.getElementById('dv-day-title').textContent = `${nomJour} ${d.getDate()} ${nomMois}`;
+
+  let html = '';
+  const ints = jour.interventions;
+  if (ints.length === 0) {
+    html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+  } else {
+    HOURS.forEach(h => {
+      const slots = ints.filter(i => parseInt(i.hDebut) === h);
+      if (!slots.length) return;
+      html += `<div class="dv-slot">
+        <div class="dv-hour">${h}h</div>
+        <div class="dv-line"></div>
+        <div class="dv-interventions">
+          ${slots.map(i => `<div class="dv-card" onclick='showModal(${JSON.stringify({nom:i.nom,heureDebut:i.heureDebut,heureFin:i.heureFin,type:i.type,adresse:i.adresse,statut:i.statut})})'>
+            <div class="dv-card-name">${i.nom}</div>
+            <div class="dv-card-type">${i.type}</div>
+            <div class="dv-card-time">${i.heureDebut} – ${i.heureFin}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    if (!html) html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+  }
+  document.getElementById('dv-timeline').innerHTML = html;
+}
+
+// Init au chargement
+renderDayView();
+// Scroll vers le jour actif
+const activeBtn = document.querySelector('.dv-day-pill.active');
+if (activeBtn) activeBtn.scrollIntoView({inline:'center', behavior:'smooth'});
 
 function openProblemeModal() { document.getElementById('prob-modal').classList.add('open'); }
 function closeProblemeModal() { document.getElementById('prob-modal').classList.remove('open'); }

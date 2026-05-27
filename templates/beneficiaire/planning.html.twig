@@ -123,6 +123,39 @@
   .modal-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
   .modal-cancel { background: #f3f3f8; color: var(--text-body); border: none; border-radius: 10px; padding: 9px 18px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
   .modal-send { background: var(--pink); color: var(--primary); border: none; border-radius: 10px; padding: 9px 18px; font-family: inherit; font-size: 0.83rem; font-weight: 700; cursor: pointer; }
+
+  /* Vue jour mobile */
+  .day-view-b { display:none; }
+
+  @media (max-width: 640px) {
+    .planning-header { flex-direction:column; align-items:flex-start; gap:10px; }
+    .planning-header .btn { width:100%; justify-content:center; }
+    .calendar-card { display:none; }
+    .day-view-b { display:block; }
+
+    .dv-week-strip { display:flex; gap:6px; overflow-x:auto; padding:0 2px 10px; scrollbar-width:none; }
+    .dv-week-strip::-webkit-scrollbar { display:none; }
+    .dv-day-pill { display:flex; flex-direction:column; align-items:center; min-width:40px; padding:8px 6px; border-radius:20px; cursor:pointer; border:none; background:none; font-family:'Poppins',sans-serif; gap:4px; flex-shrink:0; }
+    .dv-day-pill .dp-name { font-size:0.65rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; }
+    .dv-day-pill .dp-num  { font-size:1rem; font-weight:800; color:var(--text-dark); }
+    .dv-day-pill .dp-dot  { width:6px; height:6px; border-radius:50%; background:transparent; }
+    .dv-day-pill.has-visits .dp-dot { background:var(--teal-mid); }
+    .dv-day-pill.active { background:var(--primary); }
+    .dv-day-pill.active .dp-name, .dv-day-pill.active .dp-num { color:#fff; }
+    .dv-day-pill.active .dp-dot { background:var(--pink); }
+
+    .dv-day-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin:10px 0 14px; }
+    .dv-timeline { display:flex; flex-direction:column; gap:10px; }
+    .dv-slot { display:flex; gap:12px; align-items:flex-start; }
+    .dv-hour { font-size:0.7rem; color:var(--text-muted); width:34px; flex-shrink:0; padding-top:12px; text-align:right; }
+    .dv-line { width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin-top:14px; }
+    .dv-interventions { flex:1; display:flex; flex-direction:column; gap:6px; padding-bottom:4px; }
+    .dv-card { background:#fff; border-radius:12px; padding:12px 14px; box-shadow:var(--card-shadow); border-left:4px solid var(--teal-mid); }
+    .dv-card-name { font-size:0.85rem; font-weight:700; color:var(--text-dark); }
+    .dv-card-type { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .dv-card-time { font-size:0.72rem; font-weight:600; color:var(--teal); margin-top:4px; }
+    .dv-empty { font-size:0.82rem; color:var(--text-muted); padding:10px 0; }
+  }
 </style>
 
 <div class="planning-header">
@@ -147,6 +180,13 @@
     <!-- hour column -->
     <div class="hour-col" id="hourCol"></div>
   </div>
+</div>
+
+<!-- Vue jour mobile -->
+<div class="day-view-b">
+  <div class="dv-week-strip" id="dvb-strip"></div>
+  <div class="dv-day-title" id="dvb-title"></div>
+  <div class="dv-timeline" id="dvb-timeline"></div>
 </div>
 
 <!-- Modal modification -->
@@ -334,15 +374,6 @@
     if (data) render(monday, data);
   }
 
-  document.getElementById('prevWeek').addEventListener('click', () => {
-    currentMonday = addDays(currentMonday, -7);
-    loadAndRender(currentMonday);
-  });
-  document.getElementById('nextWeek').addEventListener('click', () => {
-    currentMonday = addDays(currentMonday, 7);
-    loadAndRender(currentMonday);
-  });
-
   // Modal
   const modal = document.getElementById('modifModal');
   document.getElementById('openModifModal').addEventListener('click', () => modal.classList.add('open'));
@@ -364,6 +395,101 @@
   });
 
   loadAndRender(currentMonday);
+
+  // ── Vue jour mobile ──
+  const DVB_DAYS_SHORT  = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const DVB_DAYS_LONG   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const DVB_MONTHS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const DVB_HOURS = [7,8,9,10,11,12,13,14,15,16,17,18,19];
+
+  let dvbWeekData = null;
+  let dvbActiveIdx = 0;
+
+  async function dvbLoad(monday) {
+    const data = await loadWeek(monday);
+    if (!data) return;
+    dvbWeekData = data.jours || [];
+    // find today or default to 0
+    const todayISO = new Date().toISOString().split('T')[0];
+    const idx = dvbWeekData.findIndex(j => j.date === todayISO);
+    dvbActiveIdx = idx >= 0 ? idx : 0;
+    dvbRenderStrip();
+    dvbRenderDay();
+  }
+
+  function dvbRenderStrip() {
+    if (!dvbWeekData) return;
+    const strip = document.getElementById('dvb-strip');
+    strip.innerHTML = dvbWeekData.map((j, i) => {
+      const d = new Date(j.date + 'T00:00:00');
+      const name = DVB_DAYS_SHORT[d.getDay()];
+      const hasVisits = j.interventions.length > 0;
+      return `<button class="dv-day-pill${hasVisits ? ' has-visits' : ''}${i === dvbActiveIdx ? ' active' : ''}"
+        onclick="dvbSelectDay(${i})">
+        <span class="dp-name">${name}</span>
+        <span class="dp-num">${d.getDate()}</span>
+        <span class="dp-dot"></span>
+      </button>`;
+    }).join('');
+    const active = strip.children[dvbActiveIdx];
+    if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+  }
+
+  window.dvbSelectDay = function(idx) {
+    dvbActiveIdx = idx;
+    document.querySelectorAll('#dvb-strip .dv-day-pill').forEach((p, i) => p.classList.toggle('active', i === idx));
+    dvbRenderDay();
+  }
+
+  function dvbRenderDay() {
+    if (!dvbWeekData) return;
+    const jour = dvbWeekData[dvbActiveIdx];
+    const d = new Date(jour.date + 'T00:00:00');
+    document.getElementById('dvb-title').textContent =
+      `${DVB_DAYS_LONG[d.getDay()]} ${d.getDate()} ${DVB_MONTHS_LONG[d.getMonth()]}`;
+
+    const ints = jour.interventions;
+    let html = '';
+    if (!ints.length) {
+      html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+    } else {
+      DVB_HOURS.forEach(h => {
+        const slots = ints.filter(i => parseInt((i.dateDebut||'').split(':')[0]) === h);
+        if (!slots.length) return;
+        html += `<div class="dv-slot">
+          <div class="dv-hour">${h}h</div>
+          <div class="dv-line"></div>
+          <div class="dv-interventions">
+            ${slots.map(i => `<div class="dv-card">
+              <div class="dv-card-name">${i.intervenant?.nom || '–'}</div>
+              <div class="dv-card-type">${i.type || '–'}</div>
+              <div class="dv-card-time">${i.dateDebut} – ${i.dateFin}</div>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      });
+      if (!html) html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+    }
+    document.getElementById('dvb-timeline').innerHTML = html;
+  }
+
+  // Recharge la vue jour quand la semaine change
+  const origLoadAndRender = loadAndRender;
+  async function loadAndRenderWithDvb(monday) {
+    await origLoadAndRender(monday);
+    dvbLoad(monday);
+  }
+
+  document.getElementById('prevWeek').addEventListener('click', () => {
+    currentMonday = addDays(currentMonday, -7);
+    loadAndRenderWithDvb(currentMonday);
+  });
+  document.getElementById('nextWeek').addEventListener('click', () => {
+    currentMonday = addDays(currentMonday, 7);
+    loadAndRenderWithDvb(currentMonday);
+  });
+
+  dvbLoad(currentMonday);
 })();
 </script>
 {% endblock %}

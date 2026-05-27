@@ -38,6 +38,17 @@
   .pat-item:last-child { border-bottom:none; }
   .pat-name { font-size:0.82rem; font-weight:700; color:var(--text-dark); }
   .pat-sub { font-size:0.72rem; color:var(--text-muted); }
+
+  @media (max-width: 640px) {
+    .dash-topbar { flex-direction:column; gap:12px; align-items:flex-start; }
+    .dash-topbar .btn { align-self:flex-start; }
+    .dash-greeting h1 { font-size:1.25rem; }
+    .dash-wrap { grid-template-columns:1fr; }
+    .dash-cards { grid-template-columns:1fr; }
+    .next-visit { flex-direction:column; gap:12px; align-items:flex-start; }
+    .nv-time { width:100%; display:flex; align-items:center; justify-content:space-between; }
+    .nv-time-range { font-size:1.5rem; }
+  }
 </style>
 
 {% set jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'] %}
