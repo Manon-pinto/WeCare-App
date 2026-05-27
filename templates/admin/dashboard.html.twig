@@ -1,0 +1,328 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+  /* ─────────────── PAGE LAYOUT ─────────────── */
+  .page-content {
+    margin-left: var(--sidebar-w);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #eeebfc;
+  }
+
+  /* ─── Topbar ─── */
+  .topbar {
+    padding: 28px 32px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-greeting h1 { font-size: 26px; font-weight: 800; color: var(--primary); }
+  .topbar-greeting p  { font-size: 13px; color: #7c6fcd; margin-top: 3px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .chip-date {
+    background: #fff; border-radius: 30px; padding: 8px 16px;
+    font-size: 12px; font-weight: 600; color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 6px;
+  }
+  .btn-new {
+    background: var(--primary); color: #fff; border: none; border-radius: 30px;
+    padding: 9px 18px; font-size: 12px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 12px rgba(16,14,46,0.25); transition: opacity 0.15s;
+  }
+  .btn-new:hover { opacity: 0.88; }
+
+  /* ─── Dashboard body ─── */
+  .dashboard-body {
+    flex: 1; display: flex; gap: 20px;
+    padding: 0 32px 28px; min-height: 0; overflow: hidden;
+  }
+  .dashboard-main {
+    flex: 1; display: flex; flex-direction: column; gap: 18px;
+    min-width: 0; overflow: hidden;
+  }
+
+  /* ─── Stats ─── */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat-card {
+    background: #fff; border-radius: 20px; padding: 22px 24px;
+    box-shadow: 0 2px 12px rgba(16,14,46,0.06);
+    position: relative; overflow: hidden;
+  }
+  .stat-card-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+  }
+  .stat-card-label {
+    font-size: 11px; color: #9ca3af; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+  }
+  .stat-card-value { font-size: 36px; font-weight: 900; color: var(--primary); line-height: 1; display: inline; }
+  .stat-card-suffix { font-size: 13px; font-weight: 600; color: #9ca3af; margin-left: 6px; }
+  .stat-card-sub { font-size: 11px; color: #c4b5fd; margin-top: 6px; font-weight: 500; }
+  .stat-card-blob {
+    position: absolute; top: -10px; right: -10px;
+    width: 80px; height: 80px; border-radius: 50%; opacity: 0.1;
+  }
+
+  /* ─── Planning card ─── */
+  .planning-card {
+    background: #fff; border-radius: 20px; padding: 20px 22px 16px;
+    display: flex; flex-direction: column; flex: 1; min-height: 0;
+    overflow: hidden; box-shadow: 0 2px 12px rgba(16,14,46,0.06);
+  }
+  .planning-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .planning-header-title { font-size: 15px; font-weight: 800; color: var(--primary); }
+  .planning-nav { display: flex; align-items: center; gap: 10px; }
+  .date-nav { display: flex; align-items: center; gap: 4px; }
+  .date-nav-btn {
+    background: #f3f4f6; border: none; cursor: pointer; color: var(--primary);
+    font-size: 16px; padding: 3px 8px; border-radius: 8px; line-height: 1;
+  }
+  .date-nav-label { font-size: 13px; font-weight: 700; color: var(--primary); padding: 0 4px; }
+  .btn-planning {
+    background: var(--primary); color: #fff; border: none; border-radius: 10px;
+    padding: 7px 13px; font-size: 11px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+  }
+  .planning-body { display: flex; flex: 1; gap: 0; min-height: 0; overflow: hidden; }
+
+  .plan-sidebar { width: 148px; flex-shrink: 0; padding-right: 14px; overflow-y: auto; }
+  .sector-label {
+    font-size: 9px; font-weight: 700; color: #c4b5fd;
+    letter-spacing: 0.08em; text-transform: uppercase; margin: 12px 0 5px;
+  }
+  .sector-label:first-child { margin-top: 0; }
+  .int-row { display: flex; align-items: center; gap: 7px; padding: 3px 0; font-size: 11.5px; color: #9ca3af; }
+  .int-row input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+  .int-row.checked { color: var(--primary); font-weight: 600; }
+
+  .plan-calendar {
+    flex: 1; display: flex; flex-direction: column;
+    border-left: 1px solid #f3f4f6; padding-left: 14px; min-width: 0; overflow: hidden;
+  }
+  .cal-avatar-row { display: grid; grid-template-columns: 32px repeat(5, 1fr); margin-bottom: 8px; }
+  .cal-avatar { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .av-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 700; color: #fff; }
+  .av-name { font-size: 10px; color: #374151; font-weight: 500; }
+  .cal-grid { display: grid; grid-template-columns: 32px repeat(5, 1fr); grid-auto-rows: 38px; gap: 2px 4px; overflow-y: auto; flex: 1; }
+  .cal-time { display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 6px; padding-top: 3px; font-size: 10px; color: #d1d5db; font-weight: 500; }
+  .cal-cell { border-top: 1px solid #f9fafb; }
+  .cal-block { height: 100%; border-radius: 8px; padding: 4px 7px; font-size: 9.5px; font-weight: 600; color: #fff; display: flex; flex-direction: column; justify-content: center; line-height: 1.35; }
+  .cal-block .b-name { font-weight: 700; font-size: 10px; }
+  .cal-block .b-time { opacity: 0.8; font-weight: 400; }
+  .c-sophie { background: #06b6d4; }
+  .c-leo    { background: #8b5cf6; }
+  .c-arthur { background: #ec4899; }
+  .c-leila  { background: #0ea5e9; }
+  .c-nolwen { background: #10b981; }
+
+  /* ─── Right panel ─── */
+  .right-panel {
+    width: 264px; flex-shrink: 0; display: flex; flex-direction: column;
+    gap: 16px; padding-bottom: 28px; overflow-y: auto;
+  }
+  .alerts-card {
+    background: #fff; border-radius: 20px; padding: 20px 18px;
+    box-shadow: 0 2px 12px rgba(16,14,46,0.06);
+    flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  }
+  .alerts-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+  .alerts-count-big { font-size: 38px; font-weight: 900; color: var(--primary); line-height: 1; }
+  .alerts-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-top: 2px; }
+  .btn-voir-tout {
+    display: flex; align-items: center; gap: 4px;
+    background: #f3f4f6; border: none; border-radius: 10px;
+    padding: 7px 12px; font-size: 11px; font-weight: 600; color: var(--primary);
+    cursor: pointer; white-space: nowrap; margin-top: 4px;
+  }
+  .alert-list { display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
+  .alert-item {
+    background: #fffbf0; border-radius: 14px; padding: 11px 13px;
+    display: flex; gap: 10px; align-items: flex-start;
+    border-left: 3px solid #fbbf24;
+  }
+  .alert-dot { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; margin-top: 4px; }
+  .alert-titre { font-size: 11.5px; font-weight: 700; color: var(--primary); }
+  .alert-texte { font-size: 10.5px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-greeting">
+      <h1>Bonjour, {{ prenom }}</h1>
+      <p>Voici l'activité du jour</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="chip-date">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Mardi 30 Juin 2026
+      </div>
+      <button class="btn-new">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvelle intervention
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard-body">
+
+    <!-- Left column -->
+    <div class="dashboard-main">
+
+      <!-- Stats -->
+      <div class="stats-row">
+        {% for s in stats %}
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:{% if loop.index==1 %}#ede9fe{% elseif loop.index==2 %}#d1fae5{% else %}#fce7f3{% endif %}">
+            {% if loop.index == 1 %}
+            <svg width="18" height="18" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {% elseif loop.index == 2 %}
+            <svg width="18" height="18" fill="none" stroke="#059669" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            {% else %}
+            <svg width="18" height="18" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {% endif %}
+          </div>
+          <div class="stat-card-label">{{ s.label }}</div>
+          <div>
+            <span class="stat-card-value">{{ s.value }}</span>
+            <span class="stat-card-suffix">{{ s.suffix }}</span>
+          </div>
+          {% if s.sub %}<div class="stat-card-sub">{{ s.sub }}</div>{% endif %}
+          <div class="stat-card-blob" style="background:{% if loop.index==1 %}#7c3aed{% elseif loop.index==2 %}#059669{% else %}#db2777{% endif %}"></div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Planning -->
+      <div class="planning-card">
+        <div class="planning-header">
+          <span class="planning-header-title">Planning du jour</span>
+          <div class="planning-nav">
+            <div class="date-nav">
+              <button class="date-nav-btn">&#8249;</button>
+              <span class="date-nav-label">Mardi 30 Juin</span>
+              <button class="date-nav-btn">&#8250;</button>
+            </div>
+            <button class="btn-planning">
+              Voir complet
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="planning-body">
+          <div class="plan-sidebar">
+            <div class="sector-label">Admin</div>
+            <label class="int-row"><input type="checkbox"> Moi</label>
+            <div class="sector-label">Secteur A</div>
+            <label class="int-row checked"><input type="checkbox" checked> Sophie Tinto</label>
+            <label class="int-row checked"><input type="checkbox" checked> Léo LeGrand</label>
+            <label class="int-row checked"><input type="checkbox" checked> Arthur Martin</label>
+            <label class="int-row checked"><input type="checkbox" checked> Leila Bart</label>
+            <label class="int-row checked"><input type="checkbox" checked> Nolwen Ballard</label>
+            <div class="sector-label">Secteur B</div>
+            <label class="int-row"><input type="checkbox"> Léo Legrand</label>
+            <label class="int-row"><input type="checkbox"> Valérie Lemarquand</label>
+            <label class="int-row"><input type="checkbox"> Marie Fournier</label>
+          </div>
+
+          <div class="plan-calendar">
+            <div class="cal-avatar-row">
+              <div></div>
+              <div class="cal-avatar"><div class="av-circle c-sophie">ST</div><span class="av-name">Sophie</span></div>
+              <div class="cal-avatar"><div class="av-circle c-leo">LL</div><span class="av-name">Léo</span></div>
+              <div class="cal-avatar"><div class="av-circle c-arthur">AM</div><span class="av-name">Arthur</span></div>
+              <div class="cal-avatar"><div class="av-circle c-leila">LB</div><span class="av-name">Leila</span></div>
+              <div class="cal-avatar"><div class="av-circle c-nolwen">NB</div><span class="av-name">Nolwen</span></div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-time">7</div>
+              <div class="cal-cell"><div class="cal-block c-sophie"><span class="b-name">Rog...</span><span class="b-time">7h-8h</span></div></div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell"><div class="cal-block c-arthur"><span class="b-name">Rog...</span><span class="b-time">7h-8h</span></div></div>
+              <div class="cal-cell"><div class="cal-block c-leila"><span class="b-name">Alfr...</span><span class="b-time">7h-8h</span></div></div>
+              <div class="cal-cell"><div class="cal-block c-nolwen"><span class="b-name">Geo...</span><span class="b-time">7h-8h</span></div></div>
+
+              <div class="cal-time">8</div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell"><div class="cal-block c-leo"><span class="b-name">Simo...</span><span class="b-time">8h-9h</span></div></div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+
+              <div class="cal-time">9</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+              <div class="cal-time">10</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+              <div class="cal-time">11</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+
+              <div class="cal-time">12</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div>
+              <div class="cal-cell"><div class="cal-block c-arthur"><span class="b-name">Mar...</span><span class="b-time">12h-13h</span></div></div>
+              <div class="cal-cell"><div class="cal-block c-leila"><span class="b-name">Bert...</span><span class="b-time">12h-13h</span></div></div>
+              <div class="cal-cell"></div>
+
+              <div class="cal-time">13</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+              <div class="cal-time">14</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+
+              <div class="cal-time">15</div>
+              <div class="cal-cell"><div class="cal-block c-sophie"><span class="b-name">Deni...</span><span class="b-time">15h-16h</span></div></div>
+              <div class="cal-cell"><div class="cal-block c-leo"><span class="b-name">Jul...</span><span class="b-time">15h-16h</span></div></div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell"><div class="cal-block c-leila"><span class="b-name">Geo...</span><span class="b-time">15h-16h</span></div></div>
+              <div class="cal-cell"></div>
+
+              <div class="cal-time">16</div>
+              <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+      <div class="alerts-card">
+        <div class="alerts-header">
+          <div>
+            <div class="alerts-count-big">{{ alertes|length }}</div>
+            <div class="alerts-title">Alertes actives</div>
+          </div>
+          <button class="btn-voir-tout">
+            Voir tout
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </button>
+        </div>
+        <div class="alert-list">
+          {% for alerte in alertes %}
+          <div class="alert-item">
+            <div class="alert-dot"></div>
+            <div>
+              <div class="alert-titre">{{ alerte.titre }}</div>
+              <div class="alert-texte">{{ alerte.texte }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
