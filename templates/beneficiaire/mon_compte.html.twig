@@ -1,0 +1,344 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Mon compte – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .mc-topbar { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .mc-topbar h1 { font-size:1.6rem; font-weight:800; color:var(--text-dark); }
+  .mc-topbar-sub { font-size:1rem; font-weight:600; color:var(--teal); }
+
+  .mc-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:18px; margin-bottom:18px; }
+  .mc-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); padding:24px; }
+  .mc-card-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:18px; }
+
+  .mc-avatar-row { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .mc-avatar { width:52px; height:52px; border-radius:50%; background:var(--teal-mid); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; flex-shrink:0; }
+  .mc-avatar-name { font-size:1.05rem; font-weight:800; color:var(--text-dark); }
+  .mc-avatar-age { font-size:0.8rem; color:var(--text-muted); margin-top:2px; }
+  .mc-niveau { display:inline-block; background:var(--teal-light); color:var(--teal); border-radius:20px; padding:2px 10px; font-size:0.72rem; font-weight:700; margin-top:4px; }
+
+  .mc-field { margin-bottom:14px; }
+  .mc-field-label { font-size:0.78rem; color:var(--text-muted); margin-bottom:4px; }
+  .mc-field-value { border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; font-size:0.85rem; color:var(--text-body); background:#fff; width:100%; font-family:inherit; }
+  textarea.mc-field-value { resize:none; min-height:80px; }
+  .mc-note { font-size:0.75rem; color:var(--text-muted); margin-bottom:14px; }
+
+  .mc-aidants-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); padding:24px; }
+  .mc-aidants-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .mc-aidants-title { font-size:1rem; font-weight:800; color:var(--text-dark); }
+  .mc-aidants-actions { display:flex; gap:8px; }
+
+  .mc-table { width:100%; border-collapse:collapse; }
+  .mc-table th { font-size:0.72rem; color:var(--text-muted); font-weight:600; padding:0 0 10px; text-align:left; }
+  .mc-table td { font-size:0.82rem; color:var(--text-body); padding:10px 0; border-top:1px solid var(--border); font-weight:500; }
+  .mc-table td:first-child { color:var(--text-dark); font-weight:700; }
+  .mc-table .btn-danger { background:#fff; color:#e74c3c; border:1.5px solid #e74c3c; border-radius:8px; padding:4px 10px; font-size:0.72rem; font-weight:700; cursor:pointer; }
+  .mc-table .btn-danger:hover { background:#fef2f2; }
+
+  /* Modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:#fff; border-radius:18px; padding:28px 32px; max-width:440px; width:90%; box-shadow:0 8px 40px rgba(15,0,75,0.18); }
+  .modal-box h2 { font-size:1.1rem; font-weight:800; color:var(--text-dark); margin-bottom:18px; }
+  .modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-field { margin-bottom:0; }
+  .modal-field.full { grid-column:1/-1; }
+  .modal-label { font-size:0.78rem; color:var(--text-muted); margin-bottom:4px; display:block; }
+  .modal-input { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; font-family:inherit; font-size:0.85rem; outline:none; }
+  .modal-input:focus { border-color:var(--teal-mid); }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+  .modal-cancel { background:#f3f3f8; color:var(--text-body); border:none; border-radius:10px; padding:9px 18px; font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; }
+
+  .flash-success { background:#d4edda; color:#155724; border-radius:8px; padding:12px 18px; margin-bottom:18px; font-size:0.85rem; }
+  .flash-error { background:#f8d7da; color:#721c24; border-radius:8px; padding:12px 18px; margin-bottom:18px; font-size:0.85rem; }
+
+  /* Bouton modifier profil */
+  .mc-edit-btn { margin-left:auto; }
+
+  /* Critères ANSSI */
+  .anssi-box { background:#f8f9fc; border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; margin-top:8px; margin-bottom:4px; }
+  .anssi-box p { font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:6px; }
+  .anssi-item { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text-muted); margin-bottom:3px; }
+  .anssi-item.ok { color:#27ae60; }
+  .anssi-icon { width:14px; height:14px; flex-shrink:0; }
+
+  /* Alerte dans modal */
+  .modal-alert { border-radius:8px; padding:9px 14px; font-size:0.8rem; margin-bottom:10px; display:none; }
+  .modal-alert.error { background:#f8d7da; color:#721c24; }
+  .modal-alert.success { background:#d4edda; color:#155724; }
+</style>
+
+{% for msg in app.flashes('success') %}
+  <div class="flash-success">{{ msg }}</div>
+{% endfor %}
+
+{% set nomBenef = beneficiaire and beneficiaire.utilisateur ? beneficiaire.utilisateur.nom : user.nom %}
+{% set initiales = nomBenef|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+{% set age = beneficiaire and beneficiaire.dateNaissance ? date().diff(beneficiaire.dateNaissance).y : null %}
+
+<div class="mc-topbar">
+  <h1>Mon compte</h1>
+  {% if beneficiaire %}<span class="mc-topbar-sub">Suivi de {{ nomBenef }}</span>{% endif %}
+  <div class="mc-edit-btn" style="display:flex;gap:10px;">
+    <button class="btn btn-outline" onclick="openModal('editProfilModal')">Modifier mon profil</button>
+    <button class="btn btn-pink" onclick="openModal('changerMdpModal')">Changer mon mot de passe</button>
+  </div>
+</div>
+
+<div class="mc-grid">
+  <div class="mc-card">
+    <div class="mc-card-title">Informations personnelles</div>
+    <div class="mc-avatar-row">
+      <div class="mc-avatar">{{ initiales }}</div>
+      <div>
+        <div class="mc-avatar-name">{{ nomBenef }}</div>
+        {% if age %}<div class="mc-avatar-age">{{ age }} ans</div>{% endif %}
+        {% if beneficiaire and beneficiaire.niveauRisque %}
+          <span class="mc-niveau">{{ beneficiaire.niveauRisque }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="mc-field">
+      <div class="mc-field-label">Prénom / Nom</div>
+      <input class="mc-field-value" readonly value="{{ nomBenef }}">
+    </div>
+    <div class="mc-field">
+      <div class="mc-field-label">Adresse</div>
+      <input class="mc-field-value" readonly value="{{ beneficiaire ? beneficiaire.adresse ?? '' : '' }}">
+    </div>
+    <div class="mc-field">
+      <div class="mc-field-label">Date de naissance</div>
+      <input class="mc-field-value" readonly value="{{ beneficiaire and beneficiaire.dateNaissance ? beneficiaire.dateNaissance|date('d/m/Y') : '' }}">
+    </div>
+  </div>
+
+  <div class="mc-card">
+    <div class="mc-card-title">Informations médicales</div>
+    <p class="mc-note">Ces informations sont visibles par les soignants lors de leurs interventions.</p>
+    <div class="mc-field">
+      <div class="mc-field-label">Pathologie / Antécédents médicaux</div>
+      <input class="mc-field-value" readonly value="{{ beneficiaire ? beneficiaire.pathologie ?? '' : '' }}">
+    </div>
+    <div class="mc-field">
+      <div class="mc-field-label">Niveau de risque</div>
+      <input class="mc-field-value" readonly value="{{ beneficiaire ? beneficiaire.niveauRisque ?? '' : '' }}">
+    </div>
+  </div>
+</div>
+
+<div class="mc-aidants-card">
+  <div class="mc-aidants-header">
+    <div class="mc-aidants-title">Aidants</div>
+    <div class="mc-aidants-actions">
+      <button class="btn btn-pink" onclick="openModal('ajouterModal')">+ Ajouter un aidant</button>
+    </div>
+  </div>
+  <table class="mc-table">
+    <thead>
+      <tr>
+        <th>Nom complet</th>
+        <th>Adresse mail</th>
+        <th>Téléphone</th>
+        <th>Type de lien</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for aidant in beneficiaire.aidants %}
+      <tr>
+        <td>{{ aidant.nomComplet }}</td>
+        <td>{{ aidant.email ?? '—' }}</td>
+        <td>{{ aidant.telephone ?? '—' }}</td>
+        <td>{{ aidant.lien ?? '—' }}</td>
+        <td>
+          <form method="post" action="{{ path('beneficiaire_aidant_retirer', {id: aidant.id}) }}"
+                onsubmit="return confirm('Retirer {{ aidant.nomComplet }} ?')">
+            <button type="submit" class="btn-danger">Retirer</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:20px 0;">Aucun aidant enregistré.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Modifier profil -->
+<div class="modal-overlay" id="editProfilModal">
+  <div class="modal-box">
+    <h2>Modifier mon profil</h2>
+    <div id="edit-alert" class="modal-alert"></div>
+    <div class="modal-grid">
+      <div class="modal-field full">
+        <label class="modal-label">Prénom / Nom *</label>
+        <input type="text" id="ep-nom" class="modal-input" value="{{ nomBenef }}" required>
+      </div>
+      <div class="modal-field full">
+        <label class="modal-label">Adresse e-mail *</label>
+        <input type="email" id="ep-email" class="modal-input" value="{{ user.email }}" required>
+      </div>
+      <div class="modal-field full">
+        <label class="modal-label">Adresse</label>
+        <input type="text" id="ep-adresse" class="modal-input" value="{{ beneficiaire ? beneficiaire.adresse ?? '' : '' }}">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="modal-cancel" onclick="closeModal('editProfilModal')">Annuler</button>
+      <button type="button" class="btn btn-teal" id="ep-btn" onclick="saveProfile()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Changer mot de passe -->
+<div class="modal-overlay" id="changerMdpModal">
+  <div class="modal-box">
+    <h2>Changer mon mot de passe</h2>
+    <div id="mdp-alert" class="modal-alert"></div>
+    <div class="modal-field full" style="margin-bottom:12px;">
+      <label class="modal-label">Mot de passe actuel *</label>
+      <input type="password" id="mdp-ancien" class="modal-input" placeholder="Votre mot de passe actuel" autocomplete="current-password">
+    </div>
+    <div class="modal-field full" style="margin-bottom:4px;">
+      <label class="modal-label">Nouveau mot de passe *</label>
+      <input type="password" id="mdp-nouveau" class="modal-input" placeholder="••••••••••••" autocomplete="new-password" oninput="checkAnssi(this.value)">
+    </div>
+    <div class="anssi-box">
+      <p>Critères de sécurité (ANSSI)</p>
+      <div class="anssi-item" id="c-len"><svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg> 12 caractères minimum</div>
+      <div class="anssi-item" id="c-maj"><svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg> Une lettre majuscule</div>
+      <div class="anssi-item" id="c-min"><svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg> Une lettre minuscule</div>
+      <div class="anssi-item" id="c-num"><svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg> Un chiffre</div>
+      <div class="anssi-item" id="c-spe"><svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg> Un caractère spécial (!@#$%…)</div>
+    </div>
+    <div class="modal-field full" style="margin-top:10px;">
+      <label class="modal-label">Confirmer le nouveau mot de passe *</label>
+      <input type="password" id="mdp-confirm" class="modal-input" placeholder="••••••••••••" autocomplete="new-password">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="modal-cancel" onclick="closeModal('changerMdpModal')">Annuler</button>
+      <button type="button" class="btn btn-pink" id="mdp-btn" onclick="saveMdp()">Modifier le mot de passe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajouter aidant -->
+<div class="modal-overlay" id="ajouterModal">
+  <div class="modal-box">
+    <h2>+ Ajouter un aidant</h2>
+    <form method="post" action="{{ path('beneficiaire_aidant_ajouter') }}">
+      <div class="modal-grid">
+        <div class="modal-field">
+          <label class="modal-label">Prénom *</label>
+          <input type="text" name="prenom" class="modal-input" placeholder="Prénom">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Nom *</label>
+          <input type="text" name="nom" class="modal-input" placeholder="Nom" required>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Téléphone</label>
+          <input type="tel" name="telephone" class="modal-input" placeholder="06 …">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Type de lien</label>
+          <input type="text" name="lien" class="modal-input" placeholder="Fille, Fils, Ami…">
+        </div>
+        <div class="modal-field full">
+          <label class="modal-label">Adresse e-mail</label>
+          <input type="email" name="email" class="modal-input" placeholder="exemple@mail.com">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closeModal('ajouterModal')">Annuler</button>
+        <button type="submit" class="btn btn-pink">Ajouter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.querySelectorAll('#'+id+' .modal-alert').forEach(a => { a.style.display='none'; a.textContent=''; });
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+
+const ANSSI_OK_SVG = `<svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#27ae60"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const ANSSI_KO_SVG = `<svg class="anssi-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg>`;
+
+function setAnssiItem(id, ok, label) {
+  const el = document.getElementById(id);
+  el.classList.toggle('ok', ok);
+  el.innerHTML = (ok ? ANSSI_OK_SVG : ANSSI_KO_SVG) + ' ' + label;
+}
+
+function checkAnssi(val) {
+  setAnssiItem('c-len', val.length >= 12, '12 caractères minimum');
+  setAnssiItem('c-maj', /[A-Z]/.test(val), 'Une lettre majuscule');
+  setAnssiItem('c-min', /[a-z]/.test(val), 'Une lettre minuscule');
+  setAnssiItem('c-num', /[0-9]/.test(val), 'Un chiffre');
+  setAnssiItem('c-spe', /[\W_]/.test(val), 'Un caractère spécial (!@#$%…)');
+}
+
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'modal-alert ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function saveProfile() {
+  const nom = document.getElementById('ep-nom').value.trim();
+  const email = document.getElementById('ep-email').value.trim();
+  const adresse = document.getElementById('ep-adresse').value.trim();
+  const btn = document.getElementById('ep-btn');
+  if (!nom || !email) { showAlert('edit-alert','error','Nom et email sont obligatoires.'); return; }
+  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try {
+    const r = await fetch('/api/beneficiaire/mon-compte', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({nom, email, adresse})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur');
+    showAlert('edit-alert', 'success', d.message);
+    setTimeout(() => { closeModal('editProfilModal'); location.reload(); }, 1200);
+  } catch(e) { showAlert('edit-alert','error', e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Enregistrer'; }
+}
+
+async function saveMdp() {
+  const ancien = document.getElementById('mdp-ancien').value;
+  const nouveau = document.getElementById('mdp-nouveau').value;
+  const confirm = document.getElementById('mdp-confirm').value;
+  const btn = document.getElementById('mdp-btn');
+
+  if (!ancien) { showAlert('mdp-alert','error','Veuillez saisir votre mot de passe actuel.'); return; }
+  if (!nouveau) { showAlert('mdp-alert','error','Veuillez saisir un nouveau mot de passe.'); return; }
+  if (nouveau !== confirm) { showAlert('mdp-alert','error','Les nouveaux mots de passe ne correspondent pas.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Modification…';
+  try {
+    const r = await fetch('/api/beneficiaire/changer-mdp', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ancienMotDePasse: ancien, nouveauMotDePasse: nouveau, confirmationMotDePasse: confirm})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur');
+    showAlert('mdp-alert', 'success', d.message);
+    document.getElementById('mdp-ancien').value = '';
+    document.getElementById('mdp-nouveau').value = '';
+    document.getElementById('mdp-confirm').value = '';
+    checkAnssi('');
+    setTimeout(() => closeModal('changerMdpModal'), 2000);
+  } catch(e) { showAlert('mdp-alert','error', e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Modifier le mot de passe'; }
+}
+</script>
+{% endblock %}

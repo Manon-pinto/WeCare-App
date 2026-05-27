@@ -1,0 +1,89 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Messages – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .msg-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .msg-topbar h1 { font-size:1.6rem; font-weight:800; color:var(--text-dark); display:flex; align-items:center; gap:10px; }
+  .msg-badge-count { background:var(--pink); color:var(--primary); border-radius:50%; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; }
+
+  .msg-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); overflow:hidden; }
+
+  .msg-item { border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.12s; border-left:3px solid transparent; }
+  .msg-item:last-child { border-bottom:none; }
+  .msg-item:hover { background:var(--teal-pale); }
+  .msg-item.unread { background:#e8f7ff; border-left-color:var(--teal-mid); }
+  .msg-item.open { border-left-color:var(--teal-mid); background:var(--teal-pale); }
+
+  .msg-row { padding:16px 22px; display:flex; align-items:flex-start; gap:14px; }
+  .msg-icon { width:38px; height:38px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .msg-icon svg { width:18px; height:18px; }
+  .msg-body { flex:1; min-width:0; }
+  .msg-objet { font-size:0.88rem; font-weight:700; color:var(--text-dark); display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
+  .msg-date { font-size:0.73rem; color:var(--text-muted); font-weight:400; flex-shrink:0; margin-left:10px; }
+  .msg-preview { font-size:0.78rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:500px; }
+
+  .msg-detail { display:none; padding:0 22px 18px 74px; }
+  .msg-item.open .msg-detail { display:block; }
+  .msg-contenu-full { font-size:0.82rem; color:var(--text-body); line-height:1.7; background:var(--bg); border-radius:8px; padding:12px 14px; margin-bottom:8px; }
+  .msg-reponse-wrap { border-top:1px dashed var(--border); padding-top:10px; margin-top:4px; }
+  .msg-reponse-label { font-size:0.72rem; font-weight:700; color:var(--teal); margin-bottom:4px; }
+  .msg-reponse-text { font-size:0.82rem; color:var(--text-body); line-height:1.6; }
+  .msg-unread-dot { width:8px; height:8px; border-radius:50%; background:var(--teal-mid); flex-shrink:0; margin-top:6px; }
+
+  .msg-empty { padding:40px; text-align:center; color:var(--text-muted); font-size:0.85rem; }
+</style>
+
+<div class="msg-topbar">
+  <h1>
+    Message
+    {% if nonLusMsg > 0 %}<span class="msg-badge-count">{{ nonLusMsg }}</span>{% endif %}
+  </h1>
+  <a href="{{ path('beneficiaire_contact_wecare') }}" class="btn btn-pink">+ Nouvelle demande</a>
+</div>
+
+<div class="msg-card">
+  {% for message in messages %}
+  {% set estMoi = message.expediteur.id == app.user.id %}
+  {% set estNonLu = not message.lu and message.destinataire.id == app.user.id %}
+  {% set contenu = message.contenu %}
+  {% set motif = contenu|split(']')|first %}
+  {% set motif = motif starts with '[' ? motif|slice(1) : '' %}
+  {% set texte = motif ? contenu|slice(motif|length + 2) : contenu %}
+  <div class="msg-item {{ estNonLu ? 'unread' : '' }}" onclick="toggleMsg(this, {{ message.id }})">
+    <div class="msg-row">
+      <div class="msg-icon">
+        <svg fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="msg-body">
+        <div class="msg-objet">
+          <span>{{ motif ?: (texte|slice(0,50)) }}</span>
+          <span class="msg-date">{{ message.dateEnvoi ? message.dateEnvoi|date('d/m/Y H:i') : '' }}</span>
+        </div>
+        <div class="msg-preview">{{ texte|slice(0,80) }}{% if texte|length > 80 %}…{% endif %}</div>
+      </div>
+      {% if estNonLu %}<div class="msg-unread-dot"></div>{% endif %}
+    </div>
+    <div class="msg-detail">
+      <div class="msg-contenu-full">{{ texte }}</div>
+    </div>
+  </div>
+  {% else %}
+  <div class="msg-empty">Aucun message pour le moment.</div>
+  {% endfor %}
+</div>
+
+<script>
+function toggleMsg(el, id) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.msg-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) {
+    el.classList.add('open');
+    if (el.classList.contains('unread')) {
+      fetch('/api/beneficiaire/messages/' + id + '/lire', {method:'PATCH'})
+        .then(() => { el.classList.remove('unread'); });
+    }
+  }
+}
+</script>
+{% endblock %}

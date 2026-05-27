@@ -36,6 +36,12 @@ class Intervenant
     #[ORM\Column]
     private ?float $rayonIntervention = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $vehicule = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
+
     #[ORM\ManyToMany(targetEntity: Planning::class, mappedBy: 'intervenants')]
     private Collection $plannings;
 
@@ -118,6 +124,12 @@ class Intervenant
         $this->rayonIntervention = $rayonIntervention;
         return $this;
     }
+
+    public function getVehicule(): ?string { return $this->vehicule; }
+    public function setVehicule(?string $vehicule): static { $this->vehicule = $vehicule; return $this; }
+
+    public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
 
     /** @return Collection<int, Planning> */
     public function getPlannings(): Collection

@@ -1,0 +1,90 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Soignants – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .sg-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .sg-topbar h1 { font-size:1.6rem; font-weight:800; color:var(--text-dark); }
+
+  .sg-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); overflow:hidden; margin-bottom:16px; }
+
+  .sg-header { background:#c5ebe6; padding:20px 24px; display:flex; align-items:center; gap:16px; }
+  .sg-avatar { width:52px; height:52px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; color:var(--teal); flex-shrink:0; }
+  .sg-name { font-size:1.1rem; font-weight:800; color:var(--text-dark); }
+  .sg-spec { font-size:0.8rem; color:var(--text-body); margin-top:2px; }
+  .sg-since { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+
+  .sg-body { display:grid; grid-template-columns:1fr 1.4fr; gap:0; }
+  .sg-col { padding:20px 24px; }
+  .sg-col + .sg-col { border-left:1px solid var(--border); }
+  .sg-col-title { font-size:0.72rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; }
+  .sg-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .sg-tag { border:1.5px solid var(--text-dark); border-radius:20px; padding:3px 12px; font-size:0.75rem; font-weight:600; color:var(--text-dark); }
+  .sg-creneaux { display:flex; flex-wrap:wrap; gap:6px; }
+  .sg-creneau { border:1.5px solid var(--text-dark); border-radius:20px; padding:3px 12px; font-size:0.75rem; font-weight:600; color:var(--text-dark); }
+
+  .sg-semaine { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+  .sg-day-head { font-size:0.7rem; color:var(--text-muted); font-weight:600; margin-bottom:4px; }
+  .sg-day-num { font-size:1rem; font-weight:800; color:var(--text-dark); margin-bottom:6px; }
+  .sg-slot { background:var(--teal-mid); color:#fff; border-radius:6px; padding:3px 0; font-size:0.72rem; font-weight:700; margin-bottom:3px; }
+  .sg-slot-empty { color:var(--text-muted); font-size:0.78rem; }
+
+  @media (max-width: 640px) {
+    .sg-topbar { flex-direction:column; align-items:flex-start; gap:10px; }
+    .sg-topbar .btn { width:100%; justify-content:center; }
+    .sg-body { grid-template-columns:1fr; }
+    .sg-col + .sg-col { border-left:none; border-top:1px solid var(--border); }
+    .sg-semaine { grid-template-columns:repeat(7,1fr); gap:2px; }
+  }
+</style>
+
+<div class="sg-topbar">
+  {% set nomProche = app.user.beneficiaire and app.user.beneficiaire.utilisateur ? app.user.beneficiaire.utilisateur.nom : 'votre proche' %}
+  <h1>Les soignants de {{ nomProche }}</h1>
+  <a href="{{ path('beneficiaire_contact_wecare') }}" class="btn btn-pink">Faire une demande à WeCare</a>
+</div>
+
+{% for item in soignantsData %}
+  {% set intervenant = item.intervenant %}
+  {% set jours = item.jours %}
+  {% set u = intervenant.utilisateur %}
+  {% set initiales = u.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+  <div class="sg-card">
+    <div class="sg-header">
+      <div class="sg-avatar">{{ initiales }}</div>
+      <div>
+        <div class="sg-name">{{ u.nom }}</div>
+        <div class="sg-spec">{{ intervenant.specialite }}</div>
+      </div>
+    </div>
+    <div class="sg-body">
+      <div class="sg-col">
+        <div class="sg-col-title">Mission</div>
+        <div class="sg-tags">
+          <span class="sg-tag">{{ intervenant.specialite }}</span>
+        </div>
+      </div>
+      <div class="sg-col">
+        <div class="sg-col-title">Planning de la semaine</div>
+        <div class="sg-semaine">
+          {% for jour in jours %}
+          <div>
+            <div class="sg-day-head">{{ jour.label|slice(0,3) }}</div>
+            <div class="sg-day-num">{{ jour.num }}</div>
+            {% if jour.heures|length > 0 %}
+              {% for h in jour.heures %}
+                <div class="sg-slot">{{ h }}</div>
+              {% endfor %}
+            {% else %}
+              <div class="sg-slot-empty">–</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="card" style="text-align:center;color:var(--text-muted);padding:40px;">Aucun soignant assigné pour le moment.</div>
+{% endfor %}
+{% endblock %}

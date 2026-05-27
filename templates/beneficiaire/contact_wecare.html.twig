@@ -1,0 +1,52 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Nouvelle demande – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .cw-wrap { max-width:860px; }
+  .cw-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); padding:32px 36px; }
+  .cw-field { margin-bottom:22px; }
+  .cw-label { font-size:0.9rem; font-weight:700; color:var(--text-dark); margin-bottom:8px; display:block; }
+  .cw-input {
+    width:100%; border:1.5px solid var(--border); border-radius:8px;
+    padding:10px 14px; font-family:inherit; font-size:0.85rem;
+    color:var(--text-body); outline:none; background:#fff;
+    transition:border-color 0.15s;
+  }
+  .cw-input:focus { border-color:var(--teal-mid); }
+  textarea.cw-input { resize:vertical; min-height:200px; }
+  .cw-actions { display:flex; justify-content:flex-end; margin-top:10px; }
+
+  .flash-success { background:#d4edda; color:#155724; border-radius:8px; padding:12px 18px; margin-bottom:18px; font-size:0.85rem; }
+  .flash-error { background:#f8d7da; color:#721c24; border-radius:8px; padding:12px 18px; margin-bottom:18px; font-size:0.85rem; }
+</style>
+
+{% for msg in app.flashes('success') %}
+  <div class="flash-success">{{ msg }}</div>
+{% endfor %}
+{% for msg in app.flashes('error') %}
+  <div class="flash-error">{{ msg }}</div>
+{% endfor %}
+
+<div class="cw-wrap">
+  <div class="cw-card">
+    <form method="post" action="{{ path('beneficiaire_contact_wecare_envoyer') }}">
+      <div class="cw-field">
+        <label class="cw-label">E-mail</label>
+        <input type="text" class="cw-input" value="{{ app.user.nom ~ ' (' ~ app.user.email ~ ')' }}" readonly>
+      </div>
+      <div class="cw-field">
+        <label class="cw-label" for="motif">Motif</label>
+        <input type="text" id="motif" name="motif" class="cw-input" placeholder="Décrivez la raison de votre message" required>
+      </div>
+      <div class="cw-field">
+        <label class="cw-label" for="texte">Détail du texte</label>
+        <textarea id="texte" name="texte" class="cw-input" placeholder="Rédigez votre message (1500 caractères)" maxlength="1500" required></textarea>
+      </div>
+      <div class="cw-actions">
+        <button type="submit" class="btn btn-pink">Envoyer</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

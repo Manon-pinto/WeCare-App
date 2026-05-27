@@ -1,0 +1,117 @@
+{% extends 'beneficiaire/layout.html.twig' %}
+{% block title %}Notifications – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .notif-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .notif-topbar h1 { font-size:1.6rem; font-weight:800; color:var(--text-dark); display:flex; align-items:center; gap:10px; }
+  .notif-badge { background:var(--pink); color:var(--primary); border-radius:50%; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; }
+
+  .notif-card { background:#fff; border-radius:var(--radius); box-shadow:var(--card-shadow); overflow:hidden; }
+
+  .notif-group-label { padding:10px 20px; font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; background:var(--bg); }
+
+  .notif-item {
+    display:flex; align-items:center; gap:14px; padding:16px 20px;
+    border-bottom:1px solid var(--border); transition:background 0.12s;
+  }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item.unread { background:#e8f7ff; }
+  .notif-item:hover { background:var(--teal-pale); }
+
+  .notif-avatar { width:40px; height:40px; border-radius:50%; background:var(--pink); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+  .notif-avatar.wecare { background:var(--primary); }
+  .notif-avatar svg { width:22px; height:22px; }
+
+  .notif-body { flex:1; min-width:0; }
+  .notif-title { font-size:0.85rem; font-weight:700; color:var(--text-dark); margin-bottom:2px; }
+  .notif-text { font-size:0.78rem; color:var(--text-body); line-height:1.5; }
+
+  .notif-action { flex-shrink:0; }
+  .btn-outline-teal { background:#fff; color:var(--teal); border:1.5px solid var(--teal-mid); border-radius:8px; padding:6px 14px; font-size:0.75rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; }
+  .btn-outline-teal:hover { background:var(--teal-pale); }
+</style>
+
+<div class="notif-topbar">
+  <h1>
+    Notification
+    {% if nonLues > 0 %}<span class="notif-badge">{{ nonLues }}</span>{% endif %}
+  </h1>
+  {% if nonLues > 0 %}
+  <button class="btn btn-pink" onclick="marquerToutLu()">Tout marquer comme lu</button>
+  {% endif %}
+</div>
+
+<div class="notif-card">
+  {% set today = date('today') %}
+  {% set yesterday = date('yesterday') %}
+  {% set groupes = {'AUJOURD\'HUI': [], 'HIER': [], 'CETTE SEMAINE': []} %}
+  {% set hasAny = false %}
+
+  {% for notif in notifications %}
+    {% set hasAny = true %}
+    {% set cr = notif.compteRendu %}
+    {% set inv = cr ? cr.intervention : null %}
+    {% set intervenant = inv ? inv.intervenant : null %}
+    {% set nomIntervenant = intervenant ? intervenant.utilisateur.nom : 'WeCare' %}
+    {% set isWecare = not intervenant %}
+
+    {% set notifDate = notif.createdAt ?? null %}
+
+    {% set groupe = 'CETTE SEMAINE' %}
+    {% if notifDate %}
+      {% if notifDate|date('Y-m-d') == today|date('Y-m-d') %}{% set groupe = 'AUJOURD\'HUI' %}
+      {% elseif notifDate|date('Y-m-d') == yesterday|date('Y-m-d') %}{% set groupe = 'HIER' %}
+      {% endif %}
+    {% endif %}
+
+    {% set initiales = nomIntervenant|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+
+    <div class="notif-item {{ not notif.lu ? 'unread' : '' }}" onclick="marquerLu(this, {{ notif.id }})">
+      <div class="notif-avatar {{ isWecare ? 'wecare' : '' }}">
+        {% if isWecare %}
+          <svg fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        {% else %}
+          <svg fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        {% endif %}
+      </div>
+      <div class="notif-body">
+        <div class="notif-title">
+          {% if inv %}
+            {{ nomIntervenant }} :
+            {{ notifDate ? notifDate|date('l')|capitalize ~ ' · ' ~ notifDate|date('H\\hi') : '' }}
+            – {{ inv.typeIntervention ? inv.typeIntervention.value : 'Visite' }}
+          {% else %}
+            {{ notif.type ? notif.type.value : 'Notification WeCare' }}
+            {% if notifDate %} : {{ notifDate|date('l')|capitalize ~ ' · ' ~ notifDate|date('H\\hi') }}{% endif %}
+          {% endif %}
+        </div>
+        <div class="notif-text">{{ notif.message ?? (cr ? cr.contenu|slice(0,100) : '') }}</div>
+      </div>
+      {% if cr %}
+      <div class="notif-action">
+        <a href="{{ path('beneficiaire_comptes_rendus') }}" class="btn-outline-teal">Voir compte rendu</a>
+      </div>
+      {% elseif notif.type and notif.type.value == 'message' %}
+      <div class="notif-action">
+        <a href="{{ path('beneficiaire_messages') }}" class="btn-outline-teal">Lire Message</a>
+      </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div style="padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;">Aucune notification pour le moment.</div>
+  {% endfor %}
+</div>
+<script>
+function marquerLu(el, id) {
+  if (el.classList.contains('unread')) {
+    fetch('/api/beneficiaire/notifications/' + id + '/lire', {method:'PATCH'})
+      .then(() => el.classList.remove('unread'));
+  }
+}
+function marquerToutLu() {
+  fetch('/api/beneficiaire/notifications/lire-tout', {method:'PATCH'})
+    .then(() => location.reload());
+}
+</script>
+{% endblock %}

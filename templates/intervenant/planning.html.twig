@@ -1,0 +1,334 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Planning – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .plan-topbar { display:flex; align-items:center; gap:20px; margin-bottom:22px; flex-wrap:wrap; }
+  .plan-title { font-size:1.5rem; font-weight:800; color:var(--text-dark); }
+  .week-nav { display:flex; align-items:center; gap:0; background:#fff; border-radius:20px; padding:4px 10px; box-shadow:var(--card-shadow); }
+  .week-nav-btn { background:none; border:none; cursor:pointer; color:var(--teal); font-size:1rem; padding:0 6px; line-height:1; text-decoration:none; color:var(--teal); }
+  .week-nav-label { font-size:0.85rem; font-weight:700; color:var(--text-dark); padding:0 8px; white-space:nowrap; }
+  .plan-topbar-right { margin-left:auto; }
+
+  .plan-card { background:#fff; border-radius:14px; box-shadow:var(--card-shadow); overflow:hidden; }
+  .week-grid { display:grid; grid-template-columns:50px repeat(7,1fr); }
+  .wh-empty { background:#fff; padding:14px 0; border-bottom:1px solid var(--border); }
+  .wh-day { padding:12px 6px 8px; text-align:center; border-bottom:1px solid var(--border); border-left:1px solid var(--border); }
+  .wh-day-name { font-size:0.72rem; color:var(--text-muted); font-weight:600; }
+  .wh-day-num { font-size:1.3rem; font-weight:800; color:var(--text-dark); line-height:1.1; margin-top:2px; }
+  .wh-day.today .wh-day-name, .wh-day.today .wh-day-num { color:var(--teal); }
+
+  .visit-bar { padding:4px 6px; text-align:center; font-size:0.68rem; font-weight:700; background:var(--teal-light); color:var(--text-dark); border-left:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .visit-bar.empty-bar { background:var(--bg); color:var(--text-muted); }
+  .today-col { background:rgba(63,205,192,0.06); }
+  .vb-empty { background:#fff; border-bottom:1px solid var(--border); }
+
+  .tl-hour { font-size:0.68rem; color:var(--text-muted); text-align:right; padding:0 8px; display:flex; align-items:flex-start; padding-top:6px; height:60px; border-bottom:1px solid var(--border); background:#fff; }
+  .tl-cell { border-left:1px solid var(--border); border-bottom:1px solid rgba(0,0,0,0.04); height:60px; position:relative; padding:3px; }
+  .tl-cell.today-col { background:rgba(63,205,192,0.06); }
+
+  .int-card { position:absolute; left:2px; right:2px; border-radius:6px; padding:3px 6px; font-size:0.65rem; font-weight:600; overflow:hidden; cursor:pointer; border:none; background:var(--teal-light); color:var(--text-dark); line-height:1.2; text-align:left; }
+  .int-card:hover { opacity:0.82; }
+  .int-card .ic-name { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .int-card .ic-type { opacity:0.7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ── Vue jour mobile ── */
+  .day-view { display:none; }
+
+  @media (max-width: 640px) {
+    .plan-topbar { flex-wrap:wrap; gap:10px; }
+    .plan-topbar-right { margin-left:0; width:100%; }
+    .plan-topbar-right .btn { width:100%; justify-content:center; }
+    .plan-card { display:none; }
+    .day-view { display:block; }
+
+    /* sélecteur de jours */
+    .dv-week-strip {
+      display:flex; gap:6px; overflow-x:auto; padding:0 2px 10px;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .dv-week-strip::-webkit-scrollbar { display:none; }
+    .dv-day-pill {
+      display:flex; flex-direction:column; align-items:center;
+      min-width:40px; padding:8px 6px; border-radius:20px;
+      cursor:pointer; border:none; background:none;
+      font-family:'Poppins',sans-serif; gap:4px; flex-shrink:0;
+    }
+    .dv-day-pill .dp-name { font-size:0.65rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; }
+    .dv-day-pill .dp-num  { font-size:1rem; font-weight:800; color:var(--text-dark); }
+    .dv-day-pill .dp-dot  { width:6px; height:6px; border-radius:50%; background:transparent; }
+    .dv-day-pill.has-visits .dp-dot { background:var(--teal-mid); }
+    .dv-day-pill.active { background:var(--primary); }
+    .dv-day-pill.active .dp-name,
+    .dv-day-pill.active .dp-num  { color:#fff; }
+    .dv-day-pill.active .dp-dot  { background:var(--pink); }
+
+    /* titre du jour */
+    .dv-day-title { font-size:1rem; font-weight:800; color:var(--text-dark); margin:10px 0 14px; }
+
+    /* timeline */
+    .dv-timeline { display:flex; flex-direction:column; gap:10px; }
+    .dv-slot { display:flex; gap:12px; align-items:flex-start; }
+    .dv-hour { font-size:0.7rem; color:var(--text-muted); width:34px; flex-shrink:0; padding-top:12px; text-align:right; }
+    .dv-line { width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin-top:14px; }
+    .dv-interventions { flex:1; display:flex; flex-direction:column; gap:6px; padding-bottom:4px; }
+    .dv-card {
+      background:#fff; border-radius:12px; padding:12px 14px;
+      box-shadow:var(--card-shadow); cursor:pointer;
+      border-left:4px solid var(--teal-mid);
+    }
+    .dv-card-name { font-size:0.85rem; font-weight:700; color:var(--text-dark); }
+    .dv-card-type { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .dv-card-time { font-size:0.72rem; font-weight:600; color:var(--teal); margin-top:4px; }
+    .dv-empty { font-size:0.82rem; color:var(--text-muted); padding:10px 0; }
+  }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,0,75,0.35); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#fff; border-radius:14px; padding:26px; width:440px; max-width:94vw; box-shadow:0 20px 60px rgba(15,0,75,0.2); }
+  .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+  .modal-title { font-size:1rem; font-weight:700; color:var(--text-dark); }
+  .modal-close { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:1.1rem; }
+  .modal-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.83rem; }
+  .modal-row:last-child { border-bottom:none; }
+  .mr-label { color:var(--text-muted); }
+  .mr-val { font-weight:600; color:var(--text-dark); text-align:right; }
+</style>
+
+{% set JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'] %}
+{% set MOIS = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'] %}
+{% set todayStr = "now"|date("Y-m-d") %}
+{% set hours = [7,8,9,10,11,12,13,14,15,16] %}
+
+<div class="plan-topbar">
+  <div class="plan-title">Planning</div>
+  <div class="week-nav">
+    <a href="{{ path('intervenant_planning', {offset: offset - 1}) }}" class="week-nav-btn">‹</a>
+    <span class="week-nav-label">
+      {{ dateDebut|date('d') }} {{ MOIS[dateDebut|date('n') - 1] }}
+      – {{ dateFin|date('d') }} {{ MOIS[dateFin|date('n') - 1] }} {{ dateFin|date('Y') }}
+    </span>
+    <a href="{{ path('intervenant_planning', {offset: offset + 1}) }}" class="week-nav-btn">›</a>
+  </div>
+  <div class="plan-topbar-right">
+    <button class="btn btn-pink" onclick="openProblemeModal()">Signaler un problème</button>
+  </div>
+</div>
+
+<div class="plan-card">
+  <div class="week-grid">
+    <div class="wh-empty"></div>
+    {% for j in jours %}
+      {% set isToday = j.date == todayStr %}
+      <div class="wh-day{{ isToday ? ' today' : '' }}">
+        <div class="wh-day-name">{{ JOURS[loop.index0] }}</div>
+        <div class="wh-day-num">{{ j.date|date('d') }}</div>
+      </div>
+    {% endfor %}
+
+    <div class="vb-empty"></div>
+    {% for j in jours %}
+      {% set count = j.interventions|length %}
+      {% set isToday = j.date == todayStr %}
+      <div class="visit-bar{{ count == 0 ? ' empty-bar' : '' }}{{ isToday ? ' today-col' : '' }}">
+        {{ count > 0 ? count ~ ' visite' ~ (count > 1 ? 's' : '') : '–' }}
+      </div>
+    {% endfor %}
+
+    {% for h in hours %}
+      <div class="tl-hour">{{ h }}</div>
+      {% for j in jours %}
+        {% set isToday = j.date == todayStr %}
+        <div class="tl-cell{{ isToday ? ' today-col' : '' }}">
+          {% for i in j.interventions %}
+            {% set hDebut = i.dateDebut|date('H')|number_format %}
+            {% if hDebut == h %}
+              {% set minDebut = i.dateDebut|date('i')|number_format %}
+              {% set hFin = i.dateFin|date('H')|number_format %}
+              {% set minFin = i.dateFin|date('i')|number_format %}
+              {% set heightRaw = (hFin - hDebut) * 60 + minFin - minDebut %}
+              {% set heightPx = heightRaw > 54 ? 54 : heightRaw %}
+              <button class="int-card" style="top:{{ minDebut }}px;height:{{ heightPx }}px"
+                onclick='showModal({{ {nom: i.beneficiaire.utilisateur.nom, heureDebut: i.dateDebut|date('H:i'), heureFin: i.dateFin|date('H:i'), type: i.typeIntervention.value, adresse: i.beneficiaire.adresse, statut: i.statut.value}|json_encode|raw }})'>
+                <div class="ic-name">{{ i.beneficiaire.utilisateur.nom }}</div>
+                <div class="ic-type">{{ i.typeIntervention.value }}</div>
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{% set JOURS_LONG = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'] %}
+{% set JOURS_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] %}
+{% set MOIS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] %}
+
+<div class="day-view">
+  <div class="dv-week-strip" id="dv-strip">
+    {% for j in jours %}
+      {% set isToday = j.date == todayStr %}
+      <button class="dv-day-pill{{ j.interventions|length > 0 ? ' has-visits' : '' }}{{ isToday ? ' active' : '' }}"
+        data-date="{{ j.date }}"
+        data-idx="{{ loop.index0 }}"
+        onclick="selectDay({{ loop.index0 }})">
+        <span class="dp-name">{{ JOURS_SHORT[loop.index0] }}</span>
+        <span class="dp-num">{{ j.date|date('d') }}</span>
+        <span class="dp-dot"></span>
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="dv-day-title" id="dv-day-title"></div>
+  <div class="dv-timeline" id="dv-timeline"></div>
+</div>
+
+<div class="modal-overlay" id="int-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="im-title">Intervention</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="im-body"></div>
+  </div>
+</div>
+
+<script>
+function showModal(ci) {
+  document.getElementById('im-title').textContent = ci.nom || 'Intervention';
+  document.getElementById('im-body').innerHTML = `
+    <div class="modal-row"><span class="mr-label">Patient</span><span class="mr-val">${ci.nom||'–'}</span></div>
+    <div class="modal-row"><span class="mr-label">Horaire</span><span class="mr-val">${ci.heureDebut||'–'} – ${ci.heureFin||'–'}</span></div>
+    <div class="modal-row"><span class="mr-label">Type</span><span class="mr-val">${ci.type||'–'}</span></div>
+    <div class="modal-row"><span class="mr-label">Adresse</span><span class="mr-val">${ci.adresse||'–'}</span></div>
+    <div class="modal-row"><span class="mr-label">Statut</span><span class="mr-val">${ci.statut||'–'}</span></div>`;
+  document.getElementById('int-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('int-modal').classList.remove('open'); }
+
+// ── Vue jour mobile ──
+const joursData = {{ jours|map(j => {
+  'date': j.date,
+  'interventions': j.interventions|map(i => {
+    'nom': i.beneficiaire.utilisateur.nom,
+    'type': i.typeIntervention.value,
+    'adresse': i.beneficiaire.adresse,
+    'heureDebut': i.dateDebut|date('H:i'),
+    'heureFin': i.dateFin|date('H:i'),
+    'hDebut': i.dateDebut|date('H')|number_format,
+    'statut': i.statut.value
+  })
+})|json_encode|raw }};
+
+const JOURS_LONG = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const MOIS_LONG  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const HOURS = [7,8,9,10,11,12,13,14,15,16];
+
+let activeIdx = joursData.findIndex(j => j.date === '{{ todayStr }}');
+if (activeIdx < 0) activeIdx = 0;
+
+function selectDay(idx) {
+  activeIdx = idx;
+  document.querySelectorAll('.dv-day-pill').forEach((p,i) => p.classList.toggle('active', i === idx));
+  renderDayView();
+}
+
+function renderDayView() {
+  const jour = joursData[activeIdx];
+  if (!jour) return;
+  const d = new Date(jour.date + 'T00:00:00');
+  const nomJour = JOURS_LONG[activeIdx] || '';
+  const nomMois = MOIS_LONG[d.getMonth()];
+  document.getElementById('dv-day-title').textContent = `${nomJour} ${d.getDate()} ${nomMois}`;
+
+  let html = '';
+  const ints = jour.interventions;
+  if (ints.length === 0) {
+    html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+  } else {
+    HOURS.forEach(h => {
+      const slots = ints.filter(i => parseInt(i.hDebut) === h);
+      if (!slots.length) return;
+      html += `<div class="dv-slot">
+        <div class="dv-hour">${h}h</div>
+        <div class="dv-line"></div>
+        <div class="dv-interventions">
+          ${slots.map(i => `<div class="dv-card" onclick='showModal(${JSON.stringify({nom:i.nom,heureDebut:i.heureDebut,heureFin:i.heureFin,type:i.type,adresse:i.adresse,statut:i.statut})})'>
+            <div class="dv-card-name">${i.nom}</div>
+            <div class="dv-card-type">${i.type}</div>
+            <div class="dv-card-time">${i.heureDebut} – ${i.heureFin}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    if (!html) html = '<div class="dv-empty">Aucune intervention ce jour.</div>';
+  }
+  document.getElementById('dv-timeline').innerHTML = html;
+}
+
+// Init au chargement
+renderDayView();
+// Scroll vers le jour actif
+const activeBtn = document.querySelector('.dv-day-pill.active');
+if (activeBtn) activeBtn.scrollIntoView({inline:'center', behavior:'smooth'});
+
+function openProblemeModal() { document.getElementById('prob-modal').classList.add('open'); }
+function closeProblemeModal() { document.getElementById('prob-modal').classList.remove('open'); }
+
+async function envoyerProbleme() {
+  const type = document.getElementById('prob-type').value;
+  const date = document.getElementById('prob-date').value;
+  const desc = document.getElementById('prob-desc').value.trim();
+  const err = document.getElementById('prob-err');
+  const btn = document.getElementById('prob-btn');
+  if (!desc) { err.textContent = 'La description est obligatoire.'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Envoi…';
+  try {
+    const r = await fetch('/api/intervenant/planning/probleme', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type, date, description: desc})
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Erreur'); }
+    closeProblemeModal();
+    document.getElementById('prob-desc').value = '';
+    err.style.display = 'none';
+  } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
+  finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
+}
+</script>
+
+<div class="modal-overlay" id="prob-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Signaler un problème de planning</span>
+      <button class="modal-close" onclick="closeProblemeModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Type de problème</label>
+        <select id="prob-type" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark);background:#fff">
+          <option value="indisponibilite">Indisponibilité</option>
+          <option value="erreur_planning">Erreur de planning</option>
+          <option value="conflit_horaire">Conflit d'horaire</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Date concernée (optionnel)</label>
+        <input type="date" id="prob-date" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark)">
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px">Description</label>
+        <textarea id="prob-desc" rows="4" placeholder="Décrivez le problème…" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text-dark);resize:vertical"></textarea>
+      </div>
+      <div id="prob-err" style="display:none;color:#e03e3e;font-size:0.8rem"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="modal-close" onclick="closeProblemeModal()" style="padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-dark)">Annuler</button>
+        <button id="prob-btn" onclick="envoyerProbleme()" style="padding:9px 18px;background:var(--pink);border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;color:var(--primary)">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,305 @@
+{% extends 'intervenant/layout.html.twig' %}
+{% block title %}Comptes rendus – WeCare{% endblock %}
+
+{% block content %}
+<style>
+  .cr-page { display:grid; grid-template-columns:280px 1fr; gap:20px; height:calc(100vh - 90px); }
+
+  /* left list */
+  .cr-list { background:#fff; border-radius:14px; padding:0; box-shadow:var(--card-shadow); overflow-y:auto; }
+  .cr-list-section { padding:12px 16px 4px; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); font-weight:700; }
+  .cr-item {
+    display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer;
+    border-left:3px solid transparent; transition:all 0.12s;
+  }
+  .cr-item:hover { background:var(--teal-pale); }
+  .cr-item.active { background:var(--teal-pale); border-left-color:var(--teal-mid); }
+  .cr-item-info { flex:1; overflow:hidden; }
+  .cr-item-name { font-size:0.82rem; font-weight:700; color:var(--text-dark); }
+  .cr-item-sub { font-size:0.72rem; color:var(--text-muted); }
+  .badge-redige { background:var(--teal-light); color:#0d6560; border:1px solid var(--teal-mid); display:inline-flex; align-items:center; padding:2px 9px; border-radius:20px; font-size:0.65rem; font-weight:700; }
+  .badge-a-rediger { background:#fff6cc; color:#7a5800; border:1px solid #f0c030; display:inline-flex; align-items:center; padding:2px 9px; border-radius:20px; font-size:0.65rem; font-weight:700; }
+
+  /* right editor */
+  .cr-editor { background:#fff; border-radius:14px; padding:24px; box-shadow:var(--card-shadow); display:flex; flex-direction:column; border:2px solid var(--teal-mid); overflow-y:auto; }
+  .cr-editor-empty { display:flex; align-items:center; justify-content:center; flex:1; color:var(--text-muted); font-size:0.9rem; }
+
+  .ed-patient { display:flex; align-items:center; gap:14px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+  .ed-patient-info .ed-name { font-size:1rem; font-weight:800; color:var(--text-dark); }
+  .ed-patient-info .ed-sub { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+
+  .ed-section { margin-bottom:20px; }
+  .ed-section-title { font-size:0.85rem; font-weight:700; color:var(--text-dark); margin-bottom:12px; }
+
+  .vocal-zone { display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; }
+  .mic-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .mic-btn {
+    width:60px; height:60px; border-radius:50%; background:var(--teal-mid);
+    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 14px rgba(63,205,192,0.4); transition:transform 0.12s;
+  }
+  .mic-btn:hover { transform:scale(1.06); }
+  .mic-label { font-size:0.75rem; font-weight:700; color:var(--text-dark); text-align:center; }
+  .mic-sub { font-size:0.68rem; color:var(--text-muted); text-align:center; }
+  .checklist { font-size:0.78rem; color:var(--text-muted); }
+  .checklist-title { font-size:0.82rem; font-weight:700; color:var(--text-dark); margin-bottom:8px; }
+  .checklist li { margin-bottom:4px; }
+
+  .waveform { background:var(--teal-light); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .wave-bars { flex:1; display:flex; align-items:center; gap:2px; height:28px; }
+  .wave-bar { width:3px; border-radius:2px; background:var(--teal); }
+  .wave-actions { display:flex; gap:8px; }
+  .wave-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:1rem; }
+
+  .cr-textarea { width:100%; background:var(--teal-pale); border:none; border-radius:10px; padding:14px; font-family:'Poppins',sans-serif; font-size:0.82rem; color:var(--text-dark); resize:vertical; min-height:120px; font-style:italic; }
+  .cr-textarea:focus { outline:2px solid var(--teal-mid); }
+
+  .ed-footer { display:flex; justify-content:flex-end; gap:12px; margin-top:auto; padding-top:16px; border-top:1px solid var(--border); }
+  .btn-brouillon { background:#fff; border:1.5px solid var(--border); color:var(--text-dark); padding:10px 22px; border-radius:10px; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; }
+  .btn-valider { background:var(--pink); color:var(--primary); padding:10px 22px; border-radius:10px; border:none; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; }
+
+  .alert-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; padding:10px 14px; border-radius:8px; font-size:0.82rem; margin-top:8px; }
+
+  @media (max-width: 640px) {
+    .cr-page { grid-template-columns:1fr; height:auto; }
+    .cr-list { max-height:280px; border-radius:14px; }
+    .cr-editor { min-height:400px; }
+    .vocal-zone { grid-template-columns:1fr; }
+  }
+</style>
+
+<h1 style="font-size:1.5rem;font-weight:800;color:var(--text-dark);margin-bottom:20px">Comptes rendus</h1>
+
+<div class="cr-page">
+  <!-- Left list -->
+  <div class="cr-list" id="cr-list">
+    {% set today = "now"|date("d/m/Y") %}
+    {% set yesterday = "yesterday"|date("d/m/Y") %}
+
+    {% set todayItems = interventions|filter(i => i.dateDebut|date("d/m/Y") == today) %}
+    {% set hierItems = interventions|filter(i => i.dateDebut|date("d/m/Y") == yesterday) %}
+    {% set autresItems = interventions|filter(i => i.dateDebut|date("d/m/Y") != today and i.dateDebut|date("d/m/Y") != yesterday) %}
+
+    {% macro crItem(i) %}
+      {% set nom = i.beneficiaire.utilisateur.nom %}
+      {% set ini = nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) %}
+      {% set redige = i.compteRendu is not null %}
+      <div class="cr-item" id="item-{{ i.id }}" onclick="selectItem({{ i.id }})">
+        <div style="width:36px;height:36px;font-size:0.7rem;background:var(--teal-mid);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">{{ ini }}</div>
+        <div class="cr-item-info">
+          <div class="cr-item-name">{{ nom }}</div>
+          <div class="cr-item-sub">{{ i.typeIntervention.value }}</div>
+        </div>
+        {% if redige %}<span class="badge-redige">Rédigé</span>{% else %}<span class="badge-a-rediger">À rédiger</span>{% endif %}
+      </div>
+    {% endmacro %}
+
+    {% if todayItems|length %}
+      <div class="cr-list-section">Aujourd'hui</div>
+      {% for i in todayItems %}{{ _self.crItem(i) }}{% endfor %}
+    {% endif %}
+    {% if hierItems|length %}
+      <div class="cr-list-section">Hier</div>
+      {% for i in hierItems %}{{ _self.crItem(i) }}{% endfor %}
+    {% endif %}
+    {% if autresItems|length %}
+      <div class="cr-list-section">Précédent</div>
+      {% for i in autresItems %}{{ _self.crItem(i) }}{% endfor %}
+    {% endif %}
+    {% if interventions is empty %}
+      <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.82rem">Aucune intervention</div>
+    {% endif %}
+  </div>
+
+  <!-- Right editor -->
+  <div class="cr-editor" id="cr-editor">
+    <div class="cr-editor-empty">Sélectionnez une intervention pour rédiger ou consulter le compte rendu.</div>
+  </div>
+</div>
+
+<script>
+let crData = {{ interventions|map(i => {
+  'interventionId': i.id,
+  'beneficiaire': i.beneficiaire.utilisateur.nom,
+  'date': i.dateDebut|date('d/m/Y'),
+  'heureDebut': i.dateDebut|date('H:i'),
+  'type': i.typeIntervention.value,
+  'compteRendu': i.compteRendu ? {
+    'id': i.compteRendu.id,
+    'contenu': i.compteRendu.contenu,
+    'valide': i.compteRendu.isValide()
+  } : null
+})|json_encode|raw }};
+
+let selected = null;
+const ini=n=>(n||'?').split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2);
+
+function renderList(data){
+  const today=new Date().toISOString().slice(0,10);
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+
+  const todayItems=data.filter(d=>d.date===today);
+  const hierItems=data.filter(d=>d.date===yesterday);
+  const autresItems=data.filter(d=>d.date!==today&&d.date!==yesterday);
+
+  let html='';
+  if(todayItems.length){ html+=`<div class="cr-list-section">Aujourd'hui</div>`+todayItems.map(itemHtml).join(''); }
+  if(hierItems.length){ html+=`<div class="cr-list-section">Hier</div>`+hierItems.map(itemHtml).join(''); }
+  if(autresItems.length){ html+=`<div class="cr-list-section">Précédent</div>`+autresItems.map(itemHtml).join(''); }
+  if(!html) html='<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.82rem">Aucune intervention</div>';
+  document.getElementById('cr-list').innerHTML=html;
+}
+
+function itemHtml(d){
+  const redige=d.compteRendu!==null;
+  const badge=redige?'<span class="badge-redige">Rédigé</span>':'<span class="badge-a-rediger">À rédiger</span>';
+  return `<div class="cr-item" id="item-${d.interventionId}" onclick="selectItem(${d.interventionId})">
+    <div class="avatar avatar-sm" style="width:36px;height:36px;font-size:0.7rem;background:var(--teal-mid);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${ini(d.beneficiaire)}</div>
+    <div class="cr-item-info"><div class="cr-item-name">${d.beneficiaire||''}</div><div class="cr-item-sub">${d.type||''}</div></div>
+    ${badge}
+  </div>`;
+}
+
+function selectItem(id){
+  selected=crData.find(d=>d.interventionId===id);
+  document.querySelectorAll('.cr-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('item-'+id); if(el) el.classList.add('active');
+  renderEditor(selected);
+}
+
+function renderEditor(d){
+  const cr=d.compteRendu;
+  const waves=Array.from({length:30},(_,i)=>`<div class="wave-bar" style="height:${8+Math.sin(i*0.7)*8+Math.random()*6}px"></div>`).join('');
+  document.getElementById('cr-editor').innerHTML=`
+    <div class="ed-patient">
+      <div class="avatar avatar-md" style="width:48px;height:48px;font-size:0.9rem;background:var(--teal-mid);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${ini(d.beneficiaire)}</div>
+      <div class="ed-patient-info">
+        <div class="ed-name">${d.beneficiaire||''}</div>
+        <div class="ed-sub">${d.type||''}</div>
+        <div class="ed-sub">${d.date||''} · ${d.heureDebut||''}</div>
+      </div>
+      <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:4px">···</button>
+    </div>
+
+    <div class="ed-section">
+      <div class="ed-section-title">Dictée vocale</div>
+      <div class="vocal-zone">
+        <div>
+          <div class="mic-wrap" style="flex-direction:row;justify-content:flex-start;gap:16px;margin-bottom:12px">
+            <button class="mic-btn" onclick="toggleMic(this)">
+              <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10c0 3.866 3.134 7 7 7s7-3.134 7-7"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            </button>
+            <div>
+              <div class="mic-label">Appuyer pour dicter</div>
+              <div class="mic-sub">La transcription apparaîtra<br>automatiquement dans le champ ci-dessous</div>
+            </div>
+          </div>
+          ${cr?`<div class="waveform"><div class="wave-bars">${waves}</div><div class="wave-actions"><button class="wave-btn">✕</button><button class="wave-btn" style="color:var(--teal)">✓</button></div></div>`:''}
+        </div>
+        <div>
+          <div class="checklist-title">Checklist de la visite</div>
+          <ul class="checklist" style="list-style:disc;padding-left:16px">
+            <li>Médicaments pris</li>
+            <li>Repas / hydratation vérifiés</li>
+            <li>Hygiène / toilette effectuée</li>
+            <li>État général satisfaisant</li>
+            <li>Missions effectuées</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <textarea class="cr-textarea" id="cr-contenu" placeholder="Rédiger ici…">${cr?.contenu||''}</textarea>
+    <div id="cr-err" style="display:none" class="alert-danger"></div>
+    <div class="ed-footer">
+      <button class="btn-brouillon" onclick="saveCR('brouillon')">Brouillon</button>
+      <button class="btn-valider" onclick="saveCR('valider')">Valider le CR</button>
+    </div>`;
+}
+
+let recognition = null;
+let isRecording = false;
+
+function toggleMic(btn) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Chrome ou Edge.');
+    return;
+  }
+
+  if (isRecording) {
+    recognition?.stop();
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  const textarea = document.getElementById('cr-contenu');
+  const micLabel = btn.closest('.mic-wrap')?.querySelector('.mic-label');
+  const micSub = btn.closest('.mic-wrap')?.querySelector('.mic-sub');
+  let baseText = textarea?.value || '';
+
+  recognition.onstart = () => {
+    isRecording = true;
+    btn.style.background = '#dc2626';
+    btn.style.boxShadow = '0 0 0 6px rgba(220,38,38,0.25)';
+    if (micLabel) micLabel.textContent = 'Enregistrement en cours…';
+    if (micSub) micSub.textContent = 'Appuyez à nouveau pour arrêter';
+  };
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    let final = baseText;
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        final += (final ? ' ' : '') + e.results[i][0].transcript;
+        baseText = final;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    if (textarea) textarea.value = final + (interim ? ' ' + interim : '');
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error !== 'aborted') alert('Erreur micro : ' + e.error);
+    stopMic(btn, micLabel, micSub);
+  };
+
+  recognition.onend = () => stopMic(btn, micLabel, micSub);
+
+  recognition.start();
+}
+
+function stopMic(btn, micLabel, micSub) {
+  isRecording = false;
+  btn.style.background = '';
+  btn.style.boxShadow = '';
+  if (micLabel) micLabel.textContent = 'Appuyer pour dicter';
+  if (micSub) micSub.innerHTML = 'La transcription apparaîtra<br>automatiquement dans le champ ci-dessous';
+}
+
+async function saveCR(mode){
+  const contenu=document.getElementById('cr-contenu')?.value?.trim();
+  const err=document.getElementById('cr-err');
+  if(!contenu){ err.textContent='Le contenu est obligatoire.'; err.style.display='block'; return; }
+  try {
+    const cr=selected.compteRendu;
+    const url=cr?`/api/intervenant/comptes-rendus/${cr.id}`:`/api/intervenant/interventions/${selected.interventionId}/compte-rendu`;
+    const r=await fetch(url,{method:cr?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contenu,modeRedaction:'vocal',valide:mode==='valider'})});
+    if(!r.ok){ const e=await r.json(); throw new Error(e.error||'Erreur'); }
+    load();
+  } catch(e){ if(err){ err.textContent=e.message; err.style.display='block'; } }
+}
+
+function load(){
+  fetch('/api/intervenant/comptes-rendus').then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+    crData=data;
+    if(selected){ const s=data.find(d=>d.interventionId===selected.interventionId); if(s){ selected=s; renderEditor(s); } }
+  }).catch(()=>{});
+}
+</script>
+{% endblock %}
