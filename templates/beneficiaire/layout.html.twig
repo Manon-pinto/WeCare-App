@@ -27,8 +27,8 @@
   /* Sidebar */
   .sidebar {
     width: var(--sidebar-w); display: flex; flex-direction: column;
-    position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
-    overflow: hidden; background: var(--primary); border-radius: 0 40px 40px 0;
+    position: fixed; top: 30px; left: 0; height: calc(100vh - 20px); z-index: 100;
+    overflow: visible; background: var(--primary); border-radius: 0 40px 0 0;
   }
   .sidebar-logo-wrap { padding: 28px 20px 20px; display: flex; align-items: center; justify-content: center; }
   .sidebar-logo-wrap img { width: 120px; height: auto; }
@@ -42,9 +42,10 @@
   .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .nav-item svg { opacity: 0.6; flex-shrink: 0; }
   .nav-item.active {
-    background: #CC75CA; color: #fff; font-weight: 700; border-radius: 30px;
-    margin-left: 14px; padding-left: 18px;
-    width: calc(100% - 14px + 28px); position: relative; z-index: 101;
+    background: #CC75CA; color: #fff; font-weight: 700;
+    border-radius: 12px; margin: 2px 10px; padding: 11px 20px;
+    width: auto; position: relative; z-index: 101;
+    box-shadow: 0 4px 15px rgba(204, 117, 202, 0.4);
   }
   .nav-item.active svg { opacity: 1; stroke: #fff; }
   .nav-badge { background: var(--pink); color: var(--primary); border-radius: 20px; padding: 1px 7px; font-size: 0.65rem; font-weight: 800; margin-left: auto; }
@@ -52,12 +53,22 @@
   .sidebar-user {
     padding: 16px 18px; display: flex; align-items: center; gap: 10px;
     border-top: 1px solid rgba(255,255,255,0.1); text-decoration: none;
-    transition: background 0.14s; border-radius: 0 0 40px 0;
+    transition: background 0.14s;
   }
   .sidebar-user:hover { background: rgba(255,255,255,0.07); }
   .sidebar-user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--teal-mid); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
   .sidebar-user-name { color: #fff; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sidebar-user-role { color: rgba(255,255,255,0.5); font-size: 0.68rem; }
+
+  .sidebar-corner-deco {
+    position: fixed; bottom: 0; left: var(--sidebar-w);
+    width: 62px; height: 62px; z-index: 99; overflow: hidden;
+  }
+  .sidebar-corner-deco::before {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 200%; height: 200%; border-radius: 50%;
+    box-shadow: -40px 40px 0 0 var(--primary);
+  }
 
   .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
   .page-content { padding: 28px 32px; flex: 1; }
@@ -108,6 +119,27 @@
       color: #fff; font-size: 1rem; font-weight: 700; margin-left: 10px;
     }
     .mobile-topbar img { height: 48px; width: auto; margin-left: auto; }
+
+    .mobile-topbar { position: relative; overflow: visible; }
+    .topbar-corner-deco {
+      position: absolute; bottom: -62px; left: 0;
+      width: 62px; height: 62px; overflow: hidden; pointer-events: none; z-index: 98;
+    }
+    .topbar-corner-deco::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 200%; height: 200%; border-radius: 50%;
+      box-shadow: -40px -40px 0 0 var(--primary);
+    }
+
+    .bottom-nav-corner-left {
+      position: fixed; bottom: 62px; left: 0;
+      width: 62px; height: 62px; z-index: 149; overflow: hidden; pointer-events: none;
+    }
+    .bottom-nav-corner-left::before {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 200%; height: 200%; border-radius: 50%;
+      box-shadow: -40px 40px 0 0 var(--primary);
+    }
 
     /* bottom nav */
     .bottom-nav {
@@ -194,6 +226,7 @@
     </a>
   </a>
 </div>
+<div class="sidebar-corner-deco"></div>
 
 {% set route = app.request.attributes.get('_route') %}
 {% set u = app.user %}
@@ -213,12 +246,14 @@
     <a href="{{ path('beneficiaire_mon_compte') }}" class="mobile-topbar-avatar">{{ initiales }}</a>
     <span class="mobile-topbar-title">{{ pageTitle }}</span>
     <img src="/images/Logo-fond-nuit.png" alt="WeCare">
+    <div class="topbar-corner-deco"></div>
   </div>
   <div class="page-content">
     {% block content %}{% endblock %}
   </div>
 </main>
 
+<div class="bottom-nav-corner-left"></div>
 <nav class="bottom-nav">
   <a href="{{ path('beneficiaire_dashboard') }}" class="bn-item {{ route == 'beneficiaire_dashboard' ? 'active' : '' }}">
     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>

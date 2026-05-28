@@ -18,6 +18,9 @@ security:
             lazy: true
             provider: app_user_provider
             entry_point: form_login
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -33,7 +36,9 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/inscription, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/inscription, roles: PUBLIC_ACCESS }
         - { path: ^/api/intervenant, roles: ROLE_INTERVENANT }
         - { path: ^/api/beneficiaire, roles: ROLE_BENEFICIAIRE }
         - { path: ^/intervenant, roles: ROLE_INTERVENANT }

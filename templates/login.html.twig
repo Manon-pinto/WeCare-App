@@ -20,12 +20,12 @@
 
     .split-form {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 48px 56px; background: #fff;
+      padding: 48px 56px; background: #F1FAF9;
     }
     .form-inner { width: 100%; max-width: 380px; }
 
     .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; }
-    .logo img { width: 48px; height: auto; }
+    .logo img { width: 180px; height: auto; }
 
     .form-heading { font-size: 1.05rem; font-weight: 800; color: #3fcdc0; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
     .form-sub { font-size: 0.82rem; color: #7d6b9e; margin-bottom: 28px; }
@@ -141,9 +141,13 @@ async function doLogin() {
       else if (role === 'administrateur') window.location.href = '/admin/dashboard';
       else if (role === 'beneficiaire') window.location.href = '/beneficiaire/dashboard';
       else window.location.href = '/login';
+    } else if (r.status === 429) {
+      const e = await r.json().catch(() => ({}));
+      err.textContent = e.error || 'Trop de tentatives. Réessayez dans 15 minutes.';
+      err.style.display = 'block';
     } else {
       const e = await r.json().catch(() => ({}));
-      err.textContent = e.message || 'Email ou mot de passe incorrect.';
+      err.textContent = e.error || e.message || 'Email ou mot de passe incorrect.';
       err.style.display = 'block';
     }
   } catch {
