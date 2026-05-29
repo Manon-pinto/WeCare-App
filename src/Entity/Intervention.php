@@ -49,7 +49,7 @@ class Intervention
     #[ORM\OneToOne(mappedBy: 'intervention', targetEntity: CompteRendu::class, cascade: ['persist', 'remove'])]
     private ?CompteRendu $compteRendu = null;
 
-    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Incident::class)]
+    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Incident::class, cascade: ['remove'])]
     private Collection $incidents;
 
     public function __construct()

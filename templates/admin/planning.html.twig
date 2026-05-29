@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Planning — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; background: #C8DFF0; }
+
+  /* Topbar */
+  .topbar { padding: 22px 28px 14px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: wrap; }
+  .topbar-title { font-size: 24px; font-weight: 800; color: var(--primary); margin-right: auto; }
+  .date-nav { display: flex; align-items: center; gap: 4px; background: #fff; border-radius: 30px; padding: 6px 14px; }
+  .date-nav-btn { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 17px; padding: 0 4px; line-height: 1; text-decoration: none; display: flex; align-items: center; }
+  .date-nav-label { font-size: 13px; font-weight: 700; color: var(--primary); padding: 0 6px; white-space: nowrap; }
+  .btn-today { background: #fff; border: 1.5px solid #e5e7eb; border-radius: 30px; padding: 7px 16px; font-size: 12px; font-weight: 600; color: var(--primary); cursor: pointer; transition: border-color 0.15s; }
+  .btn-today:hover { border-color: var(--primary); }
+
+  /* Ajouter dropdown */
+  .add-wrap { position: relative; }
+  .btn-add-main { background: var(--pink); color: #fff; border: none; border-radius: 10px 0 0 10px; padding: 9px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-add-arrow { background: #e45faa; color: #fff; border: none; border-radius: 0 10px 10px 0; padding: 9px 10px; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.3); }
+  .add-dropdown { position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,0,75,0.14); padding: 8px 0; min-width: 200px; z-index: 200; display: none; }
+  .add-dropdown.open { display: block; }
+  .add-dropdown-section { padding: 6px 14px 2px; font-size: 9.5px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; }
+  .add-dropdown-item { padding: 8px 16px; font-size: 12.5px; color: var(--primary); cursor: pointer; transition: background 0.1s; }
+  .add-dropdown-item:hover { background: #f9fafb; }
+
+  /* Body */
+  .planning-body { flex: 1; display: flex; gap: 16px; padding: 0 28px 24px; min-height: 0; overflow: hidden; }
+
+  /* Sidebar */
+  .plan-sidebar { width: 200px; flex-shrink: 0; background: #fff; border-radius: 20px; padding: 18px 16px; overflow-y: auto; }
+  .sidebar-section-title { font-size: 12px; font-weight: 800; color: var(--primary); margin: 14px 0 8px; }
+  .sidebar-section-title:first-child { margin-top: 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+  .sidebar-item input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
+  .sidebar-item label { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 500; }
+  .sidebar-item label.dim { color: #9ca3af; font-weight: 400; }
+  .iv-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Main calendar */
+  .plan-main { flex: 1; background: #fff; border-radius: 20px; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .cal-scroll { overflow-x: auto; overflow-y: auto; flex: 1; }
+  .cal-table { border-collapse: collapse; min-width: 100%; }
+
+  /* Day header */
+  .cal-table thead tr:first-child th { padding: 12px 8px 8px; font-size: 12px; font-weight: 700; color: var(--primary); text-align: center; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
+  .cal-table thead tr:first-child th.time-th { width: 36px; border-right: 1px solid #f3f4f6; }
+  .th-day { min-width: 90px; border-right: 1px solid #f9fafb; }
+  .th-day-inner { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .th-day-label { font-size: 10px; color: #9ca3af; font-weight: 600; text-transform: uppercase; }
+  .th-day-num { font-size: 15px; font-weight: 800; color: var(--primary); }
+  .th-day-month { font-size: 9px; color: #9ca3af; }
+
+  /* Avatar row */
+  .cal-table thead tr.avatar-row th { padding: 6px 4px 10px; border-bottom: 2px solid #f3f4f6; }
+  .av-circle { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 800; color: #fff; margin: 0 auto; }
+  .av-name-small { font-size: 8.5px; color: #6b7280; text-align: center; margin-top: 2px; }
+
+  /* Time rows */
+  .cal-table tbody td { height: 38px; border-top: 1px solid #f9fafb; padding: 2px 3px; vertical-align: top; }
+  .time-cell { text-align: right; padding-right: 6px !important; font-size: 10px; color: #d1d5db; font-weight: 500; border-right: 1px solid #f3f4f6; width: 36px; white-space: nowrap; }
+  .event-cell { min-width: 80px; position: relative; border-right: 1px solid #f9fafb; }
+  .cal-block { border-radius: 6px; padding: 3px 6px; font-size: 8.5px; font-weight: 600; color: #fff; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+  .cal-block .b-name { font-weight: 700; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-block .b-time { opacity: 0.8; font-size: 8px; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <span class="topbar-title">Planning</span>
+    <div class="date-nav">
+      <a href="{{ path('admin_planning', {week: prevWeek}) }}" class="date-nav-btn">&#8249;</a>
+      <span class="date-nav-label">{{ dateLabel }}</span>
+      <a href="{{ path('admin_planning', {week: nextWeek}) }}" class="date-nav-btn">&#8250;</a>
+    </div>
+    <a href="{{ path('admin_planning') }}" class="btn-today">Aujourd'hui</a>
+    <div class="add-wrap">
+      <div style="display:flex;">
+        <button class="btn-add-main">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter
+        </button>
+        <button class="btn-add-arrow" id="addToggle">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="add-dropdown" id="addDropdown">
+        <div class="add-dropdown-section">Soignant</div>
+        <div class="add-dropdown-item">Intervention patient</div>
+        <div class="add-dropdown-item">Arrêt maladie</div>
+        <div class="add-dropdown-item">Congés</div>
+        <div class="add-dropdown-item">Formation</div>
+        <div class="add-dropdown-section" style="margin-top:6px;">Administrateur</div>
+        <div class="add-dropdown-item">Réunion / Événement</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="planning-body">
+
+    <!-- Sidebar filtre -->
+    <div class="plan-sidebar">
+      <div class="sidebar-section-title">Administrateur</div>
+      <div class="sidebar-item">
+        <input type="checkbox" id="cb-moi">
+        <label for="cb-moi" class="dim">Moi</label>
+      </div>
+
+      {% for secteurName, ivs in secteurs %}
+      {% if ivs|length > 0 %}
+      <div class="sidebar-section-title">{{ secteurName }}</div>
+      {% for iv in ivs %}
+      <div class="sidebar-item">
+        <input type="checkbox" id="cb-iv-{{ iv.id }}" checked class="iv-checkbox" data-iv="{{ iv.id }}">
+        <div class="iv-dot" style="background: {{ iv.color }}"></div>
+        <label for="cb-iv-{{ iv.id }}">{{ iv.nom }}</label>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Calendrier -->
+    <div class="plan-main">
+      <div class="cal-scroll">
+        <table class="cal-table">
+          <thead>
+            <!-- Ligne jours -->
+            <tr>
+              <th class="time-th"></th>
+              {% for day in weekDays %}
+              <th class="th-day" colspan="{{ intervenants|length ?: 1 }}">
+                <div class="th-day-inner">
+                  <span class="th-day-label">{{ day.label }}</span>
+                  <span class="th-day-num">{{ day.num }}</span>
+                  <span class="th-day-month">{{ day.month }}</span>
+                </div>
+              </th>
+              {% endfor %}
+            </tr>
+            <!-- Ligne avatars -->
+            <tr class="avatar-row">
+              <th class="time-th"></th>
+              {% for day in weekDays %}
+                {% for iv in intervenants %}
+                <th>
+                  <div class="av-circle" style="background: {{ iv.color }}">{{ iv.initiales }}</div>
+                  <div class="av-name-small">{{ iv.prenom }}</div>
+                </th>
+                {% endfor %}
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for heure in heures %}
+            <tr>
+              <td class="time-cell">{{ heure }}</td>
+              {% for dayIdx in 0..6 %}
+                {% for iv in intervenants %}
+                <td class="event-cell" data-iv="{{ iv.id }}">
+                  {% set blocs = (grid[dayIdx] is defined and grid[dayIdx][iv.id] is defined and grid[dayIdx][iv.id][heure] is defined) ? grid[dayIdx][iv.id][heure] : [] %}
+                  {% for bloc in blocs %}
+                  <div class="cal-block" style="background: {{ iv.color }}">
+                    <span class="b-name">{{ bloc.patient }}</span>
+                    <span class="b-time">{{ bloc.hdebut }}-{{ bloc.hfin }}</span>
+                  </div>
+                  {% endfor %}
+                </td>
+                {% endfor %}
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Dropdown ajouter
+document.getElementById('addToggle').addEventListener('click', function (e) {
+  e.stopPropagation();
+  document.getElementById('addDropdown').classList.toggle('open');
+});
+document.addEventListener('click', function () {
+  document.getElementById('addDropdown').classList.remove('open');
+});
+
+// Toggle colonnes via checkbox
+document.querySelectorAll('.iv-checkbox').forEach(cb => {
+  cb.addEventListener('change', function () {
+    const ivId = this.dataset.iv;
+    document.querySelectorAll('[data-iv="' + ivId + '"]').forEach(cell => {
+      cell.style.display = this.checked ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

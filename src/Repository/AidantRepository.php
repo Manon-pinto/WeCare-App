@@ -15,4 +15,19 @@ class AidantRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Aidant::class);
     }
+
+    /** @return Aidant[] */
+    public function findAllWithDetails(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->join('a.beneficiaire', 'b')
+            ->join('b.utilisateur', 'ub')
+            ->leftJoin('b.interventions', 'i')
+            ->leftJoin('i.intervenant', 'iv')
+            ->leftJoin('iv.utilisateur', 'uiv')
+            ->addSelect('b', 'ub', 'i', 'iv', 'uiv')
+            ->orderBy('a.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -6,6 +6,7 @@ use App\Entity\Beneficiaire;
 use App\Entity\Incident;
 use App\Entity\Intervenant;
 use App\Entity\Intervention;
+use App\Enum\StatutIntervention;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +18,97 @@ class InterventionRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Intervention::class);
+    }
+
+    // ── Admin dashboard ──────────────────────────────────────────────────────
+
+    /** @return Intervention[] */
+    public function findForDate(\DateTimeInterface $date): array
+    {
+        $debut = new \DateTime($date->format('Y-m-d') . ' 00:00:00');
+        $fin   = new \DateTime($date->format('Y-m-d') . ' 23:59:59');
+
+        return $this->createQueryBuilder('interv')
+            ->join('interv.intervenant', 'iv')
+            ->join('iv.utilisateur', 'uiv')
+            ->join('interv.beneficiaire', 'ben')
+            ->join('ben.utilisateur', 'uben')
+            ->addSelect('iv', 'uiv', 'ben', 'uben')
+            ->andWhere('interv.dateDebut >= :debut')
+            ->andWhere('interv.dateDebut <= :fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('interv.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countAujourdhui(): int
+    {
+        $debut = new \DateTime('today midnight');
+        $fin   = new \DateTime('today 23:59:59');
+
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countTermineesAujourdhui(): int
+    {
+        $debut = new \DateTime('today midnight');
+        $fin   = new \DateTime('today 23:59:59');
+
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->andWhere('i.statut = :statut')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->setParameter('statut', StatutIntervention::Terminee)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** @return Intervention[] */
+    public function findForWeek(\DateTimeInterface $weekStart): array
+    {
+        $debut = new \DateTime($weekStart->format('Y-m-d') . ' 00:00:00');
+        $fin   = (clone $debut)->modify('+6 days')->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('interv')
+            ->join('interv.intervenant', 'iv')
+            ->join('iv.utilisateur', 'uiv')
+            ->join('interv.beneficiaire', 'ben')
+            ->join('ben.utilisateur', 'uben')
+            ->addSelect('iv', 'uiv', 'ben', 'uben')
+            ->andWhere('interv.dateDebut >= :debut')
+            ->andWhere('interv.dateDebut <= :fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('interv.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countActifsAujourdhui(): int
+    {
+        $debut = new \DateTime('today midnight');
+        $fin   = new \DateTime('today 23:59:59');
+
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(DISTINCT IDENTITY(i.intervenant))')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     // ── Intervenant ──────────────────────────────────────────────────────────

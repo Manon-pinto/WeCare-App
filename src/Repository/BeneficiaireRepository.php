@@ -15,4 +15,28 @@ class BeneficiaireRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Beneficiaire::class);
     }
+
+    public function countTotal(): int
+    {
+        return (int) $this->createQueryBuilder('b')
+            ->select('COUNT(b.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** @return Beneficiaire[] — eager-loads all relations needed for the patients page */
+    public function findAllWithDetails(): array
+    {
+        return $this->createQueryBuilder('b')
+            ->join('b.utilisateur', 'u')
+            ->leftJoin('b.interventions', 'i')
+            ->leftJoin('i.compteRendu', 'cr')
+            ->leftJoin('i.intervenant', 'iv')
+            ->leftJoin('iv.utilisateur', 'uiv')
+            ->addSelect('u', 'i', 'cr', 'iv', 'uiv')
+            ->orderBy('u.nom', 'ASC')
+            ->addOrderBy('i.dateDebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

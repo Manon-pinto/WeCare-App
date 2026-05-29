@@ -1,0 +1,298 @@
+{% extends 'base.html.twig' %}
+{% block title %}Prises en charge — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; background: #C8DFF0; }
+
+  .topbar { padding: 28px 32px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .topbar-title { font-size: 26px; font-weight: 800; color: var(--primary); }
+  .btn-ajouter { background: var(--pink); color: #fff; border: none; border-radius: 30px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+  .pec-body { flex: 1; padding: 0 32px 28px; }
+  .pec-card { background: #fff; border-radius: 20px; padding: 20px; overflow: hidden; }
+
+  /* Search */
+  .search-wrap { position: relative; margin-bottom: 16px; }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+  .search-input { width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid #e5e7eb; border-radius: 30px; font-size: 13px; color: var(--primary); outline: none; }
+  .search-input:focus { border-color: var(--pink); }
+
+  /* Table */
+  .pec-table { width: 100%; border-collapse: collapse; }
+  .pec-table thead th { padding: 8px 12px; font-size: 10.5px; font-weight: 600; color: #9ca3af; text-align: left; border-bottom: 1.5px solid #f3f4f6; cursor: pointer; white-space: nowrap; }
+  .pec-table thead th svg { display: inline; vertical-align: middle; margin-left: 3px; }
+
+  .pec-table tbody .data-row { cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f9fafb; }
+  .pec-table tbody .data-row:hover { background: #fafafa; }
+  .pec-table tbody .data-row.selected { background: #f0f4ff; }
+  .pec-table td { padding: 11px 12px; vertical-align: middle; font-size: 12.5px; color: var(--primary); }
+
+  .aidant-name { font-weight: 700; color: var(--primary); }
+  .contact-phone { font-size: 12px; font-weight: 600; color: var(--primary); }
+  .contact-email { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
+  .patient-name { font-weight: 700; color: var(--primary); }
+  .patient-age { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
+  .adresse-text { font-size: 11.5px; color: #374151; }
+
+  /* Niveau badges */
+  .badge-niveau { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+  .badge-niveau.eleve    { background: #fce7f3; color: #be185d; }
+  .badge-niveau.critique { background: #fee2e2; color: #991b1b; }
+  .badge-niveau.modere   { background: #dbeafe; color: #1e40af; }
+  .badge-niveau.faible   { background: #ede9fe; color: #5b21b6; }
+
+  /* Statut badges */
+  .badge-statut { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: 10.5px; font-weight: 700; white-space: nowrap; border: 1.5px solid; }
+  .badge-statut.actif   { border-color: #2dd4bf; color: #0f766e; background: #f0fdfa; }
+  .badge-statut.inactif { border-color: #d1d5db; color: #6b7280; background: #f9fafb; }
+
+  /* Soignant badges */
+  .soignants-cell { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .soignant-chip { background: #f3f4f6; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--primary); white-space: nowrap; }
+  .soignant-more { font-size: 10.5px; color: #9ca3af; font-weight: 600; }
+  .btn-assigner-inline { background: var(--pink); color: #fff; border: none; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  /* Expansion panel */
+  .expand-row td { padding: 0; border-bottom: 2px solid #e5e7eb; }
+  .expand-panel { background: #f0f8ff; border-top: 1px solid #e5e7eb; padding: 20px; }
+  .expand-close { float: right; background: none; border: 1.5px solid #d1d5db; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; color: #9ca3af; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+  .expand-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 14px; }
+
+  /* Cards aidant/patient */
+  .expand-cards { display: flex; gap: 14px; margin-bottom: 20px; }
+  .expand-card { flex: 1; background: #dbeafe; border-radius: 12px; padding: 14px 16px; }
+  .expand-card-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 4px; }
+  .expand-card-name { font-size: 14px; font-weight: 800; color: var(--primary); }
+  .expand-card-sub { font-size: 11px; color: #374151; margin-top: 3px; }
+
+  /* Slots */
+  .slots-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 8px; }
+  .slots-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .slot-btn { padding: 7px 12px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 10px; font-size: 11.5px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .slot-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .slot-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Soignant assignment list */
+  .assign-list { display: flex; flex-direction: column; gap: 10px; }
+  .assign-list-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 4px; }
+  .assign-item { background: #fff; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; border: 1.5px solid #e5e7eb; transition: border-color 0.15s; }
+  .assign-item.disponible { border-color: #e5e7eb; }
+  .assign-item.occupe { background: #f9fafb; opacity: 0.75; }
+  .assign-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .assign-info { flex: 1; min-width: 0; }
+  .assign-name { font-size: 12.5px; font-weight: 700; color: var(--primary); }
+  .assign-meta { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
+  .assign-note { font-size: 10px; color: var(--pink); margin-top: 2px; }
+
+  /* Planning bar */
+  .plan-bar { display: flex; gap: 2px; margin-top: 5px; }
+  .plan-seg { height: 6px; border-radius: 2px; flex: 1; }
+  .plan-seg.free   { background: #e5e7eb; }
+  .plan-seg.busy   { background: var(--primary); }
+  .plan-seg.target { background: #06b6d4; }
+
+  /* Dispo badge */
+  .dispo-badge { border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+  .dispo-badge.disponible  { background: #d1fae5; color: #065f46; }
+  .dispo-badge.occupe      { background: #f3f4f6; color: #6b7280; }
+  .dispo-badge.trajet-long { background: #fef3c7; color: #92400e; }
+
+  .btn-assigner-modal { background: var(--pink); color: #fff; border: none; border-radius: 10px; padding: 7px 16px; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .btn-assigner-modal:disabled { background: #f3f4f6; color: #9ca3af; cursor: default; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <h1 class="topbar-title">Prises en charge</h1>
+    <button class="btn-ajouter">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter
+    </button>
+  </div>
+
+  <div class="pec-body">
+    <div class="pec-card">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="pecSearch" placeholder="Rechercher aidant ou patient…">
+      </div>
+
+      <table class="pec-table">
+        <thead>
+          <tr>
+            <th>Aidant <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Contact <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Lien <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Patient <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Adresse patient <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Niveau <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Statut <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+            <th>Soignant <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></th>
+          </tr>
+        </thead>
+        <tbody id="pecBody">
+          {% for row in rows %}
+          {# Ligne principale #}
+          <tr class="data-row {{ not row.actif ? 'inactive' : '' }}" id="row-{{ row.id }}"
+              onclick="toggleExpand({{ row.id }}, '{{ row.aidantNom|e('js') }}', '{{ row.telephone|e('js') }}', '{{ row.lien|e('js') }}', '{{ row.patientNom|e('js') }}', {{ row.patientAge }}, '{{ row.adresse|e('js') }}')">
+            <td><span class="aidant-name">{{ row.aidantNom }}</span></td>
+            <td>
+              <div class="contact-phone">{{ row.telephone }}</div>
+              <div class="contact-email">{{ row.email }}</div>
+            </td>
+            <td>{{ row.lien }}</td>
+            <td>
+              <div class="patient-name">{{ row.patientNom }}</div>
+              <div class="patient-age">{{ row.patientAge }} ans</div>
+            </td>
+            <td><span class="adresse-text">{{ row.adresse }}</span></td>
+            <td>
+              <span class="badge-niveau {{ row.niveau }}">
+                {% if row.niveau == 'eleve' %}Élevé
+                {% elseif row.niveau == 'modere' %}Modéré
+                {% elseif row.niveau == 'critique' %}Critique
+                {% else %}Faible{% endif %}
+              </span>
+            </td>
+            <td>
+              <span class="badge-statut {{ row.actif ? 'actif' : 'inactif' }}">{{ row.actif ? 'Actif' : 'Inactif' }}</span>
+            </td>
+            <td onclick="event.stopPropagation()">
+              {% if row.soignants|length > 0 %}
+              <div class="soignants-cell">
+                <span class="soignant-chip">{{ row.soignants[0].nom }}</span>
+                {% if row.soignants|length > 1 %}
+                <span class="soignant-more">+{{ row.soignants|length - 1 }}</span>
+                {% endif %}
+              </div>
+              {% else %}
+              <button class="btn-assigner-inline" onclick="toggleExpand({{ row.id }}, '{{ row.aidantNom|e('js') }}', '{{ row.telephone|e('js') }}', '{{ row.lien|e('js') }}', '{{ row.patientNom|e('js') }}', {{ row.patientAge }}, '{{ row.adresse|e('js') }}')">
+                + Assigner
+              </button>
+              {% endif %}
+            </td>
+          </tr>
+          {# Ligne d'expansion #}
+          <tr class="expand-row" id="expand-{{ row.id }}" style="display:none;">
+            <td colspan="8">
+              <div class="expand-panel" id="panel-{{ row.id }}">
+                <button class="expand-close" onclick="closeExpand({{ row.id }})">×</button>
+                <div class="expand-title" id="expand-title-{{ row.id }}">Assigner un soignant</div>
+                <div class="expand-cards" id="expand-cards-{{ row.id }}">
+                  <div class="expand-card">
+                    <div class="expand-card-label">Aidant</div>
+                    <div class="expand-card-name" id="ec-aidant-nom-{{ row.id }}">{{ row.aidantNom }}</div>
+                    <div class="expand-card-sub" id="ec-aidant-sub-{{ row.id }}">{{ row.telephone }} · {{ row.lien }}</div>
+                  </div>
+                  <div class="expand-card">
+                    <div class="expand-card-label">Patient</div>
+                    <div class="expand-card-name" id="ec-patient-nom-{{ row.id }}">{{ row.patientNom }}</div>
+                    <div class="expand-card-sub" id="ec-patient-sub-{{ row.id }}">{{ row.patientAge }} ans · {{ row.adresse }}</div>
+                  </div>
+                </div>
+                <div class="slots-label">Choisir un créneau</div>
+                <div class="slots-row" id="slots-{{ row.id }}">
+                  {% set slots = ['6h-7h','7h-8h','8h-9h','9h-10h','10h-11h','11h-12h','12h-13h','13h-14h','14h-15h','15h-16h','16h-17h','17h-18h','18h-19h','19h-20h'] %}
+                  {% for slot in slots %}
+                  <button class="slot-btn" onclick="selectSlot({{ row.id }}, {{ loop.index0 + 6 }}, '{{ slot }}', this)">{{ slot }}</button>
+                  {% endfor %}
+                </div>
+                <div id="assign-section-{{ row.id }}" style="display:none;">
+                  <div class="assign-list-label" id="assign-label-{{ row.id }}">Soignants disponibles</div>
+                  <div class="assign-list" id="assign-list-{{ row.id }}"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" style="padding:32px; text-align:center; color:#d1d5db; font-size:13px;">Aucune prise en charge</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const SOIGNANTS = {{ soignantsJson|json_encode|raw }};
+const HOURS_START = 6;
+const HOURS_END   = 20;
+
+function toggleExpand(id, aidantNom, telephone, lien, patientNom, patientAge, adresse) {
+  const expandRow = document.getElementById('expand-' + id);
+  const dataRow   = document.getElementById('row-' + id);
+  const isOpen    = expandRow.style.display !== 'none';
+
+  // Ferme tous les autres
+  document.querySelectorAll('.expand-row').forEach(r => r.style.display = 'none');
+  document.querySelectorAll('.data-row').forEach(r => r.classList.remove('selected'));
+
+  if (!isOpen) {
+    expandRow.style.display = '';
+    dataRow.classList.add('selected');
+    document.getElementById('expand-title-' + id).textContent = 'Assigner un soignant — ' + patientNom;
+  }
+}
+
+function closeExpand(id) {
+  document.getElementById('expand-' + id).style.display = 'none';
+  document.getElementById('row-' + id).classList.remove('selected');
+}
+
+function selectSlot(rowId, hour, slotLabel, btn) {
+  // Reset slots
+  btn.closest('.slots-row').querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const section = document.getElementById('assign-section-' + rowId);
+  const list    = document.getElementById('assign-list-' + rowId);
+  const label   = document.getElementById('assign-label-' + rowId);
+  section.style.display = '';
+  label.textContent = 'Soignants disponibles — créneau ' + slotLabel;
+
+  list.innerHTML = '';
+  SOIGNANTS.forEach(function (s) {
+    const isBusy = s.occupiedHours.includes(hour);
+    const distKm = (Math.abs(s.rayon - (rowId % 5)) + 1).toFixed(1);
+    const status = isBusy ? 'occupe' : 'disponible';
+    const statusLabel = isBusy ? 'Occupée' : 'Disponible';
+
+    // Planning bar
+    let barHtml = '';
+    for (let h = HOURS_START; h < HOURS_END; h++) {
+      const cls = s.occupiedHours.includes(h) ? 'busy' : (h === hour ? 'target' : 'free');
+      barHtml += '<div class="plan-seg ' + cls + '"></div>';
+    }
+
+    list.innerHTML += `
+      <div class="assign-item ${status}">
+        <div class="assign-avatar" style="background:${s.color}">${s.initiales}</div>
+        <div class="assign-info">
+          <div class="assign-name">${s.nom} <span style="font-size:10.5px;color:#9ca3af;font-weight:500">· ${s.specialite} · ${distKm} km</span></div>
+          <div class="plan-bar">${barHtml}</div>
+        </div>
+        <span class="dispo-badge ${status}">${statusLabel}</span>
+        <button class="btn-assigner-modal" ${isBusy ? 'disabled' : ''}>${isBusy ? 'Occupée' : 'Assigner'}</button>
+      </div>`;
+  });
+}
+
+// Recherche live
+document.getElementById('pecSearch').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#pecBody .data-row').forEach(function (row) {
+    const show = row.textContent.toLowerCase().includes(q);
+    row.style.display = show ? '' : 'none';
+    const expId = row.id.replace('row-', '');
+    const expRow = document.getElementById('expand-' + expId);
+    if (!show && expRow) expRow.style.display = 'none';
+  });
+});
+</script>
+{% endblock %}

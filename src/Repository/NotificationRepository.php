@@ -49,4 +49,15 @@ class NotificationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /** @return Notification[] — toutes notifs avec leur utilisateur, triées par date DESC */
+    public function findAllWithUser(): array
+    {
+        return $this->createQueryBuilder('n')
+            ->join('n.utilisateur', 'u')
+            ->addSelect('u')
+            ->orderBy('n.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

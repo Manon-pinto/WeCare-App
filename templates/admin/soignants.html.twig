@@ -1,0 +1,430 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Soignants — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; background: #C8DFF0; }
+
+  /* Topbar */
+  .topbar { padding: 28px 32px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .topbar-title { font-size: 26px; font-weight: 800; color: var(--primary); }
+  .btn-ajouter {
+    background: var(--pink); color: #fff; border: none; border-radius: 30px;
+    padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-ajouter:hover { opacity: 0.88; }
+
+  /* Body */
+  .soignants-body { flex: 1; display: flex; gap: 20px; padding: 0 32px 28px; min-height: 0; }
+
+  /* List panel */
+  .list-panel {
+    width: 420px; flex-shrink: 0; background: #fff; border-radius: 20px;
+    padding: 20px 0; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .list-panel-head { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+  .search-input {
+    width: 100%; padding: 9px 12px 9px 36px; border: 1.5px solid #e5e7eb;
+    border-radius: 30px; font-size: 13px; color: var(--primary); outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--pink); }
+  .list-meta { display: flex; align-items: center; justify-content: space-between; }
+  .list-count { font-size: 13px; font-weight: 600; color: var(--primary); }
+
+  /* Table */
+  .soignants-table { width: 100%; border-collapse: collapse; }
+  .soignants-table thead th {
+    padding: 8px 20px; font-size: 10.5px; font-weight: 600; color: #9ca3af;
+    text-align: left; border-bottom: 1px solid #f3f4f6;
+  }
+  .soignants-table tbody tr {
+    cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f9fafb;
+  }
+  .soignants-table tbody tr:hover { background: #f9fafb; }
+  .soignants-table tbody tr.active { background: #EEF3FF; border-left: 3px solid var(--primary); }
+  .soignants-table tbody tr.active td:first-child { padding-left: 17px; }
+  .soignants-table td { padding: 10px 12px 10px 20px; vertical-align: middle; }
+  .soignants-table td:last-child { padding-right: 14px; }
+
+  .iv-cell { display: flex; align-items: center; gap: 10px; }
+  .iv-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .iv-name { font-size: 12.5px; font-weight: 700; color: var(--primary); }
+  .iv-role { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
+
+  .contact-cell { display: flex; flex-direction: column; gap: 2px; }
+  .contact-phone { font-size: 11.5px; font-weight: 600; color: var(--primary); }
+  .contact-email { font-size: 10.5px; color: #9ca3af; }
+
+  .week-badge { background: var(--primary); color: #fff; border-radius: 8px; padding: 4px 8px; font-size: 10px; font-weight: 700; white-space: nowrap; display: inline-block; }
+  .week-badge.active-badge { background: var(--pink); }
+
+  /* Bouton supprimer dans la liste */
+  .btn-delete-row {
+    width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid #fecdd3;
+    background: #fff0f2; color: #f43f5e; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+    transition: background 0.13s;
+  }
+  .btn-delete-row:hover { background: #fecdd3; }
+  .delete-form { display: inline-flex; }
+
+  /* Detail panel */
+  .detail-panel {
+    flex: 1; background: #fff; border-radius: 20px; padding: 24px 28px;
+    display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+  }
+  .detail-top { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+  .detail-avatar { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .detail-meta { flex: 1; }
+  .detail-name { font-size: 18px; font-weight: 800; color: var(--primary); }
+  .detail-sub { font-size: 12px; color: #9ca3af; margin-top: 3px; }
+  .badge-actif { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; background: #d1fae5; color: #065f46; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
+  .badge-actif::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+  .badge-inactif { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; background: #fef3c7; color: #92400e; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
+  .badge-inactif::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+
+  /* Form sections */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .form-section-title { font-size: 10px; font-weight: 700; color: #c4b5fd; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .form-label { font-size: 10.5px; color: #6b7280; font-weight: 500; }
+  .form-input { padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 12.5px; color: var(--primary); outline: none; background: #f9fafb; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--pink); background: #fff; }
+  .form-select { padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 12.5px; color: var(--primary); outline: none; background: #f9fafb; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+
+  /* Slider */
+  .slider-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .slider-header { display: flex; justify-content: space-between; align-items: center; }
+  .slider-val { font-size: 11px; font-weight: 700; color: var(--pink); }
+  input[type="range"] { width: 100%; accent-color: var(--pink); cursor: pointer; }
+
+  /* Week planning — agrandi */
+  .week-planning-section { background: #f9fafb; border-radius: 16px; padding: 18px 20px; }
+  .week-planning-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+  .week-days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .week-day-pill { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .day-label { font-size: 11px; color: #9ca3af; font-weight: 700; text-transform: uppercase; }
+  .day-count {
+    width: 100%; aspect-ratio: 1; border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: #fff; gap: 2px;
+  }
+  .day-count.has-ivs { }
+  .day-count.no-ivs { background: #f3f4f6 !important; color: #d1d5db; font-size: 14px; }
+  .day-count-sub { font-size: 8px; font-weight: 600; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.05em; }
+  .week-total { font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center; font-weight: 500; }
+
+  /* Footer buttons */
+  .detail-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: auto; }
+  .btn-annuler { padding: 10px 22px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; transition: border-color 0.15s; }
+  .btn-annuler:hover { border-color: var(--primary); }
+  .btn-enregistrer { padding: 10px 22px; background: var(--pink); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .btn-enregistrer:hover { opacity: 0.88; }
+
+  .no-selected { display: flex; align-items: center; justify-content: center; flex: 1; color: #d1d5db; font-size: 13px; }
+
+  /* ── Modal Ajouter ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(15,0,75,0.35); z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-panel {
+    background: #fff; border-radius: 24px; padding: 32px 32px 24px;
+    width: 560px; max-width: calc(100vw - 48px); max-height: 90vh; overflow-y: auto;
+    animation: modalIn 0.18s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--primary); }
+  .modal-close { background: #f3f4f6; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; color: #6b7280; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: #e5e7eb; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 16px; border-top: 1px solid #f3f4f6; margin-top: 8px; }
+  .modal-note { font-size: 10.5px; color: #9ca3af; margin-top: 4px; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <h1 class="topbar-title">Liste des soignants</h1>
+    <button class="btn-ajouter" onclick="document.getElementById('modalAjouter').style.display='flex'">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un soignant
+    </button>
+  </div>
+
+  <div class="soignants-body">
+
+    <!-- Liste -->
+    <div class="list-panel">
+      <div class="list-panel-head">
+        <div class="search-wrap">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un soignant…">
+        </div>
+        <div class="list-meta">
+          <span class="list-count" id="listCount">{{ soignants|length }} soignant{{ soignants|length > 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+
+      <div style="overflow-y: auto; flex: 1;">
+        <table class="soignants-table">
+          <thead>
+            <tr>
+              <th>Soignant</th>
+              <th>Contact</th>
+              <th>Semaine</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="soignantsBody">
+            {% for s in soignants %}
+            <tr class="{{ selected and selected.id == s.id ? 'active' : '' }}"
+                onclick="window.location='{{ path('admin_soignants', {id: s.id}) }}'">
+              <td>
+                <div class="iv-cell">
+                  <div class="iv-avatar" style="background: {{ s.color }}">{{ s.initiales }}</div>
+                  <div>
+                    <div class="iv-name">{{ s.nom }}</div>
+                    <div class="iv-role">{{ s.specialite }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-cell">
+                  <span class="contact-phone">{{ s.telephone }}</span>
+                  <span class="contact-email">{{ s.email }}</span>
+                </div>
+              </td>
+              <td>
+                {% if s.weekCount > 0 %}
+                <span class="week-badge {{ selected and selected.id == s.id ? 'active-badge' : '' }}">
+                  {{ s.weekCount }} inter.
+                </span>
+                {% else %}
+                <span style="font-size:11px; color:#d1d5db;">—</span>
+                {% endif %}
+              </td>
+              <td onclick="event.stopPropagation()">
+                <form class="delete-form" method="POST"
+                      action="{{ path('admin_soignants_supprimer', {id: s.id}) }}"
+                      onsubmit="return confirm('Supprimer {{ s.prenom }} {{ s.nomFamille }} ? Cette action est irréversible.')">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete_soignant_' ~ s.id) }}">
+                  <button type="submit" class="btn-delete-row" title="Supprimer">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Détail -->
+    <div class="detail-panel">
+      {% if selected %}
+      <div class="detail-top">
+        <div class="detail-avatar" style="background: {{ selected.color }}">{{ selected.initiales }}</div>
+        <div class="detail-meta">
+          <div class="detail-name">{{ selected.nom }}</div>
+          <div class="detail-sub">{{ selected.specialite }} · Secteur {{ selected.secteur }}</div>
+          <span class="{{ selected.disponible ? 'badge-actif' : 'badge-inactif' }}">
+            {{ selected.disponible ? 'Actif' : 'Indisponible' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <div class="form-section-title">Informations personnelles</div>
+          <div class="form-group">
+            <label class="form-label">Prénom</label>
+            <input class="form-input" type="text" value="{{ selected.prenom }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <input class="form-input" type="text" value="{{ selected.nomFamille }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input class="form-input" type="tel" value="{{ selected.telephone }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" value="{{ selected.email }}">
+          </div>
+        </div>
+        <div>
+          <div class="form-section-title">Profil professionnel</div>
+          <div class="form-group">
+            <label class="form-label">Spécialité</label>
+            <select class="form-select">
+              <option selected>{{ selected.specialite }}</option>
+              <option>Infirmier(e)</option>
+              <option>Aide-soignant(e)</option>
+              <option>Auxiliaire de vie</option>
+              <option>Kinésithérapeute</option>
+              <option>Aide à domicile</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Secteur</label>
+            <select class="form-select">
+              <option {{ selected.secteur == 'A' ? 'selected' : '' }}>A</option>
+              <option {{ selected.secteur == 'B' ? 'selected' : '' }}>B</option>
+              <option {{ selected.secteur == 'C' ? 'selected' : '' }}>C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Périmètre d'intervention</label>
+            <div class="slider-wrap">
+              <div class="slider-header">
+                <span style="font-size:11px; color:#6b7280;">0 km</span>
+                <span class="slider-val" id="rayonVal">{{ selected.rayon }} KM</span>
+                <span style="font-size:11px; color:#6b7280;">50 km</span>
+              </div>
+              <input type="range" min="1" max="50" value="{{ selected.rayon }}" id="rayonSlider"
+                oninput="document.getElementById('rayonVal').textContent = this.value + ' KM'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Statut</label>
+            <select class="form-select">
+              <option {{ selected.disponible ? 'selected' : '' }}>Actif</option>
+              <option {{ not selected.disponible ? 'selected' : '' }}>Indisponible</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Planning de la semaine — agrandi -->
+      <div class="week-planning-section">
+        <div class="week-planning-title">Planning de la semaine</div>
+        <div class="week-days-row">
+          {% for i in 0..6 %}
+          <div class="week-day-pill">
+            <span class="day-label">{{ selected.jours[i] }}</span>
+            <div class="day-count {{ selected.weekGrid[i] > 0 ? 'has-ivs' : 'no-ivs' }}"
+                 style="{{ selected.weekGrid[i] > 0 ? 'background:' ~ selected.color : '' }}">
+              {% if selected.weekGrid[i] > 0 %}
+                <span>{{ selected.weekGrid[i] }}</span>
+                <span class="day-count-sub">inter.</span>
+              {% else %}
+                —
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="week-total">
+          {% if selected.weekCount > 0 %}
+            {{ selected.weekCount }} intervention{{ selected.weekCount > 1 ? 's' : '' }} cette semaine · périmètre {{ selected.rayon }} km
+          {% else %}
+            Aucune intervention planifiée cette semaine
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="detail-footer">
+        <button class="btn-annuler" onclick="window.location='{{ path('admin_soignants') }}'">Annuler</button>
+        <button class="btn-enregistrer">Enregistrer</button>
+      </div>
+      {% else %}
+      <div class="no-selected">Sélectionnez un soignant pour voir ses détails</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Modal Ajouter un soignant ── -->
+<div class="modal-overlay" id="modalAjouter" style="display:none;"
+     onclick="if(event.target===this) closeModal()">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Ajouter un soignant</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <form method="POST" action="{{ path('admin_soignants_ajouter') }}">
+      <input type="hidden" name="_token" value="{{ csrf_token('add_soignant') }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Prénom *</label>
+          <input class="form-input" name="prenom" type="text" required placeholder="Marie">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input class="form-input" name="nom_famille" type="text" required placeholder="Dupont">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input class="form-input" name="email" type="email" required placeholder="marie.dupont@wecare.fr">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input class="form-input" name="telephone" type="tel" placeholder="06 00 00 00 00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Spécialité</label>
+          <select class="form-select" name="specialite">
+            <option>Infirmier(e)</option>
+            <option>Aide-soignant(e)</option>
+            <option>Auxiliaire de vie</option>
+            <option>Kinésithérapeute</option>
+            <option>Aide à domicile</option>
+            <option>Orthophoniste</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rayon d'intervention</label>
+          <div class="slider-wrap">
+            <div class="slider-header">
+              <span style="font-size:11px; color:#6b7280;">0 km</span>
+              <span class="slider-val" id="modalRayonVal">10 KM</span>
+              <span style="font-size:11px; color:#6b7280;">50 km</span>
+            </div>
+            <input type="range" name="rayon" min="1" max="50" value="10"
+              oninput="document.getElementById('modalRayonVal').textContent = this.value + ' KM'">
+          </div>
+        </div>
+      </div>
+      <p class="modal-note">Le mot de passe temporaire sera <strong>wecare123</strong> — à changer à la première connexion.</p>
+      <div class="modal-footer">
+        <button type="button" class="btn-annuler" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn-enregistrer">Créer le soignant</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function closeModal() {
+  document.getElementById('modalAjouter').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+document.getElementById('searchInput').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#soignantsBody tr');
+  let count = 0;
+  rows.forEach(row => {
+    const show = row.textContent.toLowerCase().includes(q);
+    row.style.display = show ? '' : 'none';
+    if (show) count++;
+  });
+  document.getElementById('listCount').textContent = count + ' soignant' + (count > 1 ? 's' : '');
+});
+</script>
+{% endblock %}

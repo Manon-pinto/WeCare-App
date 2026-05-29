@@ -10,6 +10,8 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+/.claude
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
