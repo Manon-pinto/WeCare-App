@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Utilisateur;
+use App\Enum\StatutIntervention;
 use App\Repository\BeneficiaireRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IntervenantRepository;
@@ -15,9 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 class DashboardController extends AbstractController
 {
-    private const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    private const MOIS  = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    use AdminTrait;
+
+    private const JOURS   = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    private const MOIS    = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                             'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
 
     #[Route('/dashboard', name: 'admin_dashboard')]
@@ -29,40 +32,70 @@ class DashboardController extends AbstractController
         IncidentRepository     $incidentRepo,
     ): Response {
         /** @var Utilisateur $user */
-        $user       = $this->getUser();
-        $nomComplet = $user?->getNom() ?? '';
-        $prenom     = explode(' ', trim($nomComplet))[0] ?? $nomComplet;
+        $user   = $this->getUser();
+        $admin  = $this->getCurrentAdmin();
+        $prenom = explode(' ', trim($user?->getNom() ?? ''))[0] ?? '';
+
+        // Intervenants de cet admin
+        $mesIntervenants = $intervenantRepo->findAllWithDetails($admin);
+        $myIvIds         = array_map(fn($iv) => $iv->getId(), $mesIntervenants);
 
         // ── Date de navigation ─────────────────────────────────────────────
         $dateStr = $request->query->get('date', 'today');
-        try {
-            $date = new \DateTime($dateStr);
-        } catch (\Exception) {
-            $date = new \DateTime('today');
-        }
+        try { $date = new \DateTime($dateStr); } catch (\Exception) { $date = new \DateTime('today'); }
         $date->setTime(0, 0, 0);
         $prevDate = (clone $date)->modify('-1 day');
         $nextDate = (clone $date)->modify('+1 day');
 
-        // ── Stats ──────────────────────────────────────────────────────────
-        $nbIntervenants  = $intervenantRepo->countActifsCeMois();
-        $nbBeneficiaires = $beneficiaireRepo->countTotal();
-        $nbAujourdhui    = $interventionRepo->countAujourdhui();
-        $nbTerminees     = $interventionRepo->countTermineesAujourdhui();
+        // ── Planning du jour filtré par admin ─────────────────────────────
+        $interventionsJour = $interventionRepo->findForDate($date, $myIvIds);
 
-        $incidents = $incidentRepo->findActifs();
-        $alertes   = array_map(static function ($incident) {
+        // ── Stats dérivées des données déjà chargées ──────────────────────
+        $nbIntervenants  = count($mesIntervenants);
+        $nbBeneficiaires = count($beneficiaireRepo->findAllNames($admin));
+        $nbAujourdhui    = count($interventionsJour);
+        $nbTerminees     = count(array_filter(
+            $interventionsJour,
+            fn($i) => $i->getStatut() === StatutIntervention::Terminee
+        ));
+
+        // ── Données pour la modale "Nouvelle intervention" ────────────────
+        $patients  = array_map(fn($b) => ['id' => $b->getId(), 'nom' => $b->getUtilisateur()->getNom()],
+                               $beneficiaireRepo->findAllNames($admin));
+        $soignants = array_map(fn($iv) => [
+            'id'        => $iv->getId(),
+            'nom'       => $iv->getUtilisateur()->getNom(),
+            'specialite'=> $iv->getSpecialite() ?? '',
+        ], $mesIntervenants);
+
+        // Heures occupées aujourd'hui par soignant (pour blocage client)
+        $occupiedByIv = [];
+        foreach ($mesIntervenants as $iv) {
+            $occupiedByIv[$iv->getId()] = [];
+        }
+        foreach ($interventionsJour as $interv) {
+            $ivId  = $interv->getIntervenant()->getId();
+            $hDeb  = (int) $interv->getDateDebut()->format('H');
+            $hFin  = (int) $interv->getDateFin()->format('H');
+            for ($h = $hDeb; $h < $hFin; $h++) {
+                $occupiedByIv[$ivId][] = $h;
+            }
+        }
+
+        // ── Alertes (incidents globaux) ────────────────────────────────────
+        $alertes = array_map(static function ($incident) {
             $gravite = $incident->getGravite()?->value ?? 'moderee';
             $zone    = $incident->getZone();
             $titre   = $zone ? 'Incident — ' . $zone : 'Incident ' . ucfirst($gravite);
             $desc    = $incident->getDescription() ?? '';
-            $texte   = mb_strlen($desc) > 70 ? mb_substr($desc, 0, 67) . '...' : $desc;
-            return ['titre' => $titre, 'texte' => $texte, 'gravite' => $gravite];
-        }, $incidents);
+            return [
+                'titre'  => $titre,
+                'texte'  => mb_strlen($desc) > 70 ? mb_substr($desc, 0, 67) . '...' : $desc,
+                'gravite'=> $gravite,
+            ];
+        }, $incidentRepo->findActifs());
 
-        // ── Planning ───────────────────────────────────────────────────────
-        $interventionsJour = $interventionRepo->findForDate($date);
-
+        // ── Grille planning ────────────────────────────────────────────────
         $formatH = static fn(\DateTimeInterface $dt): string =>
             $dt->format('G') . 'h' . ($dt->format('i') !== '00' ? $dt->format('i') : '');
 
@@ -89,7 +122,7 @@ class DashboardController extends AbstractController
 
             $heure      = (int) $intervention->getDateDebut()->format('H');
             $nomPatient = $intervention->getBeneficiaire()->getUtilisateur()->getNom();
-            $court      = mb_strlen($nomPatient) > 5 ? mb_substr($nomPatient, 0, 4) . '...' : $nomPatient;
+            $court      = mb_strlen($nomPatient) > 5 ? mb_substr($nomPatient, 0, 4) . '…' : $nomPatient;
 
             $planningGrid[$heure][$ivId][] = [
                 'patient' => $court,
@@ -109,11 +142,15 @@ class DashboardController extends AbstractController
             'prevDateStr'          => $prevDate->format('Y-m-d'),
             'nextDateStr'          => $nextDate->format('Y-m-d'),
             'stats'                => [
-                ['icon' => 'users',     'label' => 'Intervenants actifs', 'value' => $nbIntervenants,  'suffix' => 'ce mois.',        'sub' => null],
-                ['icon' => 'heart',     'label' => 'Patients suivis',     'value' => $nbBeneficiaires, 'suffix' => 'dossiers actifs', 'sub' => null],
-                ['icon' => 'clipboard', 'label' => 'Interventions',       'value' => $nbAujourdhui,    'suffix' => "aujourd'hui",     'sub' => 'dont ' . $nbTerminees . ' effectuées'],
+                ['icon' => 'users',     'label' => 'Intervenants',     'value' => $nbIntervenants,  'suffix' => 'actifs',          'sub' => null],
+                ['icon' => 'heart',     'label' => 'Patients suivis',  'value' => $nbBeneficiaires, 'suffix' => 'dossiers actifs', 'sub' => null],
+                ['icon' => 'clipboard', 'label' => 'Interventions',    'value' => $nbAujourdhui,    'suffix' => "aujourd'hui",     'sub' => 'dont ' . $nbTerminees . ' effectuées'],
             ],
             'alertes'              => $alertes,
+            'patients'             => $patients,
+            'soignants'            => $soignants,
+            'occupiedByIv'         => $occupiedByIv,
+            'todayStr'             => $date->format('Y-m-d'),
             'intervenantsPlanning' => $intervenantsPlanning,
             'planningGrid'         => $planningGrid,
         ]);

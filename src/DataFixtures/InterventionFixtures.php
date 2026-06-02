@@ -48,6 +48,11 @@ class InterventionFixtures extends Fixture implements DependentFixtureInterface
             ['ben_8',  'interv_2', 'planning_1', 'today', '11:00', '12:00', TypeIntervention::Surveillance,   StatutIntervention::Planifiee],
             ['ben_9',  'interv_0', 'planning_1', 'today', '11:30', '12:30', TypeIntervention::Accompagnement, StatutIntervention::Planifiee],
 
+            // ── Admin2 — aujourd'hui (planning_3) ──
+            ['ben2_0', 'interv2_0', 'planning_3', 'today', '09:00', '10:00', TypeIntervention::Soins,          StatutIntervention::Planifiee],
+            ['ben2_1', 'interv2_1', 'planning_3', 'today', '10:00', '11:00', TypeIntervention::Menage,         StatutIntervention::Planifiee],
+            ['ben2_2', 'interv2_0', 'planning_3', 'today', '14:00', '15:00', TypeIntervention::Accompagnement, StatutIntervention::Planifiee],
+
             // ── Semaine prochaine (planning_2 = Brouillon) ──
             ['ben_0', 'interv_0', 'planning_2', '+7 days', '08:00', '09:00', TypeIntervention::Toilette,       StatutIntervention::Planifiee],
             ['ben_1', 'interv_1', 'planning_2', '+8 days', '09:00', '10:30', TypeIntervention::Menage,         StatutIntervention::Planifiee],

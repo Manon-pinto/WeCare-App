@@ -25,6 +25,7 @@ class PlanningFixtures extends Fixture implements DependentFixtureInterface
         $planningsData = [
             ['monday last week',  StatutPlanning::Archive,  ['interv_0', 'interv_2']],
             ['monday this week',  StatutPlanning::Publie,   ['interv_0', 'interv_1', 'interv_2', 'interv_3']],
+            ['monday this week',  StatutPlanning::Publie,   ['interv2_0', 'interv2_1']],
             ['monday next week',  StatutPlanning::Brouillon, ['interv_0', 'interv_1']],
         ];
 

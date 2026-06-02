@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Enum\StatutIntervention;
 use App\Repository\BeneficiaireRepository;
+use App\Repository\IntervenantRepository;
 use App\Repository\InterventionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,17 +14,22 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 class MapController extends AbstractController
 {
-    private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
+    use AdminTrait;
 
-    private const JOURS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    private const MOIS  = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+    private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
+    private const JOURS   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    private const MOIS    = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
 
     #[Route('/map', name: 'admin_map')]
     public function index(
         Request                $request,
         BeneficiaireRepository $beneficiaireRepo,
+        IntervenantRepository  $intervenantRepo,
         InterventionRepository $interventionRepo,
     ): Response {
+        $admin    = $this->getCurrentAdmin();
+        $myIvIds  = array_map(fn($iv) => $iv->getId(), $intervenantRepo->findAllWithDetails($admin));
+
         $mode    = $request->query->get('mode', 'jour');
         $dateStr = $request->query->get('date', (new \DateTime('today'))->format('Y-m-d'));
         $date    = new \DateTime($dateStr);
@@ -32,14 +38,14 @@ class MapController extends AbstractController
             $dow       = (int) $date->format('N');
             $weekStart = (clone $date)->modify('-' . ($dow - 1) . ' days midnight');
             $weekEnd   = (clone $weekStart)->modify('+6 days');
-            $interventionsJour = $interventionRepo->findForWeek($weekStart);
+            $interventionsJour = $interventionRepo->findForWeek($weekStart, $myIvIds);
             $prevDate  = (clone $weekStart)->modify('-1 week');
             $nextDate  = (clone $weekStart)->modify('+1 week');
             $dateLabel = $weekStart->format('j') . ' ' . self::MOIS[(int)$weekStart->format('n') - 1]
                        . ' – ' . $weekEnd->format('j') . ' ' . self::MOIS[(int)$weekEnd->format('n') - 1]
                        . ' ' . $weekEnd->format('Y');
         } else {
-            $interventionsJour = $interventionRepo->findForDate($date);
+            $interventionsJour = $interventionRepo->findForDate($date, $myIvIds);
             $prevDate  = (clone $date)->modify('-1 day');
             $nextDate  = (clone $date)->modify('+1 day');
             $dateLabel = self::JOURS[(int)$date->format('w')] . ' '
@@ -53,7 +59,7 @@ class MapController extends AbstractController
             fn($i) => $i->getStatut() === StatutIntervention::Terminee
         ));
 
-        $tousLesBens = $beneficiaireRepo->findAllWithDetails();
+        $tousLesBens = $beneficiaireRepo->findAllForMap($admin);
 
         $patients = [];
         foreach ($tousLesBens as $ben) {

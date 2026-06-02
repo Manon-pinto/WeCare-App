@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 class PatientsController extends AbstractController
 {
+    use AdminTrait;
     private const PALETTE = ['#8b5cf6', '#2dd4bf', '#ec4899', '#10b981', '#06b6d4', '#f59e0b'];
 
     private const TYPE_LABELS = [
@@ -37,7 +38,7 @@ class PatientsController extends AbstractController
     #[Route('/patients', name: 'admin_patients')]
     public function index(BeneficiaireRepository $repo): Response
     {
-        $beneficiaires = $repo->findAllWithDetails();
+        $beneficiaires = $repo->findAllWithDetails($this->getCurrentAdmin());
         $today         = new \DateTime('today');
         $yesterday     = (clone $today)->modify('-1 day');
         $joursAbr      = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -109,6 +110,7 @@ class PatientsController extends AbstractController
                 'risque'        => $risque,
                 'risqueLabel'   => self::RISQUE_LABELS[$risque] ?? ucfirst($risque),
                 'pathologie'    => $b->getPathologie() ?? '',
+                'rdvParSemaine' => $b->getRdvParSemaine(),
                 'dateNaissance' => $b->getDateNaissance()->format('Y-m-d'),
                 'color'         => self::PALETTE[$idx % count(self::PALETTE)],
                 'crs'           => $crs,
@@ -141,11 +143,13 @@ class PatientsController extends AbstractController
 
         $beneficiaire = new Beneficiaire();
         $beneficiaire->setUtilisateur($utilisateur);
-        $beneficiaire->setAdminCreateur($this->getUser()->getAdministrateur());
+        $beneficiaire->setAdminCreateur($this->getCurrentAdmin());
         $beneficiaire->setDateNaissance(new \DateTime($request->request->get('dateNaissance')));
         $beneficiaire->setAdresse($request->request->get('adresse'));
         $beneficiaire->setPathologie($request->request->get('pathologie') ?: null);
         $beneficiaire->setNiveauRisque($request->request->get('niveauRisque', 'modere'));
+        $rdv = $request->request->get('rdvParSemaine');
+        if ($rdv !== null && $rdv !== '') $beneficiaire->setRdvParSemaine((int) $rdv);
         $beneficiaire->setLatitude('0');
         $beneficiaire->setLongitude('0');
 
@@ -186,6 +190,8 @@ class PatientsController extends AbstractController
         $beneficiaire->setAdresse($request->request->get('adresse'));
         $beneficiaire->setPathologie($request->request->get('pathologie') ?: null);
         $beneficiaire->setNiveauRisque($request->request->get('niveauRisque', 'modere'));
+        $rdv = $request->request->get('rdvParSemaine');
+        if ($rdv !== null && $rdv !== '') $beneficiaire->setRdvParSemaine((int) $rdv);
 
         $em->flush();
 

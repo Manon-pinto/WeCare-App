@@ -167,6 +167,24 @@
   .alert-icon-wrap.critique { border-color: #ef4444; color: #dc2626; }
   .alert-titre { font-size: 11.5px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
   .alert-texte { font-size: 10.5px; color: #9ca3af; line-height: 1.4; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,0,75,0.35); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal-panel { background: #fff; border-radius: 24px; padding: 32px; width: 540px; max-width: calc(100vw - 48px); max-height: 90vh; overflow-y: auto; animation: mIn 0.18s ease; }
+  @keyframes mIn { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--primary); }
+  .modal-close { background: #f3f4f6; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; color: #6b7280; display: flex; align-items: center; justify-content: center; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-input, .form-select { border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; font-size: 13px; color: var(--primary); outline: none; background: #fafafa; font-family: inherit; width: 100%; box-sizing: border-box; }
+  .form-input:focus, .form-select:focus { border-color: var(--pink); background: #fff; }
+  .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; border-top: 1px solid #f3f4f6; padding-top: 16px; }
+  .btn-modal-cancel { background: #f3f4f6; border: none; border-radius: 10px; padding: 9px 18px; font-size: 12px; font-weight: 600; color: #6b7280; cursor: pointer; }
+  .btn-modal-save { background: var(--pink); color: #fff; border: none; border-radius: 10px; padding: 9px 22px; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .btn-modal-save:hover { opacity: 0.88; }
 </style>
 {% endblock %}
 
@@ -186,7 +204,7 @@
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         {{ dateLabel }}
       </div>
-      <button class="btn-new">
+      <button class="btn-new" onclick="document.getElementById('modalIntervention').style.display='flex'">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nouvelle intervention
       </button>
@@ -231,7 +249,7 @@
               <span class="date-nav-label">{{ dateLabel }}</span>
               <a href="{{ path('admin_dashboard', {date: nextDateStr}) }}" class="date-nav-btn">&#8250;</a>
             </div>
-            <button class="btn-planning">
+            <button class="btn-planning" onclick="window.location='{{ path('admin_planning') }}'">
               Voir planning complet
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </button>
@@ -333,7 +351,120 @@
   </div>
 </div>
 
+<!-- Modal — Nouvelle intervention -->
+<div class="modal-overlay" id="modalIntervention" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Nouvelle intervention</span>
+      <button class="modal-close" onclick="document.getElementById('modalIntervention').style.display='none'">×</button>
+    </div>
+    <form method="POST" action="{{ path('admin_planning_creer') }}">
+      <div class="modal-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Patient *</label>
+          <select class="form-select" name="ben_id" required>
+            <option value="">— Sélectionner un patient —</option>
+            {% for p in patients %}
+            <option value="{{ p.id }}">{{ p.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Soignant *</label>
+          <select class="form-select" name="iv_id" required>
+            <option value="">— Sélectionner un soignant —</option>
+            {% for s in soignants %}
+            <option value="{{ s.id }}">{{ s.nom }}{% if s.specialite %} — {{ s.specialite }}{% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Date *</label>
+          <input class="form-input" type="date" name="date" value="{{ todayStr }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heure début *</label>
+          <select class="form-select" name="h_debut" id="dash-h-debut" required>
+            {% for h in range(6, 19) %}
+            <option value="{{ h }}" {{ h == 9 ? 'selected' : '' }}>{{ '%02d'|format(h) }}:00</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heure fin *</label>
+          <select class="form-select" name="h_fin" id="dash-h-fin" required>
+            {% for h in range(7, 20) %}
+            <option value="{{ h }}" {{ h == 10 ? 'selected' : '' }}>{{ '%02d'|format(h) }}:00</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Type *</label>
+          <select class="form-select" name="type" required>
+            <option value="soins">Soins infirmiers</option>
+            <option value="toilette">Toilette</option>
+            <option value="menage">Ménage</option>
+            <option value="repas">Repas</option>
+            <option value="accompagnement">Accompagnement</option>
+            <option value="surveillance">Surveillance</option>
+          </select>
+        </div>
+      </div>
+      <div id="dash-conflict-warning" style="display:none;background:#fee2e2;color:#991b1b;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;margin-top:4px;">
+        ⚠ Ce soignant est déjà occupé sur ce créneau — choisissez un autre horaire ou un autre soignant.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" onclick="document.getElementById('modalIntervention').style.display='none'">Annuler</button>
+        <button type="submit" class="btn-modal-save" id="btn-submit-dash">Créer l'intervention</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+const OCCUPIED_DASH = {{ occupiedByIv|json_encode|raw }};
+const TODAY_STR     = '{{ todayStr }}';
+
+function checkConflictDash() {
+  const warn = document.getElementById('dash-conflict-warning');
+  const btn  = document.getElementById('btn-submit-dash');
+  if (!warn || !btn) return;
+
+  // Si la date sélectionnée ≠ aujourd'hui, pas de vérification client
+  const modalDate = document.querySelector('#modalIntervention input[name="date"]')?.value;
+  if (modalDate && modalDate !== TODAY_STR) {
+    warn.style.display = 'none';
+    btn.disabled = false; btn.style.opacity = '';
+    return;
+  }
+
+  const ivId   = document.querySelector('#modalIntervention select[name="iv_id"]')?.value;
+  const hDebut = parseInt(document.getElementById('dash-h-debut')?.value);
+  const hFin   = parseInt(document.getElementById('dash-h-fin')?.value);
+  if (!ivId) return;
+  const occ = (OCCUPIED_DASH[ivId] || []).map(Number);
+  let conflict = false;
+  for (let h = hDebut; h < hFin; h++) {
+    if (occ.includes(h)) { conflict = true; break; }
+  }
+  warn.style.display = conflict ? 'block' : 'none';
+  btn.disabled = conflict;
+  btn.style.opacity = conflict ? '0.5' : '';
+}
+
+document.getElementById('dash-h-debut')?.addEventListener('change', function () {
+  const fin = document.getElementById('dash-h-fin');
+  if (parseInt(fin.value) <= parseInt(this.value)) fin.value = parseInt(this.value) + 1;
+  checkConflictDash();
+});
+document.getElementById('dash-h-fin')?.addEventListener('change', checkConflictDash);
+document.querySelector('#modalIntervention select[name="iv_id"]')?.addEventListener('change', checkConflictDash);
+document.querySelector('#modalIntervention input[name="date"]')?.addEventListener('change', checkConflictDash);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modalIntervention').style.display = 'none';
+});
+
 (function () {
   const avatarRow = document.querySelector('.cal-avatar-row');
   const calGrid   = document.querySelector('.cal-grid');

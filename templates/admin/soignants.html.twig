@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
 <style>
-  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; background: #C8DFF0; }
+  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #C8DFF0; }
 
   /* Topbar */
   .topbar { padding: 28px 32px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
@@ -83,10 +83,21 @@
   .detail-meta { flex: 1; }
   .detail-name { font-size: 18px; font-weight: 800; color: var(--primary); }
   .detail-sub { font-size: 12px; color: #9ca3af; margin-top: 3px; }
-  .badge-actif { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; background: #d1fae5; color: #065f46; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
-  .badge-actif::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
-  .badge-inactif { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; background: #fef3c7; color: #92400e; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
-  .badge-inactif::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+  .statut-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
+  .statut-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .statut-actif       { background: #d1fae5; color: #065f46; }
+  .statut-actif::before { background: #10b981; }
+  .statut-conge       { background: #e0f2fe; color: #075985; }
+  .statut-conge::before { background: #0ea5e9; }
+  .statut-arret       { background: #fee2e2; color: #991b1b; }
+  .statut-arret::before { background: #ef4444; }
+  .statut-formation   { background: #ede9fe; color: #5b21b6; }
+  .statut-formation::before { background: #8b5cf6; }
+  .statut-indisponible { background: #fef3c7; color: #92400e; }
+  .statut-indisponible::before { background: #f59e0b; }
+  /* compat aliases */
+  .badge-actif   { display:inline-flex;align-items:center;gap:4px;margin-top:6px;background:#d1fae5;color:#065f46;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700; }
+  .badge-inactif { display:inline-flex;align-items:center;gap:4px;margin-top:6px;background:#fef3c7;color:#92400e;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700; }
 
   /* Form sections */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -119,12 +130,27 @@
   .day-count-sub { font-size: 8px; font-weight: 600; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.05em; }
   .week-total { font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center; font-weight: 500; }
 
-  /* Footer buttons */
-  .detail-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: auto; }
-  .btn-annuler { padding: 10px 22px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; transition: border-color 0.15s; }
-  .btn-annuler:hover { border-color: var(--primary); }
-  .btn-enregistrer { padding: 10px 22px; background: var(--pink); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
-  .btn-enregistrer:hover { opacity: 0.88; }
+  /* Action buttons top-right */
+  .detail-actions { position: absolute; top: 0; right: 0; display: flex; gap: 8px; }
+  .btn-modifier {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border: 1.5px solid #c7d2fe; background: #eef2ff;
+    border-radius: 10px; font-size: 12px; font-weight: 700; color: #4338ca;
+    cursor: pointer; transition: all 0.13s; text-decoration: none;
+  }
+  .btn-modifier:hover { background: #e0e7ff; border-color: #a5b4fc; }
+  .btn-supprimer {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border: 1.5px solid #fecdd3; background: #fff0f2;
+    border-radius: 10px; font-size: 12px; font-weight: 700; color: #e11d48;
+    cursor: pointer; transition: all 0.13s;
+  }
+  .btn-supprimer:hover { background: #fecdd3; }
+
+  /* Footer (kept for modal usage) */
+  .detail-footer { display: none; }
+  .btn-annuler { padding: 10px 22px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; }
+  .btn-enregistrer { padding: 10px 22px; background: var(--pink); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
   .no-selected { display: flex; align-items: center; justify-content: center; flex: 1; color: #d1d5db; font-size: 13px; }
 
@@ -182,7 +208,6 @@
               <th>Soignant</th>
               <th>Contact</th>
               <th>Semaine</th>
-              <th></th>
             </tr>
           </thead>
           <tbody id="soignantsBody">
@@ -194,7 +219,13 @@
                   <div class="iv-avatar" style="background: {{ s.color }}">{{ s.initiales }}</div>
                   <div>
                     <div class="iv-name">{{ s.nom }}</div>
-                    <div class="iv-role">{{ s.specialite }}</div>
+                    <div class="iv-role">
+                      {{ s.specialite }}
+                      {% if (s.statut ?? 'actif') != 'actif' %}
+                      {% set lblMap = {'conge':'En congé','arret':'Arrêt maladie','formation':'En formation','indisponible':'Indisponible'} %}
+                      <span class="statut-badge statut-{{ s.statut }}" style="margin-top:2px;font-size:9.5px;">{{ lblMap[s.statut] ?? s.statut }}</span>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
               </td>
@@ -213,16 +244,6 @@
                 <span style="font-size:11px; color:#d1d5db;">—</span>
                 {% endif %}
               </td>
-              <td onclick="event.stopPropagation()">
-                <form class="delete-form" method="POST"
-                      action="{{ path('admin_soignants_supprimer', {id: s.id}) }}"
-                      onsubmit="return confirm('Supprimer {{ s.prenom }} {{ s.nomFamille }} ? Cette action est irréversible.')">
-                  <input type="hidden" name="_token" value="{{ csrf_token('delete_soignant_' ~ s.id) }}">
-                  <button type="submit" class="btn-delete-row" title="Supprimer">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                </form>
-              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -238,51 +259,62 @@
         <div class="detail-meta">
           <div class="detail-name">{{ selected.nom }}</div>
           <div class="detail-sub">{{ selected.specialite }} · Secteur {{ selected.secteur }}</div>
-          <span class="{{ selected.disponible ? 'badge-actif' : 'badge-inactif' }}">
-            {{ selected.disponible ? 'Actif' : 'Indisponible' }}
+          {% set statutLabels = {
+            'actif': 'Actif', 'conge': 'En congé',
+            'arret': 'Arrêt maladie', 'formation': 'En formation',
+            'indisponible': 'Indisponible'
+          } %}
+          <span class="statut-badge statut-{{ selected.statut ?? 'actif' }}">
+            {{ statutLabels[selected.statut ?? 'actif'] ?? 'Actif' }}
           </span>
+        </div>
+        <div class="detail-actions">
+          <button type="submit" form="soignant-form" class="btn-modifier">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Modifier
+          </button>
+          <form method="POST" action="{{ path('admin_soignants_supprimer', {id: selected.id}) }}"
+                onsubmit="return confirm('Supprimer {{ selected.nom|e('js') }} ? Cette action est irréversible.')">
+            <button type="submit" class="btn-supprimer">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              Supprimer
+            </button>
+          </form>
         </div>
       </div>
 
+      <form id="soignant-form" method="POST" action="{{ path('admin_soignants_modifier', {id: selected.id}) }}">
       <div class="form-grid">
         <div>
           <div class="form-section-title">Informations personnelles</div>
           <div class="form-group">
             <label class="form-label">Prénom</label>
-            <input class="form-input" type="text" value="{{ selected.prenom }}">
+            <input class="form-input" type="text" name="prenom" value="{{ selected.prenom }}">
           </div>
           <div class="form-group">
             <label class="form-label">Nom</label>
-            <input class="form-input" type="text" value="{{ selected.nomFamille }}">
+            <input class="form-input" type="text" name="nom_famille" value="{{ selected.nomFamille }}">
           </div>
           <div class="form-group">
             <label class="form-label">Téléphone</label>
-            <input class="form-input" type="tel" value="{{ selected.telephone }}">
+            <input class="form-input" type="tel" name="telephone" value="{{ selected.telephone }}">
           </div>
           <div class="form-group">
             <label class="form-label">Email</label>
-            <input class="form-input" type="email" value="{{ selected.email }}">
+            <input class="form-input" type="email" name="email" value="{{ selected.email }}">
           </div>
         </div>
         <div>
           <div class="form-section-title">Profil professionnel</div>
           <div class="form-group">
             <label class="form-label">Spécialité</label>
-            <select class="form-select">
-              <option selected>{{ selected.specialite }}</option>
-              <option>Infirmier(e)</option>
-              <option>Aide-soignant(e)</option>
-              <option>Auxiliaire de vie</option>
-              <option>Kinésithérapeute</option>
-              <option>Aide à domicile</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Secteur</label>
-            <select class="form-select">
-              <option {{ selected.secteur == 'A' ? 'selected' : '' }}>A</option>
-              <option {{ selected.secteur == 'B' ? 'selected' : '' }}>B</option>
-              <option {{ selected.secteur == 'C' ? 'selected' : '' }}>C</option>
+            <select class="form-select" name="specialite">
+              <option value="Infirmier(e)"      {{ selected.specialite == 'Infirmier(e)'      ? 'selected' : '' }}>Infirmier(e)</option>
+              <option value="Aide-soignant(e)"  {{ selected.specialite == 'Aide-soignant(e)'  ? 'selected' : '' }}>Aide-soignant(e)</option>
+              <option value="Auxiliaire de vie" {{ selected.specialite == 'Auxiliaire de vie' ? 'selected' : '' }}>Auxiliaire de vie</option>
+              <option value="Kinésithérapeute"  {{ selected.specialite == 'Kinésithérapeute'  ? 'selected' : '' }}>Kinésithérapeute</option>
+              <option value="Aide à domicile"   {{ selected.specialite == 'Aide à domicile'   ? 'selected' : '' }}>Aide à domicile</option>
+              <option value="Soins infirmiers"  {{ selected.specialite == 'Soins infirmiers'  ? 'selected' : '' }}>Soins infirmiers</option>
             </select>
           </div>
           <div class="form-group">
@@ -294,14 +326,18 @@
                 <span style="font-size:11px; color:#6b7280;">50 km</span>
               </div>
               <input type="range" min="1" max="50" value="{{ selected.rayon }}" id="rayonSlider"
+                name="rayon"
                 oninput="document.getElementById('rayonVal').textContent = this.value + ' KM'">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">Statut</label>
-            <select class="form-select">
-              <option {{ selected.disponible ? 'selected' : '' }}>Actif</option>
-              <option {{ not selected.disponible ? 'selected' : '' }}>Indisponible</option>
+            <select class="form-select" name="statut">
+              <option value="actif"        {{ (selected.statut ?? 'actif') == 'actif'        ? 'selected' : '' }}>Actif</option>
+              <option value="conge"        {{ (selected.statut ?? '') == 'conge'        ? 'selected' : '' }}>En congé</option>
+              <option value="arret"        {{ (selected.statut ?? '') == 'arret'        ? 'selected' : '' }}>Arrêt maladie</option>
+              <option value="formation"    {{ (selected.statut ?? '') == 'formation'    ? 'selected' : '' }}>En formation</option>
+              <option value="indisponible" {{ (selected.statut ?? '') == 'indisponible' ? 'selected' : '' }}>Indisponible</option>
             </select>
           </div>
         </div>
@@ -336,9 +372,10 @@
       </div>
 
       <div class="detail-footer">
-        <button class="btn-annuler" onclick="window.location='{{ path('admin_soignants') }}'">Annuler</button>
-        <button class="btn-enregistrer">Enregistrer</button>
+        <a href="{{ path('admin_soignants', {id: selected.id}) }}" class="btn-annuler">Annuler</a>
+        <button type="submit" class="btn-enregistrer">Enregistrer</button>
       </div>
+      </form>
       {% else %}
       <div class="no-selected">Sélectionnez un soignant pour voir ses détails</div>
       {% endif %}
@@ -356,7 +393,6 @@
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <form method="POST" action="{{ path('admin_soignants_ajouter') }}">
-      <input type="hidden" name="_token" value="{{ csrf_token('add_soignant') }}">
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Prénom *</label>

@@ -23,12 +23,14 @@ class InterventionRepository extends ServiceEntityRepository
     // ── Admin dashboard ──────────────────────────────────────────────────────
 
     /** @return Intervention[] */
-    public function findForDate(\DateTimeInterface $date): array
+    public function findForDate(\DateTimeInterface $date, ?array $ivIds = null): array
     {
         $debut = new \DateTime($date->format('Y-m-d') . ' 00:00:00');
         $fin   = new \DateTime($date->format('Y-m-d') . ' 23:59:59');
 
-        return $this->createQueryBuilder('interv')
+        if ($ivIds !== null && count($ivIds) === 0) return [];
+
+        $qb = $this->createQueryBuilder('interv')
             ->join('interv.intervenant', 'iv')
             ->join('iv.utilisateur', 'uiv')
             ->join('interv.beneficiaire', 'ben')
@@ -38,9 +40,13 @@ class InterventionRepository extends ServiceEntityRepository
             ->andWhere('interv.dateDebut <= :fin')
             ->setParameter('debut', $debut)
             ->setParameter('fin', $fin)
-            ->orderBy('interv.dateDebut', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('interv.dateDebut', 'ASC');
+
+        if ($ivIds !== null) {
+            $qb->andWhere('iv.id IN (:ivIds)')->setParameter('ivIds', $ivIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countAujourdhui(): int
@@ -76,12 +82,14 @@ class InterventionRepository extends ServiceEntityRepository
     }
 
     /** @return Intervention[] */
-    public function findForWeek(\DateTimeInterface $weekStart): array
+    public function findForWeek(\DateTimeInterface $weekStart, ?array $ivIds = null): array
     {
         $debut = new \DateTime($weekStart->format('Y-m-d') . ' 00:00:00');
         $fin   = (clone $debut)->modify('+6 days')->setTime(23, 59, 59);
 
-        return $this->createQueryBuilder('interv')
+        if ($ivIds !== null && count($ivIds) === 0) return [];
+
+        $qb = $this->createQueryBuilder('interv')
             ->join('interv.intervenant', 'iv')
             ->join('iv.utilisateur', 'uiv')
             ->join('interv.beneficiaire', 'ben')
@@ -91,9 +99,13 @@ class InterventionRepository extends ServiceEntityRepository
             ->andWhere('interv.dateDebut <= :fin')
             ->setParameter('debut', $debut)
             ->setParameter('fin', $fin)
-            ->orderBy('interv.dateDebut', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('interv.dateDebut', 'ASC');
+
+        if ($ivIds !== null) {
+            $qb->andWhere('iv.id IN (:ivIds)')->setParameter('ivIds', $ivIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countActifsAujourdhui(): int
@@ -109,6 +121,47 @@ class InterventionRepository extends ServiceEntityRepository
             ->setParameter('fin', $fin)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** Vérifie si un intervenant est déjà occupé sur un créneau (chevauchement) */
+    public function isIntervenantBusy(
+        \App\Entity\Intervenant $intervenant,
+        \DateTimeInterface      $debut,
+        \DateTimeInterface      $fin
+    ): bool {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.intervenant = :iv')
+            ->andWhere('i.dateDebut < :fin')
+            ->andWhere('i.dateFin > :debut')
+            ->setParameter('iv', $intervenant)
+            ->setParameter('fin', $fin)
+            ->setParameter('debut', $debut)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
+    /** @return Intervention[] — prochaines interventions pour une liste de bénéficiaires */
+    public function findUpcomingForBeneficiaires(array $benIds, int $days = 30): array
+    {
+        if (empty($benIds)) return [];
+        $today = new \DateTime('today');
+        $limit = (clone $today)->modify("+$days days")->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('i')
+            ->join('i.beneficiaire', 'b')
+            ->join('i.intervenant', 'iv')
+            ->join('iv.utilisateur', 'uiv')
+            ->addSelect('b', 'iv', 'uiv')
+            ->andWhere('b.id IN (:benIds)')
+            ->andWhere('i.dateDebut >= :today')
+            ->andWhere('i.dateDebut <= :limit')
+            ->setParameter('benIds', $benIds)
+            ->setParameter('today', $today)
+            ->setParameter('limit', $limit)
+            ->orderBy('i.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     // ── Intervenant ──────────────────────────────────────────────────────────

@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 class SoignantsController extends AbstractController
 {
+    use AdminTrait;
     private const PALETTE  = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
     private const SECTEURS = ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'];
 
@@ -26,12 +27,13 @@ class SoignantsController extends AbstractController
         IntervenantRepository $intervenantRepo,
         InterventionRepository $interventionRepo,
     ): Response {
-        $intervenants = $intervenantRepo->findAllWithDetails();
+        $admin        = $this->getCurrentAdmin();
+        $intervenants = $intervenantRepo->findAllWithDetails($admin);
 
         $weekStart = new \DateTime('monday this week midnight');
         $joursLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
-        $allWeekIvs = $interventionRepo->findForWeek($weekStart);
+        $allWeekIvs = $interventionRepo->findForWeek($weekStart, array_map(fn($iv) => $iv->getId(), $intervenants));
         $weekByIv   = [];
         foreach ($allWeekIvs as $wi) {
             $weekByIv[$wi->getIntervenant()->getId()][] = $wi;
@@ -63,6 +65,7 @@ class SoignantsController extends AbstractController
                 'telephone'  => $iv->getTelephone() ?? '',
                 'email'      => $u->getEmail() ?? '',
                 'disponible' => $iv->isDisponibilite(),
+            'statut'     => $iv->getStatut(),
                 'rayon'      => (int) ($iv->getRayonIntervention() ?? 5),
                 'weekCount'  => count($ivWeekIvs),
                 'weekGrid'   => $weekGrid,
@@ -88,10 +91,6 @@ class SoignantsController extends AbstractController
         EntityManagerInterface      $em,
         UserPasswordHasherInterface $hasher,
     ): Response {
-        if (!$this->isCsrfTokenValid('add_soignant', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
-        }
-
         $prenom     = trim($request->request->get('prenom', ''));
         $nomFam     = trim($request->request->get('nom_famille', ''));
         $email      = trim($request->request->get('email', ''));
@@ -106,12 +105,9 @@ class SoignantsController extends AbstractController
         $u->setRole(RoleUtilisateur::Intervenant);
         $em->persist($u);
 
-        /** @var \App\Entity\Utilisateur $adminUser */
-        $adminUser = $this->getUser();
-
         $iv = new Intervenant();
         $iv->setUtilisateur($u);
-        $iv->setAdminCreateur($adminUser->getAdministrateur());
+        $iv->setAdminCreateur($this->getCurrentAdmin());
         $iv->setSpecialite($specialite);
         $iv->setTelephone($telephone ?: '0600000000');
         $iv->setDisponibilite(true);
@@ -124,6 +120,38 @@ class SoignantsController extends AbstractController
         return $this->redirectToRoute('admin_soignants', ['id' => $iv->getId()]);
     }
 
+    #[Route('/soignants/{id}/modifier', name: 'admin_soignants_modifier', methods: ['POST'])]
+    public function modifier(
+        int                   $id,
+        Request               $request,
+        IntervenantRepository $intervenantRepo,
+        EntityManagerInterface $em,
+    ): Response {
+        $iv = $intervenantRepo->find($id);
+        if (!$iv) return $this->redirectToRoute('admin_soignants');
+
+        $prenom     = trim($request->request->get('prenom', ''));
+        $nomFam     = trim($request->request->get('nom_famille', ''));
+        $telephone  = trim($request->request->get('telephone', ''));
+        $email      = trim($request->request->get('email', ''));
+        $specialite = trim($request->request->get('specialite', 'Infirmier(e)'));
+        $rayon = (float) $request->request->get('rayon', $iv->getRayonIntervention());
+
+        $u = $iv->getUtilisateur();
+        $nomComplet = trim($prenom . ' ' . $nomFam);
+        if ($nomComplet !== ' ') $u->setNom($nomComplet);
+        if ($email) $u->setEmail($email);
+
+        $statut = $request->request->get('statut', 'actif');
+        $iv->setSpecialite($specialite);
+        $iv->setTelephone($telephone ?: $iv->getTelephone());
+        $iv->setRayonIntervention($rayon);
+        $iv->setStatut($statut);
+        $em->flush();
+
+        return $this->redirectToRoute('admin_soignants', ['id' => $id]);
+    }
+
     #[Route('/soignants/{id}/supprimer', name: 'admin_soignants_supprimer', methods: ['POST'])]
     public function supprimer(
         int                    $id,
@@ -131,10 +159,6 @@ class SoignantsController extends AbstractController
         IntervenantRepository  $intervenantRepo,
         EntityManagerInterface $em,
     ): Response {
-        if (!$this->isCsrfTokenValid('delete_soignant_' . $id, $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
-        }
-
         $iv = $intervenantRepo->find($id);
         if ($iv) {
             // Détacher du planning (côté propriétaire ManyToMany)

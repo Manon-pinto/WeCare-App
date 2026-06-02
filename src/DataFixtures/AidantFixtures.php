@@ -47,6 +47,23 @@ class AidantFixtures extends Fixture implements DependentFixtureInterface
             $manager->persist($a);
         }
 
+        // ── Aidants admin2 ──
+        $aidantsAdmin2 = [
+            ['beneficiaire' => 'ben2_0', 'nom' => 'Blanc', 'prenom' => 'Sophie',  'telephone' => '0677889900', 'email' => 'sophie.blanc@mail.fr', 'lien' => 'Fille'],
+            ['beneficiaire' => 'ben2_2', 'nom' => 'Petit', 'prenom' => 'Bernard', 'telephone' => '0688990011', 'email' => 'bernard.petit@mail.fr', 'lien' => 'Fils'],
+        ];
+
+        foreach ($aidantsAdmin2 as $data) {
+            $a = new Aidant();
+            $a->setBeneficiaire($this->getReference($data['beneficiaire'], Beneficiaire::class));
+            $a->setNom($data['nom']);
+            $a->setPrenom($data['prenom']);
+            $a->setTelephone($data['telephone']);
+            $a->setEmail($data['email']);
+            $a->setLien($data['lien']);
+            $manager->persist($a);
+        }
+
         $manager->flush();
     }
 }

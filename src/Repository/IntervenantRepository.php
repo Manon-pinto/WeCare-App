@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Administrateur;
 use App\Entity\Intervenant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,16 +17,19 @@ class IntervenantRepository extends ServiceEntityRepository
         parent::__construct($registry, Intervenant::class);
     }
 
-    /** @return Intervenant[] */
-    public function findAllWithDetails(): array
+    /** @return Intervenant[] — charge uniquement utilisateur, sans interventions */
+    public function findAllWithDetails(?Administrateur $admin = null): array
     {
-        return $this->createQueryBuilder('iv')
+        $qb = $this->createQueryBuilder('iv')
             ->join('iv.utilisateur', 'u')
-            ->leftJoin('iv.interventions', 'i')
-            ->addSelect('u', 'i')
-            ->orderBy('u.nom', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->addSelect('u')
+            ->orderBy('u.nom', 'ASC');
+
+        if ($admin !== null) {
+            $qb->andWhere('iv.adminCreateur = :admin')->setParameter('admin', $admin);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countActifsCeMois(): int
