@@ -1,0 +1,43 @@
+<nav class="lp-nav" id="lp-nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/Logo-fond-clair.png" alt="WeCare">
+  </a>
+  <ul class="nav-links">
+    <li><a href="/fonctionnalites" class="nav-link {% if app.request.attributes.get('_route') == 'landing_features' %}active{% endif %}">Fonctionnalités</a></li>
+    <li><a href="/tarifs"          class="nav-link {% if app.request.attributes.get('_route') == 'landing_pricing' %}active{% endif %}">Tarifs</a></li>
+    <li class="nav-dropdown-wrap">
+      <a href="/ressources" class="nav-link nav-dropdown-trigger {% if app.request.attributes.get('_route') == 'landing_ressources' %}active{% endif %}">
+        Ressources
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-left:4px;transition:transform 0.2s"><polyline points="6 9 12 15 18 9"/></svg>
+      </a>
+      <div class="nav-dropdown">
+        <a href="/blog" class="nav-dropdown-item">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Blog
+        </a>
+        <a href="/contact" class="nav-dropdown-item">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Contact
+        </a>
+        <a href="/ressources#aide" class="nav-dropdown-item">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Centre d'aide
+        </a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-ctas">
+    <a href="/login"       class="nav-btn-ghost">Se connecter</a>
+    <a href="/inscription" class="nav-btn-teal">Essai gratuit</a>
+  </div>
+  <button class="nav-burger" id="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile-drawer" id="nav-drawer">
+  <a href="/fonctionnalites">Fonctionnalités</a>
+  <a href="/tarifs">Tarifs</a>
+  <a href="/ressources">Ressources</a>
+  <a href="/login"       class="drawer-ghost">Se connecter</a>
+  <a href="/inscription" class="drawer-primary">Essai gratuit</a>
+</div>

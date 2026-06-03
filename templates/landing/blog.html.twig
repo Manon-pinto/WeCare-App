@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog – WeCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+    /* ── Blog page ── */
+    .blog-hero {
+      background: #F2FBFF;
+      padding: 64px 48px 48px;
+      text-align: center;
+    }
+    .blog-hero-bar {
+      width: 36px; height: 4px;
+      background: #2CA7CB;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .blog-hero-title {
+      font-size: 2.6rem; font-weight: 800; color: #0c0052;
+      line-height: 1.15;
+    }
+
+    /* ── Featured article ── */
+    .blog-featured-wrap {
+      background: #fff;
+      padding: 0 48px;
+    }
+    .blog-featured {
+      max-width: 1200px; margin: 0 auto;
+      padding: 48px 0 40px;
+    }
+    .blog-featured-card {
+      display: grid; grid-template-columns: 1fr 420px;
+      gap: 40px; align-items: center;
+      background: #F2FBFF;
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 40px;
+    }
+    .blog-featured-tag {
+      display: inline-block;
+      background: #ff91fd22;
+      color: #c040be;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .blog-featured-title {
+      font-size: 1.6rem; font-weight: 800; color: #0c0052;
+      line-height: 1.25; margin-bottom: 16px;
+    }
+    .blog-featured-list {
+      list-style: none; display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 24px;
+    }
+    .blog-featured-list li {
+      font-size: 0.85rem; color: #5a5580;
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .blog-featured-list li::before {
+      content: '•'; color: #2CA7CB; font-weight: 800; margin-top: 1px; flex-shrink: 0;
+    }
+    .blog-featured-meta {
+      font-size: 0.78rem; color: #9a95b8; margin-bottom: 20px;
+    }
+    .blog-featured-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 24px; background: #2CA7CB; color: #fff;
+      border-radius: 10px; font-weight: 700; font-size: 0.88rem;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .blog-featured-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .blog-featured-img {
+      position: relative; border-radius: 16px; overflow: hidden;
+      aspect-ratio: 16/10; background: linear-gradient(135deg,#e4f5f3,#f0eef8);
+    }
+    .blog-featured-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .blog-featured-play {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #2CA7CB; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(44,167,203,0.4);
+    }
+    .blog-featured-play svg { margin-left: 3px; }
+    /* Overlay profil app sur l'image featured */
+    .blog-featured-profile {
+      position: absolute; bottom: 16px; right: 16px;
+      background: #3a2080; color: #fff;
+      border-radius: 14px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 24px rgba(15,0,75,0.30);
+      min-width: 180px;
+    }
+    .blog-featured-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #6c44e0; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .blog-featured-profile-name {
+      font-size: 0.82rem; font-weight: 700; color: #fff; line-height: 1.2;
+    }
+    .blog-featured-profile-tags {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px;
+    }
+    .blog-featured-profile-tag {
+      font-size: 0.60rem; font-weight: 600; letter-spacing: 0.06em;
+      background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85);
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    /* ── Filters ── */
+    .blog-filters-wrap {
+      background: #fff;
+      border-bottom: 1px solid #f0eef8;
+      padding: 0 48px;
+      position: sticky; top: 68px; z-index: 100;
+    }
+    .blog-filters {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; gap: 24px;
+      padding: 18px 0;
+      overflow-x: auto;
+    }
+    .blog-filter-btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 0; border: none; cursor: pointer;
+      font-size: 0.84rem; font-weight: 500; font-family: 'Poppins', sans-serif;
+      background: transparent; color: #7a75a0;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+    .blog-filter-btn:hover { color: #0c0052; }
+    .blog-filter-btn.active { color: #0c0052; font-weight: 600; }
+    /* Radio circle */
+    .blog-filter-radio {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid #c8c4e0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: border-color 0.15s;
+    }
+    .blog-filter-btn.active .blog-filter-radio {
+      border-color: #2CA7CB;
+    }
+    .blog-filter-radio-inner {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #2CA7CB;
+      display: none;
+    }
+    .blog-filter-btn.active .blog-filter-radio-inner { display: block; }
+
+    /* ── Search bar ── */
+    .blog-search-wrap {
+      background: #fff; padding: 0 48px 32px;
+    }
+    .blog-search {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; gap: 16px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .blog-search-field {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1; min-width: 220px;
+      border: 1.5px solid #e8e4f0; border-radius: 10px;
+      padding: 10px 16px; background: #faf9fd;
+      transition: border-color 0.15s;
+    }
+    .blog-search-field:focus-within { border-color: #2CA7CB; }
+    .blog-search-field svg { stroke: #a09abe; flex-shrink: 0; }
+    .blog-search-field input {
+      border: none; background: transparent; outline: none;
+      font-size: 0.86rem; font-family: 'Poppins', sans-serif; color: #0c0052; width: 100%;
+    }
+    .blog-search-field input::placeholder { color: #b0a8cc; }
+    .blog-search-select {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1; min-width: 220px;
+      border: 1.5px solid #e8e4f0; border-radius: 10px;
+      padding: 10px 16px; background: #faf9fd;
+      position: relative;
+    }
+    .blog-search-select svg { stroke: #a09abe; flex-shrink: 0; }
+    .blog-search-select select {
+      border: none; background: transparent; outline: none;
+      font-size: 0.86rem; font-family: 'Poppins', sans-serif; color: #0c0052; width: 100%;
+      appearance: none; cursor: pointer;
+    }
+    .blog-search-btn {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: #2CA7CB; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: opacity 0.15s;
+    }
+    .blog-search-btn:hover { opacity: 0.88; }
+
+    /* ── Articles grid ── */
+    .blog-grid-wrap {
+      background: #F2FBFF; padding: 48px 48px 64px;
+    }
+    .blog-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+    }
+    .blog-card {
+      background: #fff; border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(15,0,75,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .blog-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(15,0,75,0.10);
+    }
+    .blog-card-img {
+      width: 100%; aspect-ratio: 16/9; overflow: hidden;
+    }
+    .blog-card-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.3s;
+    }
+    .blog-card:hover .blog-card-img img { transform: scale(1.04); }
+    .blog-card-body { padding: 20px 22px 24px; }
+    .blog-card-tag {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #2CA7CB;
+      margin-bottom: 8px;
+    }
+    .blog-card-title {
+      font-size: 0.96rem; font-weight: 700; color: #0c0052;
+      line-height: 1.35; margin-bottom: 10px;
+    }
+    .blog-card-excerpt {
+      font-size: 0.80rem; color: #7a75a0; line-height: 1.6;
+      margin-bottom: 14px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .blog-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.76rem; color: #a09abe;
+    }
+    .blog-card-date { display: flex; align-items: center; gap: 5px; }
+    .blog-card-read {
+      display: flex; align-items: center; gap: 4px;
+      color: #2CA7CB; font-weight: 600; font-size: 0.76rem;
+    }
+
+    /* ── Load more ── */
+    .blog-loadmore {
+      display: flex; justify-content: center; padding: 0 0 64px;
+      background: #F2FBFF;
+    }
+    .blog-loadmore-btn {
+      padding: 12px 40px; background: #2CA7CB; color: #fff;
+      border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+      border: none; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+      font-family: 'Poppins', sans-serif;
+    }
+    .blog-loadmore-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .blog-hero { padding: 48px 24px 36px; }
+      .blog-featured-wrap, .blog-filters-wrap, .blog-search-wrap, .blog-grid-wrap, .blog-loadmore { padding-left: 24px; padding-right: 24px; }
+      .blog-featured-card { grid-template-columns: 1fr; }
+      .blog-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    }
+    @media (max-width: 600px) {
+      .blog-hero { padding: 36px 20px 28px; }
+      .blog-hero-title { font-size: 1.8rem; }
+      .blog-featured-wrap, .blog-filters-wrap, .blog-search-wrap, .blog-grid-wrap, .blog-loadmore { padding-left: 20px; padding-right: 20px; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .blog-featured-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+{{ include('landing/_nav.html.twig') }}
+
+{# ── Hero ── #}
+<section class="blog-hero">
+  <div class="blog-hero-bar"></div>
+  <h1 class="blog-hero-title">La une WeCare</h1>
+</section>
+
+{# ── Article à la une ── #}
+<div class="blog-featured-wrap">
+  <div class="blog-featured">
+    <div class="blog-featured-card reveal">
+      <div>
+        <span class="blog-featured-tag">Webinaire</span>
+        <h2 class="blog-featured-title">Améliorez la planification<br>de vos interventions SAAD</h2>
+        <p style="font-size:0.82rem;font-weight:600;color:#5a5580;margin-bottom:10px;">Au programme :</p>
+        <ul class="blog-featured-list">
+          <li>La planification intelligente pour améliorer la productivité</li>
+          <li>Gestion des incidents terrain : Innovation WeCare</li>
+          <li>Optimisation des tournées (réduction des temps de trajet)</li>
+        </ul>
+        <div class="blog-featured-meta">2 juin 2026 &nbsp;·&nbsp; Webinaire · 45 min</div>
+      </div>
+      <div class="blog-featured-img">
+        <img src="/images/blog-featured.jpg" alt="Planification SAAD" onerror="this.style.display='none'">
+        <div class="blog-featured-play">
+          <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Filtres par catégorie ── #}
+<div class="blog-filters-wrap">
+  <div class="blog-filters">
+    <button class="blog-filter-btn active" data-cat="all">
+      <span class="blog-filter-radio"><span class="blog-filter-radio-inner"></span></span>
+      Planification &amp; Tournées
+    </button>
+    <button class="blog-filter-btn" data-cat="interventions">
+      <span class="blog-filter-radio"><span class="blog-filter-radio-inner"></span></span>
+      Interventions terrain
+    </button>
+    <button class="blog-filter-btn" data-cat="aidants">
+      <span class="blog-filter-radio"><span class="blog-filter-radio-inner"></span></span>
+      Aidants &amp; Bénéficiaires
+    </button>
+    <button class="blog-filter-btn" data-cat="actualites">
+      <span class="blog-filter-radio"><span class="blog-filter-radio-inner"></span></span>
+      Actualités
+    </button>
+    <button class="blog-filter-btn" data-cat="guides">
+      <span class="blog-filter-radio"><span class="blog-filter-radio-inner"></span></span>
+      Guides &amp; Ressources
+    </button>
+  </div>
+</div>
+
+{# ── Barre de recherche ── #}
+<div class="blog-search-wrap">
+  <div class="blog-search" style="padding-top:24px;">
+    <div class="blog-search-field">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="blog-search-input" placeholder="Mot-clé…">
+    </div>
+    <div class="blog-search-select">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <select id="blog-structure-filter">
+        <option value="">Sélectionnez une structure</option>
+        <option value="saad">SAAD</option>
+        <option value="ssiad">SSIAD</option>
+        <option value="ehpad">EHPAD</option>
+        <option value="crt">CRT</option>
+      </select>
+    </div>
+    <button class="blog-search-btn" aria-label="Rechercher">
+      <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+{# ── Grille d'articles ── #}
+{% set articles = [
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Comment réduire les temps de trajet de vos intervenants de 30%", excerpt: "Découvrez les stratégies d'optimisation des tournées qui permettent aux SAAD de gagner en efficacité.", date: '2 juin 2026', read: '5 min', img: '/images/blog-1.jpg' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Gestion des incidents terrain : bonnes pratiques 2026", excerpt: "Retour d'expérience sur la gestion en temps réel des aléas lors des interventions à domicile.", date: '2 juin 2026', read: '7 min', img: '/images/blog-2.jpg' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "L'application mobile au cœur de la qualité de service", excerpt: "Comment nos intervenants utilisent WeCare sur le terrain pour améliorer le suivi des bénéficiaires.", date: '2 juin 2026', read: '4 min', img: '/images/blog-3.jpg' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Planification intelligente : les clés d'une organisation optimale", excerpt: "L'IA de WeCare analyse vos contraintes pour générer des tournées équilibrées en quelques secondes.", date: '2 juin 2026', read: '6 min', img: '/images/blog-4.jpg' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Gérer les remplacements de dernière minute sans stress", excerpt: "Protocoles et outils pour assurer la continuité du service même en cas d'absence imprévue.", date: '2 juin 2026', read: '5 min', img: '/images/blog-5.jpg' },
+  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "L'espace bénéficiaire : un lien essentiel avec la famille", excerpt: "Faites-en sorte que les proches aidants soient toujours informés et rassurés grâce au portail WeCare.", date: '2 juin 2026', read: '4 min', img: '/images/blog-6.jpg' },
+  { cat: 'actualites', tag: 'Actualités', title: "WeCare certifié HDS & ISO 27001 : ce que ça change pour vous", excerpt: "La sécurité des données de santé de vos bénéficiaires est notre priorité absolue.", date: '2 juin 2026', read: '3 min', img: '/images/blog-7.jpg' },
+  { cat: 'guides', tag: 'Guides & Ressources', title: "Guide complet : réussir sa transition numérique en SAAD", excerpt: "De la décision à la mise en place, toutes les étapes pour adopter un logiciel de gestion sans friction.", date: '2 juin 2026', read: '10 min', img: '/images/blog-8.jpg' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Télégestion et pointage électronique : guide pratique", excerpt: "Comprendre les exigences réglementaires et choisir la solution adaptée à votre structure.", date: '2 juin 2026', read: '6 min', img: '/images/blog-9.jpg' },
+  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "Améliorer la communication avec les familles : les outils WeCare", excerpt: "Notifications, comptes rendus d'intervention, messagerie sécurisée — tout pour rassurer les proches.", date: '2 juin 2026', read: '5 min', img: '/images/blog-10.jpg' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Modulation des heures : comment WeCare simplifie le suivi", excerpt: "Suivez en temps réel les heures modulées et évitez les dépassements budgétaires grâce au tableau de bord.", date: '2 juin 2026', read: '4 min', img: '/images/blog-11.jpg' },
+  { cat: 'guides', tag: 'Guides & Ressources', title: "Checklist : préparer votre SAAD à l'inspection de qualité", excerpt: "Les 20 points de contrôle essentiels pour aborder sereinement une inspection ou un audit qualité.", date: '2 juin 2026', read: '8 min', img: '/images/blog-12.jpg' },
+] %}
+
+<div class="blog-grid-wrap">
+  <div class="blog-grid" id="blog-grid">
+    {% for article in articles %}
+    <div class="blog-card reveal" data-cat="{{ article.cat }}">
+      <div class="blog-card-img">
+        <img src="{{ article.img }}" alt="{{ article.title }}"
+             onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#e4f5f3 0%,#f0eef8 100%)'">
+      </div>
+      <div class="blog-card-body">
+        <span class="blog-card-tag">{{ article.tag }}</span>
+        <h3 class="blog-card-title">{{ article.title }}</h3>
+        <p class="blog-card-excerpt">{{ article.excerpt }}</p>
+        <div class="blog-card-footer">
+          <span class="blog-card-date">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ article.date }}
+          </span>
+          <span class="blog-card-read">
+            {{ article.read }} de lecture
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="blog-loadmore">
+  <button class="blog-loadmore-btn" id="blog-load-more">Charger plus</button>
+</div>
+
+{{ include('landing/_footer.html.twig') }}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Category filters
+  const filterBtns = document.querySelectorAll('.blog-filter-btn');
+  const cards = document.querySelectorAll('#blog-grid .blog-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      cards.forEach(card => {
+        if (cat === 'all' || card.dataset.cat === cat) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Search filter
+  const searchInput = document.getElementById('blog-search-input');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    cards.forEach(card => {
+      const text = card.querySelector('.blog-card-title').textContent.toLowerCase()
+                 + card.querySelector('.blog-card-excerpt').textContent.toLowerCase();
+      card.style.display = !q || text.includes(q) ? '' : 'none';
+    });
+  });
+
+  // Load more (show message — static demo)
+  document.getElementById('blog-load-more').addEventListener('click', function() {
+    this.textContent = 'Tous les articles sont affichés';
+    this.style.opacity = '0.5';
+    this.disabled = true;
+  });
+});
+</script>
+
+</body>
+</html>

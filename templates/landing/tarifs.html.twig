@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tarifs WeCare – Commencez gratuitement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+
+    /* ── HERO ── */
+    .tr-hero {
+      background: #F2FBFF;
+      text-align: center;
+      padding: 72px 48px 56px;
+    }
+    .tr-hero-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #2CA7CB;
+      background: rgba(44,167,203,0.10); border-radius: 50px;
+      padding: 5px 14px; margin-bottom: 20px;
+    }
+    .tr-hero h1 {
+      font-size: 2.6rem; font-weight: 800; color: #0c0052;
+      line-height: 1.2; margin-bottom: 14px;
+    }
+    .tr-hero h1 span { color: #ff91fd; }
+    .tr-hero p {
+      font-size: 0.94rem; color: #8a85b0;
+      max-width: 520px; margin: 0 auto; line-height: 1.75;
+    }
+    @media (max-width: 768px) { .tr-hero { padding: 52px 24px 40px; } .tr-hero h1 { font-size: 1.8rem; } }
+
+    /* ── PLAN CARDS ── */
+    .tr-plans {
+      background: #fff;
+      padding: 48px 48px 64px;
+      border-bottom: 1px solid #eef4f8;
+    }
+    .tr-plans-inner {
+      max-width: 980px; margin: 0 auto;
+      display: grid; grid-template-columns: 240px 1fr 1fr;
+      gap: 20px; align-items: start;
+    }
+
+    /* Slider card */
+    .tr-slider-card {
+      background: #F2FBFF;
+      border: 1.5px solid #d4eef8;
+      border-radius: 16px; padding: 28px 24px;
+    }
+    .tr-slider-title {
+      font-size: 1rem; font-weight: 700; color: #0c0052; margin-bottom: 6px;
+    }
+    .tr-slider-sub {
+      font-size: 0.78rem; color: #8a85b0; line-height: 1.5; margin-bottom: 20px;
+    }
+    .tr-slider-label {
+      font-size: 0.72rem; font-weight: 600; color: #6b63a8;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .tr-slider-value {
+      font-size: 0.88rem; font-weight: 700; color: #0c0052; margin-bottom: 10px;
+    }
+    input[type=range].tr-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px;
+      background: linear-gradient(to right, #2CA7CB 0%, #2CA7CB 50%, #d4eef8 50%, #d4eef8 100%);
+      border-radius: 4px; outline: none; margin-bottom: 24px;
+    }
+    input[type=range].tr-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #2CA7CB; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(44,167,203,0.35);
+    }
+    input[type=range].tr-slider::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #2CA7CB; cursor: pointer; border: none;
+    }
+    .tr-slider-btn {
+      display: block; text-align: center;
+      padding: 11px 20px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 700;
+      background: #2CA7CB; color: #fff;
+      transition: opacity 0.15s;
+    }
+    .tr-slider-btn:hover { opacity: 0.88; }
+    .tr-slider-note {
+      font-size: 0.72rem; color: #b0a8cc; text-align: center; margin-top: 10px;
+    }
+
+    /* Forfait cards */
+    .tr-forfait {
+      border: 1.5px solid #e0edf5; border-radius: 16px; padding: 28px 28px 24px;
+      background: #fff; position: relative;
+    }
+    .tr-forfait.annual {
+      border-color: #2CA7CB;
+      box-shadow: 0 8px 32px rgba(44,167,203,0.12);
+    }
+    .tr-forfait-tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #2CA7CB; margin-bottom: 10px;
+    }
+    .tr-forfait-range {
+      font-size: 0.9rem; font-weight: 600; color: #0c0052; margin-bottom: 14px;
+    }
+    .tr-forfait-price {
+      display: flex; align-items: baseline; gap: 4px;
+      margin-bottom: 4px;
+    }
+    .tr-forfait-amount {
+      font-size: 2.6rem; font-weight: 800; color: #0c0052; line-height: 1;
+    }
+    .tr-forfait-currency { font-size: 1.2rem; font-weight: 700; color: #0c0052; }
+    .tr-forfait-period { font-size: 0.85rem; color: #8a85b0; }
+    .tr-forfait-economy {
+      font-size: 0.78rem; font-weight: 600; color: #2CA7CB; margin-bottom: 20px;
+    }
+    .tr-forfait-feature {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.84rem; color: #3a357f; font-weight: 500; margin-bottom: 20px;
+    }
+    .tr-forfait-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
+    .tr-forfait-cta-primary {
+      display: block; text-align: center;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700;
+      background: #2CA7CB; color: #fff;
+      transition: opacity 0.15s;
+    }
+    .tr-forfait-cta-primary:hover { opacity: 0.88; }
+    .tr-forfait-cta-outline {
+      display: block; text-align: center;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700;
+      border: 2px solid #2CA7CB; color: #2CA7CB;
+      transition: background 0.15s;
+    }
+    .tr-forfait-cta-outline:hover { background: rgba(44,167,203,0.06); }
+    .tr-forfait-note {
+      font-size: 0.72rem; color: #b0a8cc; text-align: center; margin-top: 10px;
+    }
+
+    /* Boutons réutilisés dans sticky */
+    .tr-card-btn {
+      display: inline-block; text-align: center;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700;
+      border: 2px solid #e2ddf0; color: #0c0052;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .tr-card-btn:hover { border-color: #2CA7CB; background: rgba(44,167,203,0.06); }
+    .tr-card-btn-pink {
+      display: inline-block; text-align: center;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700;
+      background: #ff91fd; color: #0f004b;
+      transition: opacity 0.15s;
+    }
+    .tr-card-btn-pink:hover { opacity: 0.88; }
+
+    @media (max-width: 900px) {
+      .tr-plans { padding: 40px 24px; }
+      .tr-plans-inner { grid-template-columns: 1fr; }
+    }
+
+    /* ── COMPARE TABLE ── */
+    .tr-compare { background: #F2FBFF; padding: 0 48px 80px; }
+    .tr-compare-inner { max-width: 860px; margin: 0 auto; }
+    .tr-compare-title { text-align: center; padding: 64px 0 40px; }
+
+    .tr-table { width: 100%; border-collapse: collapse; }
+
+    /* Sticky header row */
+    .tr-sticky {
+      position: sticky;
+      top: 68px;
+      z-index: 200;
+      background: #F2FBFF;
+    }
+    .tr-sticky th {
+      padding: 0; text-align: center;
+      border-bottom: 2px solid #dde9f5;
+    }
+    .tr-sticky th:first-child { text-align: left; border-bottom: none; background: transparent; }
+    .tr-th-inner {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .tr-th-free .tr-th-inner {
+      background: #fff; border-radius: 12px 12px 0 0;
+    }
+    .tr-th-pro .tr-th-inner {
+      background: #0f004b; border-radius: 12px 12px 0 0;
+    }
+    .tr-th-offert-badge {
+      display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #fff;
+      background: #2CA7CB; border-radius: 20px; padding: 2px 9px; margin-bottom: 4px;
+    }
+    .tr-th-pro-badge {
+      display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #0f004b;
+      background: #ff91fd; border-radius: 20px; padding: 2px 9px; margin-bottom: 4px;
+    }
+    .tr-th-price { font-size: 1.4rem; font-weight: 800; }
+    .tr-th-free .tr-th-price { color: #0c0052; }
+    .tr-th-pro  .tr-th-price { color: #fff; }
+    .tr-th-btn-teal {
+      display: inline-block; padding: 9px 18px; border-radius: 10px;
+      background: #2CA7CB; color: #fff;
+      font-size: 0.82rem; font-weight: 700; margin-top: 8px; white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .tr-th-btn-teal:hover { opacity: 0.88; }
+    .tr-th-btn-outline {
+      display: inline-block; padding: 9px 18px; border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.4); color: #fff;
+      font-size: 0.82rem; font-weight: 700; margin-top: 8px; white-space: nowrap;
+      transition: border-color 0.15s;
+    }
+    .tr-th-btn-outline:hover { border-color: #fff; }
+    .tr-compare-bar {
+      width: 40px; height: 3px; background: #ff91fd;
+      border-radius: 2px; margin: 0 auto 16px;
+    }
+    .ic-dash { font-size: 1rem; color: #c0bcd8; font-weight: 500; }
+
+    /* Category rows */
+    .tr-cat td {
+      padding: 18px 20px 6px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #2CA7CB;
+    }
+
+    /* Feature rows */
+    .tr-row { border-bottom: 1px solid #dde9f5; }
+    .tr-row:hover { background: rgba(44,167,203,0.04); }
+    .tr-row td {
+      padding: 13px 20px; font-size: 0.86rem;
+      text-align: center; color: #3a357f;
+      background: #fff;
+    }
+    .tr-row td:first-child {
+      text-align: left; color: #0c0052; font-weight: 500;
+      background: transparent;
+    }
+    .tr-row td:nth-child(2) { border-left: 1px solid #f0eef8; border-right: 1px solid #f0eef8; }
+
+    /* Indicators */
+    .ic-yes {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #2CA7CB;
+    }
+    .ic-yes svg { width: 11px; height: 11px; }
+    .ic-no {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid #d1cfe8;
+    }
+    .ic-soon {
+      display: inline-block; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(44,167,203,0.12); color: #2CA7CB;
+      padding: 2px 9px; border-radius: 20px;
+    }
+    .ic-label {
+      font-size: 0.84rem; font-weight: 500; color: #6b63a8;
+    }
+
+    /* Footer buttons */
+    .tr-foot td {
+      padding: 28px 20px; text-align: center; background: #fff;
+    }
+    .tr-foot td:first-child { background: transparent; }
+
+    @media (max-width: 900px) {
+      .tr-compare { padding: 0 16px 64px; }
+      .tr-sticky { top: 68px; }
+      .tr-row td, .tr-sticky th { padding: 10px 10px; font-size: 0.8rem; }
+    }
+
+    /* ── FAQ ── */
+    .tr-faq { background: #fff; padding: 72px 48px; }
+    .tr-faq-inner { max-width: 720px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid #f0eef8; }
+    .faq-q {
+      padding: 18px 0; display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.94rem; font-weight: 600; color: #0c0052;
+      cursor: pointer; gap: 16px;
+    }
+    .faq-icon { font-size: 1.2rem; color: #2CA7CB; flex-shrink: 0; transition: transform 0.2s; }
+    .faq-a { font-size: 0.88rem; color: #8a85b0; line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
+    .faq-item.open .faq-a { max-height: 200px; padding-bottom: 16px; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+  </style>
+</head>
+<body>
+{{ include('landing/_nav.html.twig') }}
+
+<!-- ── HERO ── -->
+<section class="tr-hero">
+  <div class="tr-hero-tag">Tarifs</div>
+  <h1>Tarifs WeCare, commencez<br><span>gratuitement</span></h1>
+  <p>Commencez à utiliser toutes les fonctionnalités de WeCare – sans limitations, sans carte bancaire, pour une période illimitée avant de faire vos premières interventions.</p>
+</section>
+
+<!-- ── PLAN CARDS ── -->
+<section class="tr-plans">
+  <div class="tr-plans-inner">
+
+    <!-- Sélecteur bénéficiaires -->
+    <div class="tr-slider-card reveal">
+      <div class="tr-slider-title">Bénéficiaires</div>
+      <div class="tr-slider-sub">Sélectionnez votre nombre de bénéficiaire requis</div>
+      <div class="tr-slider-label">Bénéficiaires</div>
+      <div class="tr-slider-value" id="slider-display">101–150</div>
+      <input type="range" class="tr-slider" id="benef-slider" min="0" max="4" value="2" step="1">
+      <a href="/inscription" class="tr-slider-btn">Commencez gratuitement</a>
+      <p class="tr-slider-note">Plus que 12 mois pour profiter de cette offre gratuite</p>
+    </div>
+
+    <!-- Forfait annuel -->
+    <div class="tr-forfait annual reveal" style="transition-delay:0.08s">
+      <div class="tr-forfait-tag">Forfait annuel</div>
+      <div class="tr-forfait-range" id="annual-range">Entre 101 et 150 bénéficiaires</div>
+      <div class="tr-forfait-price">
+        <span class="tr-forfait-amount" id="annual-price">1419</span>
+        <span class="tr-forfait-currency">€</span>
+        <span class="tr-forfait-period">TTC / an</span>
+      </div>
+      <div class="tr-forfait-economy" id="annual-economy">Économisez 129€ par an</div>
+      <div class="tr-forfait-feature">
+        <svg width="16" height="16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Toutes les fonctionnalités disponibles
+      </div>
+      <a href="/inscription" class="tr-forfait-cta-primary">Choisir ce forfait</a>
+      <p class="tr-forfait-note">Économique · Accès direct au logiciel</p>
+    </div>
+
+    <!-- Forfait mensuel -->
+    <div class="tr-forfait reveal" style="transition-delay:0.16s">
+      <div class="tr-forfait-tag">Forfait mensuel</div>
+      <div class="tr-forfait-range" id="monthly-range">Entre 101 et 150 bénéficiaires</div>
+      <div class="tr-forfait-price">
+        <span class="tr-forfait-amount" id="monthly-price">129</span>
+        <span class="tr-forfait-currency">€</span>
+        <span class="tr-forfait-period">TTC / mois</span>
+      </div>
+      <div class="tr-forfait-economy" style="visibility:hidden">—</div>
+      <div class="tr-forfait-feature">
+        <svg width="16" height="16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Toutes les fonctionnalités disponibles
+      </div>
+      <a href="/inscription" class="tr-forfait-cta-outline">Choisir ce forfait</a>
+      <p class="tr-forfait-note">Sans engagement · Accès direct au logiciel</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── COMPARISON TABLE ── -->
+<section class="tr-compare">
+  <div class="tr-compare-inner">
+
+    <div class="tr-compare-title reveal">
+      <div class="tr-compare-bar"></div>
+      <h2 class="section-title">Comparatifs des offres WeCare</h2>
+      <p style="color:#8a85b0;font-size:0.88rem">Découvrez les fonctionnalités de notre plateforme multi-utilisateurs.</p>
+    </div>
+
+    <table class="tr-table">
+      <thead>
+        <tr class="tr-sticky">
+          <th style="width:48%"></th>
+          <th class="tr-th-free">
+            <div class="tr-th-inner">
+              <div class="tr-th-offert-badge">OFFERT</div>
+              <div class="tr-th-price">Gratuit</div>
+              <a href="/inscription" class="tr-th-btn-teal">Démarrer gratuitement</a>
+            </div>
+          </th>
+          <th class="tr-th-pro">
+            <div class="tr-th-inner">
+              <div class="tr-th-pro-badge">PRO</div>
+              <div class="tr-th-price">Premium</div>
+              <a href="/tarifs" class="tr-th-btn-outline">Simuler mon tarif</a>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% macro ind(val) %}
+          {% if val is same as(true) %}<span class="ic-yes"><svg fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+          {% elseif val is same as(false) %}<span class="ic-dash">—</span>
+          {% else %}<span class="ic-label">{{ val }}</span>
+          {% endif %}
+        {% endmacro %}
+
+        {# ── Fonctionnalités ── #}
+        <tr class="tr-cat"><td colspan="3">Fonctionnalités</td></tr>
+        <tr class="tr-row"><td>Nombre de bénéficiaires</td><td>{{ _self.ind('Limité à 50') }}</td><td>{{ _self.ind('Au choix') }}</td></tr>
+        <tr class="tr-row"><td>Nombre de responsables de secteur</td><td>{{ _self.ind('1') }}</td><td>{{ _self.ind('Illimité') }}</td></tr>
+        <tr class="tr-row"><td>Nombre d'intervenants</td><td>{{ _self.ind('5') }}</td><td>{{ _self.ind('Illimité') }}</td></tr>
+        <tr class="tr-row"><td>Plateforme responsable de secteur &amp; intervenant</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Plateforme bénéficiaire / aidant</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── CRM bénéficiaire ── #}
+        <tr class="tr-cat"><td colspan="3">CRM bénéficiaire</td></tr>
+        <tr class="tr-row"><td>Base de données bénéficiaires</td><td>{{ _self.ind('Limité à 50') }}</td><td>{{ _self.ind('Au choix') }}</td></tr>
+        <tr class="tr-row"><td>Fiches bénéficiaires</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Historique des interventions</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Historique des comptes rendus</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Historique des incidents</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Gestion des équipes ── #}
+        <tr class="tr-cat"><td colspan="3">Gestion des équipes</td></tr>
+        <tr class="tr-row"><td>Fiches intervenants</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Affectation de missions</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Suivi du volume horaire</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Planification intelligente ── #}
+        <tr class="tr-cat"><td colspan="3">Planification intelligente</td></tr>
+        <tr class="tr-row"><td>Planning intervenant</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Gestion des absences (congés, arrêt maladie...)</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Planning bénéficiaire</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Gestion des incidents (hospitalisation, absence...)</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Détection de conflits de planning</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Optimisation des tournées (temps de trajets...)</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Recommandations intelligente IA <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Optimisation des interventions ── #}
+        <tr class="tr-cat"><td colspan="3">Optimisation des interventions</td></tr>
+        <tr class="tr-row"><td>Planning en temps réel</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Centralisation de l'information terrain &amp; CR</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Dictée vocale &amp; transcription automatique</td><td>{{ _self.ind('Limité à 1 utilisation/jour') }}</td><td>{{ _self.ind('Illimité') }}</td></tr>
+        <tr class="tr-row"><td>Déclaration d'incident terrain</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Traçabilité et suivi des interventions</td><td>{{ _self.ind('15 jours de mémoire') }}</td><td>{{ _self.ind('2 an de mémoire') }}</td></tr>
+        <tr class="tr-row"><td>Communication intervenant à responsable</td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Communication intervenant à bénéficiaire/aidant</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Analyse et reporting ── #}
+        <tr class="tr-cat"><td colspan="3">Analyse et reporting</td></tr>
+        <tr class="tr-row"><td>Tableaux de bord d'activité <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind('1') }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Analyse du temps effectif <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Exports CSV et Excel <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Espace bénéficiaire / aidant ── #}
+        <tr class="tr-cat"><td colspan="3">Espace bénéficiaire / aidant</td></tr>
+        <tr class="tr-row"><td>Planning en temps réel</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Détail des interventions</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Messagerie intégrée</td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Avantages ── #}
+        <tr class="tr-cat"><td colspan="3">Avantages</td></tr>
+        <tr class="tr-row"><td>Parrainage : gain parrain/filleul jusqu'à</td><td>{{ _self.ind('30€') }}</td><td>{{ _self.ind('75€') }}</td></tr>
+
+        {# ── Facturation ── #}
+        <tr class="tr-cat"><td colspan="3">Facturation</td></tr>
+        <tr class="tr-row"><td>Devis et facturation électronique <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Paiement des prestations en ligne <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Relances automatiques (impayés) <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Accusé de réception, lecture et clic <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Avance de crédit d'impôt <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(false) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+        {# ── Comptabilité ── #}
+        <tr class="tr-cat"><td colspan="3">Comptabilité</td></tr>
+        <tr class="tr-row"><td>Livre des recettes <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+        <tr class="tr-row"><td>Livre des achats <span class="ic-soon">Bientôt</span></td><td>{{ _self.ind(true) }}</td><td>{{ _self.ind(true) }}</td></tr>
+
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{{ include('landing/_footer.html.twig') }}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ── Slider pricing ──
+  const tiers = [
+    { label: '1 – 50',       range: 'Jusqu\'à 50 bénéficiaires',        annual: 539,   monthly: 49,  economy: 49  },
+    { label: '51 – 100',     range: 'Entre 51 et 100 bénéficiaires',     annual: 979,   monthly: 89,  economy: 89  },
+    { label: '101 – 150',    range: 'Entre 101 et 150 bénéficiaires',    annual: 1419,  monthly: 129, economy: 129 },
+    { label: '151 – 200',    range: 'Entre 151 et 200 bénéficiaires',    annual: 1859,  monthly: 169, economy: 169 },
+    { label: '201 – 350',    range: 'Entre 201 et 350 bénéficiaires',    annual: 2299,  monthly: 209, economy: 209 },
+  ];
+
+  const slider      = document.getElementById('benef-slider');
+  const display     = document.getElementById('slider-display');
+  const annualRange = document.getElementById('annual-range');
+  const annualPrice = document.getElementById('annual-price');
+  const annualEco   = document.getElementById('annual-economy');
+  const monthlyRange= document.getElementById('monthly-range');
+  const monthlyPrice= document.getElementById('monthly-price');
+
+  function updatePricing() {
+    const t = tiers[+slider.value];
+    display.textContent = t.label;
+    annualRange.textContent  = t.range;
+    monthlyRange.textContent = t.range;
+
+    annualPrice.textContent  = t.annual;
+    monthlyPrice.textContent = t.monthly;
+    annualEco.textContent    = 'Économisez ' + t.economy + '€ par an';
+
+    // Update slider gradient fill
+    const pct = (+slider.value / (tiers.length - 1)) * 100;
+    slider.style.background = `linear-gradient(to right, #2CA7CB 0%, #2CA7CB ${pct}%, #d4eef8 ${pct}%, #d4eef8 100%)`;
+  }
+
+  slider?.addEventListener('input', updatePricing);
+  updatePricing();
+
+  // ── FAQ ──
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+  });
+});
+</script>
+</body>
+</html>

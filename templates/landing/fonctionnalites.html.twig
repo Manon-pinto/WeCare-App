@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fonctionnalités WeCare – Pour les services à la personne</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+
+    /* ── HERO ── */
+    .fn-hero {
+      background: #fff;
+      text-align: center;
+      padding: 72px 48px 56px;
+    }
+    .fn-hero-tag {
+      display: inline-block;
+      width: 40px; height: 3px;
+      background: #2CA7CB;
+      border-radius: 2px;
+      margin-bottom: 22px;
+    }
+    .fn-hero h1 {
+      font-size: 2.7rem; font-weight: 800; color: #0c0052;
+      line-height: 1.15; margin-bottom: 18px;
+    }
+    .fn-hero h1 .underline-teal {
+      position: relative; display: inline-block;
+    }
+    .fn-hero h1 .underline-teal::after {
+      content: '';
+      position: absolute; left: 0; bottom: -4px;
+      width: 100%; height: 3px;
+      background: #2CA7CB; border-radius: 2px;
+    }
+    .fn-hero-sub {
+      font-size: 0.94rem; color: #8a85b0;
+      max-width: 520px; margin: 0 auto;
+      line-height: 1.75;
+    }
+    @media (max-width: 768px) {
+      .fn-hero { padding: 52px 24px 40px; }
+      .fn-hero h1 { font-size: 1.9rem; }
+    }
+    @media (max-width: 480px) {
+      .fn-hero h1 { font-size: 1.5rem; }
+    }
+
+    /* ── TABS SECTION ── */
+    .fn-tabs-section {
+      background: #F2FBFF;
+      padding: 64px 0 72px;
+    }
+    .fn-tabs-nav {
+      display: flex; justify-content: center; gap: 8px;
+      margin-bottom: 52px; padding: 0 24px; flex-wrap: wrap;
+    }
+    .fn-tab-btn {
+      padding: 10px 22px; border-radius: 50px;
+      font-size: 0.86rem; font-weight: 600;
+      border: none; cursor: pointer;
+      background: #ede9f8; color: #6b63a8;
+      transition: background 0.2s, color 0.2s;
+    }
+    .fn-tab-btn:hover { background: #ddd8f5; color: #0c0052; }
+    .fn-tab-btn.active { background: #2CA7CB; color: #fff; }
+
+    .fn-tab-content { display: none; }
+    .fn-tab-content.active { display: block; }
+
+    .fn-tab-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: center;
+    }
+    .fn-checklist { display: flex; flex-direction: column; gap: 12px; }
+    .fn-check-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.875rem; color: #3a357f; font-weight: 500;
+      line-height: 1.5;
+    }
+    .fn-check-icon {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #2CA7CB; flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fn-check-icon svg { width: 10px; height: 10px; }
+    .fn-badge-bientot {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #fff;
+      background: #2CA7CB; border-radius: 4px;
+      padding: 2px 7px; margin-left: 8px;
+      vertical-align: middle;
+    }
+    .fn-tab-visual {
+      border-radius: 16px; overflow: hidden;
+      background: linear-gradient(135deg, #F2FBFF 0%, #ede9f8 100%);
+    }
+    .fn-tab-visual .lp-img { height: 360px; border-radius: 16px; }
+    .fn-tabs-cta {
+      text-align: center; margin-top: 52px;
+    }
+
+    @media (max-width: 900px) {
+      .fn-tab-inner { grid-template-columns: 1fr; padding: 0 24px; gap: 32px; }
+      .fn-tab-visual .lp-img { height: 240px; }
+    }
+
+    /* ── COMING SOON INTRO ── */
+    .fn-soon-intro {
+      text-align: center; padding: 80px 48px 16px;
+      background: #fff;
+    }
+    .fn-soon-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #2CA7CB;
+      background: rgba(13,184,166,0.10); border-radius: 50px;
+      padding: 5px 14px; margin-bottom: 20px;
+    }
+    .fn-soon-intro h2 {
+      font-size: 2.1rem; font-weight: 800; color: #0c0052;
+      line-height: 1.2; margin-bottom: 14px; max-width: 560px; margin-left: auto; margin-right: auto;
+    }
+    .fn-soon-intro p {
+      font-size: 0.92rem; color: #8a85b0; line-height: 1.7;
+      max-width: 480px; margin: 0 auto;
+    }
+
+    /* ── FEATURE ROWS ── */
+    .fn-feature-row {
+      background: #fff;
+      padding: 64px 0;
+      border-top: 1px solid #f0eef8;
+    }
+    .fn-feature-row-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    .fn-feature-tag-bientot {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #fff;
+      background: #2CA7CB; border-radius: 4px;
+      padding: 3px 9px; margin-bottom: 14px;
+    }
+    .fn-feature-title {
+      font-size: 1.55rem; font-weight: 800; color: #0c0052;
+      line-height: 1.25; margin-bottom: 12px;
+    }
+    .fn-feature-desc {
+      font-size: 0.88rem; color: #8a85b0;
+      line-height: 1.7; max-width: 380px;
+    }
+    .fn-feature-bullets { display: flex; flex-direction: column; gap: 10px; }
+    .fn-bullet {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.875rem; color: #3a357f; font-weight: 500;
+    }
+    .fn-bullet-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #2CA7CB; flex-shrink: 0; margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .fn-feature-row-inner { grid-template-columns: 1fr; gap: 32px; padding: 0 24px; }
+    }
+
+    /* ── CTA BANNER ── */
+    .fn-cta-banner {
+      background: #F2FBFF;
+      padding: 56px 48px;
+      display: flex; align-items: center;
+      gap: 56px;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: 24px;
+    }
+    .fn-cta-wrap {
+      background: #F2FBFF;
+      padding: 48px 0 64px;
+    }
+    .fn-cta-photo {
+      flex-shrink: 0;
+      width: 48%;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(13,184,166,0.15);
+    }
+    .fn-cta-photo img {
+      width: 100%; height: 320px;
+      object-fit: cover; object-position: center top;
+      display: block; border-radius: 20px;
+    }
+    .fn-cta-photo-placeholder {
+      width: 100%; height: 320px;
+      background: linear-gradient(135deg, #c5ebe6 0%, #d4f0ec 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; border-radius: 20px;
+    }
+    .fn-cta-content {
+      flex: 1;
+    }
+    .fn-cta-bar {
+      width: 36px; height: 4px;
+      background: #ff91fd; border-radius: 2px;
+      margin-bottom: 20px;
+    }
+    .fn-cta-content h2 {
+      font-size: 1.75rem; font-weight: 700; color: #0c0052;
+      line-height: 1.25; margin-bottom: 24px;
+      max-width: 300px;
+    }
+    .fn-cta-content h2 strong { font-weight: 800; }
+    .fn-cta-sub {
+      font-size: 0.78rem; color: #8a85b0;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .fn-cta-banner { flex-direction: column; gap: 32px; padding: 40px 24px; }
+      .fn-cta-photo { width: 100%; }
+      .fn-cta-content h2 { max-width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .fn-cta-wrap { padding: 32px 16px 48px; }
+      .fn-cta-banner { border-radius: 16px; }
+    }
+  </style>
+</head>
+<body>
+{{ include('landing/_nav.html.twig') }}
+
+<!-- ── HERO ── -->
+<section class="fn-hero">
+  <div class="fn-hero-tag"></div>
+  <h1>
+    Fonctionnalités WeCare,<br>
+    <span class="underline-teal">pour les services à la personnes</span>
+  </h1>
+  <p class="fn-hero-sub">
+    WeCare est un logiciel de gestion d'interventions conçu pour les services à la personne afin de valoriser le temps passé auprès des bénéficiaires.
+  </p>
+</section>
+
+<!-- ── TICKER ── -->
+<div class="ticker-wrap-light">
+  <div class="ticker-track-light">
+    {% for i in 1..4 %}
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+        Aucun frais de mise en place
+      </span>
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>
+        Essai gratuit illimité
+      </span>
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Espace aidant inclus
+      </span>
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        Sans engagement
+      </span>
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        Support 7j/7
+      </span>
+      <span class="ticker-item-light">
+        <span class="ti-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        RGPD &amp; HDS
+      </span>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<section class="fn-tabs-section">
+  <div class="fn-tabs-nav reveal">
+    <button class="fn-tab-btn active" data-tab="planning">Planification Intelligente</button>
+    <button class="fn-tab-btn" data-tab="multi">Plateforme multi-utilisateurs</button>
+    <button class="fn-tab-btn" data-tab="intervention">Gestion d'Intervention</button>
+  </div>
+
+  <!-- Tab 1 : Planification Intelligente -->
+  <div class="fn-tab-content active" id="tab-planning">
+    <div class="fn-tab-inner">
+      <div class="fn-checklist reveal-left">
+        {% set items_planning = [
+          {text: 'Planning en temps réel', soon: false},
+          {text: 'Gestion et validation des tâches', soon: false},
+          {text: 'Gérez les compétences des intervenants', soon: false},
+          {text: 'Planification intelligente des numéros', soon: false},
+          {text: 'Suivi des traçeurs (Localgo, et infos manuelles, …)', soon: false},
+          {text: 'Optimisation des kms et du temps de trajet', soon: false},
+          {text: 'Automatisation des interventions', soon: false},
+          {text: 'Gestion des incidents Bénéficiaire (Hospitalisation, réhabilitation, …)', soon: false},
+          {text: 'Détection de conflits de planning', soon: false},
+          {text: 'Notifications et alertes vérification nécessaires', soon: false},
+          {text: 'Assistant de planification IA', soon: true},
+        ] %}
+        {% for item in items_planning %}
+        <div class="fn-check-item">
+          <div class="fn-check-icon">
+            <svg fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>{{ item.text }}{% if item.soon %}<span class="fn-badge-bientot">Bientôt</span>{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="fn-tab-visual reveal-right">
+        <div class="lp-img" style="height:360px;">
+          <img src="/images/lp/feat-planning.jpg" alt="Planning intelligent" onerror="this.style.display='none'">
+          <span class="lp-img-icon">🖥️</span>
+          <span>feat-planning.jpg</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2 : Plateforme multi-utilisateurs -->
+  <div class="fn-tab-content" id="tab-multi">
+    <div class="fn-tab-inner">
+      <div class="fn-checklist reveal-left">
+        {% set items_multi = [
+          {text: 'Gestion des rôles et permissions', soon: false},
+          {text: 'Espace coordinateur dédié', soon: false},
+          {text: 'Application mobile intervenant', soon: false},
+          {text: 'Espace aidant / famille sécurisé', soon: false},
+          {text: 'Messagerie interne intégrée', soon: false},
+          {text: 'Notifications push en temps réel', soon: false},
+          {text: 'Tableau de bord personnalisé par profil', soon: false},
+          {text: 'Signature électronique des comptes rendus', soon: false},
+          {text: 'Accès multi-agences', soon: true},
+          {text: 'Single Sign-On (SSO)', soon: true},
+        ] %}
+        {% for item in items_multi %}
+        <div class="fn-check-item">
+          <div class="fn-check-icon">
+            <svg fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>{{ item.text }}{% if item.soon %}<span class="fn-badge-bientot">Bientôt</span>{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="fn-tab-visual reveal-right">
+        <div class="lp-img" style="height:360px;">
+          <img src="/images/lp/feat-multi.jpg" alt="Plateforme multi-utilisateurs" onerror="this.style.display='none'">
+          <span class="lp-img-icon">🖥️</span>
+          <span>feat-multi.jpg</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3 : Gestion d'Intervention -->
+  <div class="fn-tab-content" id="tab-intervention">
+    <div class="fn-tab-inner">
+      <div class="fn-checklist reveal-left">
+        {% set items_interv = [
+          {text: "Comptes rendus d'intervention", soon: false},
+          {text: 'Dictée vocale par reconnaissance IA', soon: false},
+          {text: 'Suivi des présences et pointages', soon: false},
+          {text: 'Cartographie des tournées interactives', soon: false},
+          {text: 'Alertes sur événements critiques', soon: false},
+          {text: "Gestion des remplacements d'urgence", soon: false},
+          {text: 'Historique complet par bénéficiaire', soon: false},
+          {text: "Export des rapports d'intervention", soon: false},
+          {text: 'Vérification par QR code / NFC', soon: true},
+        ] %}
+        {% for item in items_interv %}
+        <div class="fn-check-item">
+          <div class="fn-check-icon">
+            <svg fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>{{ item.text }}{% if item.soon %}<span class="fn-badge-bientot">Bientôt</span>{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="fn-tab-visual reveal-right">
+        <div class="lp-img" style="height:360px;">
+          <img src="/images/lp/feat-intervention.jpg" alt="Gestion d'Intervention" onerror="this.style.display='none'">
+          <span class="lp-img-icon">🖥️</span>
+          <span>feat-intervention.jpg</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fn-tabs-cta reveal">
+    <a href="/inscription" class="btn-teal">S'inscrire gratuitement</a>
+  </div>
+</section>
+
+<!-- ── COMING SOON INTRO ── -->
+<div class="fn-soon-intro reveal">
+  <div class="fn-soon-tag">Bientôt</div>
+  <h2>WeCare innove avec ces prochaines fonctionnalités</h2>
+  <p>Nous améliorons notre logiciel tous les jours afin d'optimiser le pilotage de votre activité.</p>
+</div>
+
+<!-- ── FEATURE ROW 1 : Assistant IA ── -->
+<div class="fn-feature-row" style="background:#F2FBFF;">
+  <div class="fn-feature-row-inner">
+    <div class="reveal-left">
+      <div class="fn-feature-tag-bientot">Bientôt</div>
+      <h3 class="fn-feature-title">Assistant de planification IA</h3>
+      <p class="fn-feature-desc">Optimisez votre productivité grâce à un assistant IA conçu pour simplifier la planification de vos interventions.</p>
+    </div>
+    <div class="fn-feature-bullets reveal-right">
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Recommandations intelligentes</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Allocation automatique de planning</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Gestion et prospection automatisée</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURE ROW 2 : Analyse & Reporting ── -->
+<div class="fn-feature-row">
+  <div class="fn-feature-row-inner">
+    <div class="reveal-left">
+      <div class="fn-feature-tag-bientot">Bientôt</div>
+      <h3 class="fn-feature-title">Analyse &amp; Reporting</h3>
+      <p class="fn-feature-desc">Pilotez votre activité grâce à des données d'intervention en temps réel et des tableaux de bord personnalisables.</p>
+    </div>
+    <div class="fn-feature-bullets reveal-right">
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Analyse IA</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Tableaux de bord personnalisables</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Export CSV et Excel</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Synchronisation autres outils BI</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURE ROW 3 : Devis & Facturation ── -->
+<div class="fn-feature-row" style="background:#F2FBFF;">
+  <div class="fn-feature-row-inner">
+    <div class="reveal-left">
+      <div class="fn-feature-tag-bientot">Bientôt</div>
+      <h3 class="fn-feature-title">Devis &amp; Facturation</h3>
+      <p class="fn-feature-desc">Centralisez la création et le suivi de vos devis ainsi que la gestion des factures depuis une seule plateforme.</p>
+    </div>
+    <div class="fn-feature-bullets reveal-right">
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Devis personnalisables</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Envoi par mail et relances automatiques</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Accès aux templates et factures en site</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Renseignez la pression dans le ligne</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURE ROW 4 : Comptabilité ── -->
+<div class="fn-feature-row">
+  <div class="fn-feature-row-inner">
+    <div class="reveal-left">
+      <div class="fn-feature-tag-bientot">Bientôt</div>
+      <h3 class="fn-feature-title">Comptabilité</h3>
+      <p class="fn-feature-desc">Connectez votre comptabilité et simplifiez au maximum le suivi de votre comptabilité.</p>
+    </div>
+    <div class="fn-feature-bullets reveal-right">
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Tableaux de suivi financiers</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Livre des recettes</span></div>
+      <div class="fn-bullet"><div class="fn-bullet-dot"></div><span>Livre des achats</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CTA BANNER ── -->
+<div class="fn-cta-wrap">
+  <div class="fn-cta-banner">
+    <div class="fn-cta-photo">
+      <img src="/images/lp/cta-soignante.jpg" alt="Soignante et bénéficiaire"
+           onerror="this.style.display='none'; this.parentElement.classList.add('fn-cta-photo-placeholder'); this.parentElement.innerHTML='👴👩‍⚕️'">
+    </div>
+    <div class="fn-cta-content reveal-right">
+      <div class="fn-cta-bar"></div>
+      <h2>Commencez gratuitement<br>dès <strong>maintenant</strong></h2>
+      <a href="/inscription" class="btn-pink">Essai gratuit</a>
+      <p class="fn-cta-sub">Plus que 12 mois pour profiter de cette offre gratuite</p>
+    </div>
+  </div>
+</div>
+
+{{ include('landing/_footer.html.twig') }}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Tabs
+  const tabBtns = document.querySelectorAll('.fn-tab-btn');
+  const tabContents = document.querySelectorAll('.fn-tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + target)?.classList.add('active');
+
+      // Re-trigger reveal animations inside newly activated tab
+      document.querySelectorAll('#tab-' + target + ' .reveal-left, #tab-' + target + ' .reveal-right').forEach(el => {
+        el.classList.remove('visible');
+        setTimeout(() => el.classList.add('visible'), 50);
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>
