@@ -138,6 +138,8 @@
     .plan-feature-row { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #3a357f; margin-bottom: 10px; }
     .plan-card.featured .plan-feature-row { color: rgba(255,255,255,0.8); }
     .plan-feature-check { width: 16px; height: 16px; border-radius: 50%; background: #0db8a6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #hp-slider::-webkit-slider-thumb { -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#2CA7CB;cursor:pointer;box-shadow:0 2px 8px rgba(44,167,203,0.4); }
+    #hp-slider::-moz-range-thumb { width:18px;height:18px;border-radius:50%;background:#2CA7CB;cursor:pointer;border:none; }
     .plan-cta { margin-top: auto; padding-top: 20px; }
     .plan-btn {
       display: block; width: 100%; padding: 12px; text-align: center;
@@ -165,24 +167,36 @@
 
     /* ── CTA Final ── */
     .cta-section {
-      position: relative; overflow: hidden;
-      min-height: 340px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 64px 48px;
+      background: #F2FBFF;
+      padding: 72px 48px;
     }
-    .cta-bg {
-      position: absolute; inset: 0;
-      background: #0f004b;
+    .cta-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 420px;
+      gap: 56px; align-items: center;
     }
-    .cta-bg .lp-img {
-      position: absolute; inset: 0; border-radius: 0;
-      height: 100%; opacity: 0.35;
-    }
-    .cta-bg .lp-img img { border-radius: 0; }
-    .cta-content { position: relative; z-index: 2; max-width: 600px; }
-    .cta-content h2 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .cta-content h2 { font-size: 2rem; font-weight: 800; color: #0c0052; margin-bottom: 12px; line-height: 1.25; }
     .cta-content h2 span { color: #ff91fd; }
-    .cta-content p { color: rgba(255,255,255,0.65); font-size: 0.92rem; margin-bottom: 28px; line-height: 1.6; }
+    .cta-content p { color: #8a85b0; font-size: 0.92rem; margin-bottom: 28px; line-height: 1.7; }
+    .cta-tag {
+      display: inline-block; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #2CA7CB; background: rgba(44,167,203,0.10);
+      border-radius: 50px; padding: 5px 14px; margin-bottom: 18px;
+    }
+    .cta-img {
+      border-radius: 20px; overflow: hidden;
+      aspect-ratio: 4/3;
+      box-shadow: 0 16px 48px rgba(15,0,75,0.12);
+    }
+    .cta-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    @media (max-width: 900px) {
+      .cta-inner { grid-template-columns: 1fr; }
+      .cta-img { max-width: 480px; }
+      .cta-section { padding: 56px 24px; }
+    }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
@@ -366,27 +380,38 @@
       <p>Commencez avec l'abonnement gratuit de WeCare, suivez vos interventions, gérez l'information et optimisez votre temps effectif sans frais.</p>
     </div>
     <div class="pricing-grid">
+      <!-- Carte slider -->
       <div class="plan-card reveal">
         <div class="plan-label">Bénéficiaires</div>
-        <div class="plan-range">Sélectionnez votre nombre de bénéficiaires pour connaître le tarif le plus adapté.</div>
-        <div class="plan-price-row"><span class="plan-price-big">0€</span><span class="plan-price-unit">/mois</span></div>
-        <div class="plan-price-alt">Jusqu'à 50 bénéficiaires</div>
+        <p style="font-size:0.85rem;font-weight:600;color:#0c0052;line-height:1.4;margin-bottom:16px">Sélectionnez votre nombre de bénéficiaires pour connaître le tarif le plus adapté.</p>
+        <div class="plan-price-row">
+          <span class="plan-price-big" id="hp-price">49€</span>
+          <span class="plan-price-unit">/mois</span>
+        </div>
+        <div class="plan-price-alt" id="hp-range">Jusqu'à 50 bénéficiaires</div>
+        <input type="range" id="hp-slider" min="0" max="4" value="0" step="1" style="-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;outline:none;margin:12px 0 20px;background:linear-gradient(to right,#2CA7CB 0%,#2CA7CB 0%,#d4eef8 0%,#d4eef8 100%);cursor:pointer">
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
         <div class="plan-cta"><a href="/inscription" class="plan-btn">Démarrer gratuitement</a></div>
       </div>
       <div class="plan-card featured reveal" style="transition-delay:0.1s">
         <div class="plan-badge-tag">Tarif annuel</div>
-        <div class="plan-range">Entre 101 et 150 bénéficiaires</div>
-        <div class="plan-price-row"><span class="plan-price-big">129€</span><span class="plan-price-unit">/ 75€/mois</span></div>
-        <div class="plan-price-alt">1 419€ / an</div>
+        <div class="plan-range" id="hp-annual-range">Jusqu'à 50 bénéficiaires</div>
+        <div class="plan-price-row">
+          <span class="plan-price-big" id="hp-annual-price">539€</span>
+          <span class="plan-price-unit">TTC / an</span>
+        </div>
+        <div class="plan-price-alt" id="hp-annual-yearly">Économisez 49€ par an</div>
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
         <div class="plan-cta"><a href="/tarifs" class="plan-btn primary">Choisir le forfait</a></div>
       </div>
       <div class="plan-card reveal" style="transition-delay:0.2s">
-        <div class="plan-label">Premium</div>
-        <div class="plan-range">Entre 101 et 350 bénéficiaires</div>
-        <div class="plan-price-row"><span class="plan-price-big">129€</span><span class="plan-price-unit">/mois</span></div>
-        <div class="plan-price-alt">ou 1 419€ / an</div>
+        <div class="plan-label">Forfait mensuel</div>
+        <div class="plan-range" id="hp-monthly-range">Jusqu'à 50 bénéficiaires</div>
+        <div class="plan-price-row">
+          <span class="plan-price-big" id="hp-monthly-price">49€</span>
+          <span class="plan-price-unit">/mois</span>
+        </div>
+        <div class="plan-price-alt" id="hp-monthly-yearly">ou 539€ / an</div>
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
         <div class="plan-cta"><a href="/tarifs" class="plan-btn">Choisir le forfait</a></div>
       </div>
@@ -420,16 +445,19 @@
 
 <!-- ── CTA FINAL ── -->
 <div class="cta-section">
-  <div class="cta-bg">
-    {# → /public/images/lp/cta-bottom.jpg #}
-    <div class="lp-img" style="border-radius:0">
-      <img src="/images/lp/cta-bottom.jpg" alt="WeCare" onerror="this.style.display='none'">
+  <div class="cta-inner">
+    <div class="cta-content reveal">
+      <div class="cta-tag">Offre limitée</div>
+      <h2>Commencez <span>gratuitement</span><br>dès maintenant</h2>
+      <p>Plus que 12 mois pour profiter de cette offre gratuite.</p>
+      <a href="/inscription" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#ff91fd;color:#0f004b;border-radius:10px;font-weight:700;font-size:0.92rem;transition:opacity 0.15s">
+        Essai gratuit
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
     </div>
-  </div>
-  <div class="cta-content reveal">
-    <h2>Commencez <span>gratuitement</span><br>dès maintenant</h2>
-    <p>Nous vous accompagnons dans la mise en place de WeCare au sein de votre structure d'aide à domicile pour tout le monde.</p>
-    <a href="/inscription" class="btn-pink">Essai gratuit</a>
+    <div class="cta-img reveal-right">
+      <img src="/images/lp/cta-bottom.jpg" alt="WeCare aide à domicile" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#e4f5f3,#d4eef8)'">
+    </div>
   </div>
 </div>
 
@@ -454,6 +482,31 @@ function updateCarousel() { if(track) track.style.transform = `translateX(-${car
 
 prevBtn?.addEventListener('click', () => { carouselIdx = Math.max(0, carouselIdx-1); updateCarousel(); });
 nextBtn?.addEventListener('click', () => { carouselIdx = Math.min(maxIdx(), carouselIdx+1); updateCarousel(); });
+
+// ── Pricing slider (homepage) ──
+const hpTiers = [
+  { range: "Jusqu'à 50 bénéficiaires",        monthly: 49,  annual: 539,  economy: 49  },
+  { range: 'Entre 51 et 100 bénéficiaires',   monthly: 89,  annual: 979,  economy: 89  },
+  { range: 'Entre 101 et 150 bénéficiaires',  monthly: 129, annual: 1419, economy: 129 },
+  { range: 'Entre 151 et 200 bénéficiaires',  monthly: 169, annual: 1859, economy: 169 },
+  { range: 'Entre 201 et 350 bénéficiaires',  monthly: 209, annual: 2299, economy: 209 },
+];
+const hpSlider = document.getElementById('hp-slider');
+function hpUpdate() {
+  const t = hpTiers[+hpSlider.value];
+  const pct = (+hpSlider.value / 4) * 100;
+  hpSlider.style.background = `linear-gradient(to right,#2CA7CB 0%,#2CA7CB ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
+  document.getElementById('hp-price').textContent         = t.monthly + '€';
+  document.getElementById('hp-range').textContent         = t.range;
+  document.getElementById('hp-annual-range').textContent  = t.range;
+  document.getElementById('hp-annual-price').textContent  = t.annual + '€';
+  document.getElementById('hp-annual-yearly').textContent = 'Économisez ' + t.economy + '€ par an';
+  document.getElementById('hp-monthly-range').textContent = t.range;
+  document.getElementById('hp-monthly-price').textContent = t.monthly + '€';
+  document.getElementById('hp-monthly-yearly').textContent= 'ou ' + t.annual + '€ / an';
+}
+hpSlider?.addEventListener('input', hpUpdate);
+hpUpdate();
 
 // Auto-scroll carousel
 if(track) {

@@ -44,105 +44,114 @@
       gap: 20px; align-items: start;
     }
 
-    /* Slider card */
-    .tr-slider-card {
-      background: #F2FBFF;
-      border: 1.5px solid #d4eef8;
-      border-radius: 16px; padding: 28px 24px;
-    }
-    .tr-slider-title {
-      font-size: 1rem; font-weight: 700; color: #0c0052; margin-bottom: 6px;
-    }
-    .tr-slider-sub {
-      font-size: 0.78rem; color: #8a85b0; line-height: 1.5; margin-bottom: 20px;
-    }
-    .tr-slider-label {
-      font-size: 0.72rem; font-weight: 600; color: #6b63a8;
-      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
-    }
-    .tr-slider-value {
-      font-size: 0.88rem; font-weight: 700; color: #0c0052; margin-bottom: 10px;
+    /* ── Plan cards layout ── */
+    .tr-plans-inner {
+      max-width: 980px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px; align-items: stretch;
     }
     input[type=range].tr-slider {
       -webkit-appearance: none; appearance: none;
-      width: 100%; height: 4px;
-      background: linear-gradient(to right, #2CA7CB 0%, #2CA7CB 50%, #d4eef8 50%, #d4eef8 100%);
-      border-radius: 4px; outline: none; margin-bottom: 24px;
+      width: 100%; height: 4px; border-radius: 4px; outline: none;
+      margin: 12px 0 6px; cursor: pointer;
+      background: linear-gradient(to right, #2CA7CB 0%, #2CA7CB 0%, #d4eef8 0%, #d4eef8 100%);
     }
     input[type=range].tr-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #2CA7CB; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(44,167,203,0.35);
+      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: #2CA7CB; cursor: pointer; box-shadow: 0 2px 8px rgba(44,167,203,0.4);
     }
     input[type=range].tr-slider::-moz-range-thumb {
       width: 18px; height: 18px; border-radius: 50%;
       background: #2CA7CB; cursor: pointer; border: none;
     }
-    .tr-slider-btn {
-      display: block; text-align: center;
-      padding: 11px 20px; border-radius: 10px;
-      font-size: 0.85rem; font-weight: 700;
-      background: #2CA7CB; color: #fff;
-      transition: opacity 0.15s;
-    }
-    .tr-slider-btn:hover { opacity: 0.88; }
-    .tr-slider-note {
-      font-size: 0.72rem; color: #b0a8cc; text-align: center; margin-top: 10px;
-    }
 
-    /* Forfait cards */
-    .tr-forfait {
-      border: 1.5px solid #e0edf5; border-radius: 16px; padding: 28px 28px 24px;
-      background: #fff; position: relative;
+    /* Carte gauche : gratuit */
+    .tr-card {
+      border: 1.5px solid #e0edf5; border-radius: 16px; padding: 32px 28px 28px;
+      background: #fff; display: flex; flex-direction: column;
     }
-    .tr-forfait.annual {
-      border-color: #2CA7CB;
-      box-shadow: 0 8px 32px rgba(44,167,203,0.12);
+    .tr-card-tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #2CA7CB; margin-bottom: 12px;
     }
-    .tr-forfait-tag {
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: #2CA7CB; margin-bottom: 10px;
+    .tr-card-desc {
+      font-size: 0.88rem; font-weight: 600; color: #0c0052;
+      line-height: 1.45; margin-bottom: 20px;
     }
-    .tr-forfait-range {
-      font-size: 0.9rem; font-weight: 600; color: #0c0052; margin-bottom: 14px;
+    .tr-card-price-row {
+      display: flex; align-items: baseline; gap: 2px; margin-bottom: 4px;
     }
-    .tr-forfait-price {
-      display: flex; align-items: baseline; gap: 4px;
-      margin-bottom: 4px;
+    .tr-card-amount {
+      font-size: 2.8rem; font-weight: 800; color: #0c0052; line-height: 1;
     }
-    .tr-forfait-amount {
-      font-size: 2.6rem; font-weight: 800; color: #0c0052; line-height: 1;
+    .tr-card-currency { font-size: 1.4rem; font-weight: 800; color: #0c0052; }
+    .tr-card-period { font-size: 0.85rem; color: #8a85b0; margin-left: 4px; }
+    .tr-card-sub {
+      font-size: 0.80rem; color: #8a85b0; margin-bottom: 20px;
     }
-    .tr-forfait-currency { font-size: 1.2rem; font-weight: 700; color: #0c0052; }
-    .tr-forfait-period { font-size: 0.85rem; color: #8a85b0; }
-    .tr-forfait-economy {
-      font-size: 0.78rem; font-weight: 600; color: #2CA7CB; margin-bottom: 20px;
-    }
-    .tr-forfait-feature {
+    .tr-card-feature {
       display: flex; align-items: center; gap: 8px;
-      font-size: 0.84rem; color: #3a357f; font-weight: 500; margin-bottom: 20px;
+      font-size: 0.84rem; color: #3a357f; font-weight: 500;
+      margin-bottom: 24px; margin-top: auto;
     }
-    .tr-forfait-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
-    .tr-forfait-cta-primary {
+    .tr-card-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
+    .tr-card-btn-outline {
       display: block; text-align: center;
-      padding: 12px 24px; border-radius: 10px;
-      font-size: 0.88rem; font-weight: 700;
-      background: #2CA7CB; color: #fff;
-      transition: opacity 0.15s;
-    }
-    .tr-forfait-cta-primary:hover { opacity: 0.88; }
-    .tr-forfait-cta-outline {
-      display: block; text-align: center;
-      padding: 12px 24px; border-radius: 10px;
+      padding: 13px 24px; border-radius: 10px;
       font-size: 0.88rem; font-weight: 700;
       border: 2px solid #2CA7CB; color: #2CA7CB;
       transition: background 0.15s;
     }
-    .tr-forfait-cta-outline:hover { background: rgba(44,167,203,0.06); }
-    .tr-forfait-note {
-      font-size: 0.72rem; color: #b0a8cc; text-align: center; margin-top: 10px;
+    .tr-card-btn-outline:hover { background: rgba(44,167,203,0.06); }
+
+    /* Carte centrale : annuel navy */
+    .tr-card-annual {
+      background: #0f004b; border: none;
+      border-radius: 16px; padding: 32px 28px 28px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 16px 48px rgba(15,0,75,0.25);
     }
+    .tr-card-annual-badge {
+      display: inline-block; align-self: flex-start;
+      font-size: 0.72rem; font-weight: 700;
+      background: #2CA7CB; color: #fff;
+      padding: 5px 14px; border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .tr-card-annual-range {
+      font-size: 0.92rem; font-weight: 600; color: rgba(255,255,255,0.75);
+      margin-bottom: 16px;
+    }
+    .tr-card-annual-price-row {
+      display: flex; align-items: baseline; gap: 0; margin-bottom: 6px;
+    }
+    .tr-card-annual-amount {
+      font-size: 3rem; font-weight: 800; color: #fff; line-height: 1;
+    }
+    .tr-card-annual-currency { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .tr-card-annual-slash {
+      font-size: 0.88rem; color: rgba(255,255,255,0.5); margin: 0 6px; align-self: center;
+    }
+    .tr-card-annual-monthly {
+      font-size: 0.88rem; color: rgba(255,255,255,0.55); align-self: center;
+    }
+    .tr-card-annual-sub {
+      font-size: 0.80rem; color: rgba(255,255,255,0.45); margin-bottom: 20px;
+    }
+    .tr-card-annual-feature {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.84rem; color: rgba(255,255,255,0.80); font-weight: 500;
+      margin-bottom: 28px; margin-top: auto;
+    }
+    .tr-card-annual-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
+    .tr-card-btn-pink {
+      display: block; text-align: center;
+      padding: 13px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700;
+      background: #ff91fd; color: #0f004b;
+      transition: opacity 0.15s;
+    }
+    .tr-card-btn-pink:hover { opacity: 0.88; }
 
     /* Boutons réutilisés dans sticky */
     .tr-card-btn {
@@ -284,19 +293,6 @@
       .tr-row td, .tr-sticky th { padding: 10px 10px; font-size: 0.8rem; }
     }
 
-    /* ── FAQ ── */
-    .tr-faq { background: #fff; padding: 72px 48px; }
-    .tr-faq-inner { max-width: 720px; margin: 0 auto; }
-    .faq-item { border-bottom: 1px solid #f0eef8; }
-    .faq-q {
-      padding: 18px 0; display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.94rem; font-weight: 600; color: #0c0052;
-      cursor: pointer; gap: 16px;
-    }
-    .faq-icon { font-size: 1.2rem; color: #2CA7CB; flex-shrink: 0; transition: transform 0.2s; }
-    .faq-a { font-size: 0.88rem; color: #8a85b0; line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
-    .faq-item.open .faq-a { max-height: 200px; padding-bottom: 16px; }
-    .faq-item.open .faq-icon { transform: rotate(45deg); }
   </style>
 </head>
 <body>
@@ -313,51 +309,55 @@
 <section class="tr-plans">
   <div class="tr-plans-inner">
 
-    <!-- Sélecteur bénéficiaires -->
-    <div class="tr-slider-card reveal">
-      <div class="tr-slider-title">Bénéficiaires</div>
-      <div class="tr-slider-sub">Sélectionnez votre nombre de bénéficiaire requis</div>
-      <div class="tr-slider-label">Bénéficiaires</div>
-      <div class="tr-slider-value" id="slider-display">101–150</div>
-      <input type="range" class="tr-slider" id="benef-slider" min="0" max="4" value="2" step="1">
-      <a href="/inscription" class="tr-slider-btn">Commencez gratuitement</a>
-      <p class="tr-slider-note">Plus que 12 mois pour profiter de cette offre gratuite</p>
-    </div>
-
-    <!-- Forfait annuel -->
-    <div class="tr-forfait annual reveal" style="transition-delay:0.08s">
-      <div class="tr-forfait-tag">Forfait annuel</div>
-      <div class="tr-forfait-range" id="annual-range">Entre 101 et 150 bénéficiaires</div>
-      <div class="tr-forfait-price">
-        <span class="tr-forfait-amount" id="annual-price">1419</span>
-        <span class="tr-forfait-currency">€</span>
-        <span class="tr-forfait-period">TTC / an</span>
+    <!-- Carte slider -->
+    <div class="tr-card reveal">
+      <div class="tr-card-tag">Bénéficiaires</div>
+      <p class="tr-card-desc">Sélectionnez votre nombre de bénéficiaires pour connaître le tarif le plus adapté.</p>
+      <div class="tr-card-price-row">
+        <span class="tr-card-amount" id="tr-price">49</span>
+        <span class="tr-card-currency">€</span>
+        <span class="tr-card-period">/mois</span>
       </div>
-      <div class="tr-forfait-economy" id="annual-economy">Économisez 129€ par an</div>
-      <div class="tr-forfait-feature">
-        <svg width="16" height="16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="tr-card-sub" id="tr-range">Jusqu'à 50 bénéficiaires</div>
+      <input type="range" class="tr-slider" id="tr-slider" min="0" max="4" value="0" step="1">
+      <div class="tr-card-feature" style="margin-top:auto">
+        <svg width="18" height="18" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
         Toutes les fonctionnalités disponibles
       </div>
-      <a href="/inscription" class="tr-forfait-cta-primary">Choisir ce forfait</a>
-      <p class="tr-forfait-note">Économique · Accès direct au logiciel</p>
+      <a href="/inscription" class="tr-card-btn-outline">Démarrer gratuitement</a>
     </div>
 
-    <!-- Forfait mensuel -->
-    <div class="tr-forfait reveal" style="transition-delay:0.16s">
-      <div class="tr-forfait-tag">Forfait mensuel</div>
-      <div class="tr-forfait-range" id="monthly-range">Entre 101 et 150 bénéficiaires</div>
-      <div class="tr-forfait-price">
-        <span class="tr-forfait-amount" id="monthly-price">129</span>
-        <span class="tr-forfait-currency">€</span>
-        <span class="tr-forfait-period">TTC / mois</span>
+    <!-- Carte annuel (navy) -->
+    <div class="tr-card-annual reveal" style="transition-delay:0.08s">
+      <span class="tr-card-annual-badge">Tarif annuel</span>
+      <div class="tr-card-annual-range" id="annual-range">Jusqu'à 50 bénéficiaires</div>
+      <div class="tr-card-annual-price-row">
+        <span class="tr-card-annual-amount" id="annual-price">539</span>
+        <span class="tr-card-annual-currency">€</span>
+        <span class="tr-card-annual-slash" style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin:0 4px;align-self:center">TTC / an</span>
       </div>
-      <div class="tr-forfait-economy" style="visibility:hidden">—</div>
-      <div class="tr-forfait-feature">
-        <svg width="16" height="16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="tr-card-annual-sub" id="annual-yearly">Économisez 45€ par an</div>
+      <div class="tr-card-annual-feature" style="margin-top:auto">
+        <svg width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
         Toutes les fonctionnalités disponibles
       </div>
-      <a href="/inscription" class="tr-forfait-cta-outline">Choisir ce forfait</a>
-      <p class="tr-forfait-note">Sans engagement · Accès direct au logiciel</p>
+      <a href="/inscription" class="tr-card-btn-pink">Choisir le forfait</a>
+    </div>
+
+    <!-- Carte premium (mensuel) -->
+    <div class="tr-card reveal" style="transition-delay:0.16s">
+      <div class="tr-card-tag">Forfait mensuel</div>
+      <div class="tr-card-price-row">
+        <span class="tr-card-amount" id="monthly-price">49</span>
+        <span class="tr-card-currency">€</span>
+        <span class="tr-card-period">/mois</span>
+      </div>
+      <div class="tr-card-sub" id="monthly-annual">ou 539€ / an</div>
+      <div class="tr-card-feature" style="margin-top:auto">
+        <svg width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
+        Toutes les fonctionnalités disponibles
+      </div>
+      <a href="/inscription" class="tr-card-btn-outline">Choisir le forfait</a>
     </div>
 
   </div>
@@ -483,45 +483,30 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Slider pricing ──
-  const tiers = [
-    { label: '1 – 50',       range: 'Jusqu\'à 50 bénéficiaires',        annual: 539,   monthly: 49,  economy: 49  },
-    { label: '51 – 100',     range: 'Entre 51 et 100 bénéficiaires',     annual: 979,   monthly: 89,  economy: 89  },
-    { label: '101 – 150',    range: 'Entre 101 et 150 bénéficiaires',    annual: 1419,  monthly: 129, economy: 129 },
-    { label: '151 – 200',    range: 'Entre 151 et 200 bénéficiaires',    annual: 1859,  monthly: 169, economy: 169 },
-    { label: '201 – 350',    range: 'Entre 201 et 350 bénéficiaires',    annual: 2299,  monthly: 209, economy: 209 },
+  // ── Pricing slider ──
+  const trTiers = [
+    { range: "Jusqu'à 50 bénéficiaires",        monthly: 49,  annual: 539,  economy: 49  },
+    { range: 'Entre 51 et 100 bénéficiaires',   monthly: 89,  annual: 979,  economy: 89  },
+    { range: 'Entre 101 et 150 bénéficiaires',  monthly: 129, annual: 1419, economy: 129 },
+    { range: 'Entre 151 et 200 bénéficiaires',  monthly: 169, annual: 1859, economy: 169 },
+    { range: 'Entre 201 et 350 bénéficiaires',  monthly: 209, annual: 2299, economy: 209 },
   ];
-
-  const slider      = document.getElementById('benef-slider');
-  const display     = document.getElementById('slider-display');
-  const annualRange = document.getElementById('annual-range');
-  const annualPrice = document.getElementById('annual-price');
-  const annualEco   = document.getElementById('annual-economy');
-  const monthlyRange= document.getElementById('monthly-range');
-  const monthlyPrice= document.getElementById('monthly-price');
-
-  function updatePricing() {
-    const t = tiers[+slider.value];
-    display.textContent = t.label;
-    annualRange.textContent  = t.range;
-    monthlyRange.textContent = t.range;
-
-    annualPrice.textContent  = t.annual;
-    monthlyPrice.textContent = t.monthly;
-    annualEco.textContent    = 'Économisez ' + t.economy + '€ par an';
-
-    // Update slider gradient fill
-    const pct = (+slider.value / (tiers.length - 1)) * 100;
-    slider.style.background = `linear-gradient(to right, #2CA7CB 0%, #2CA7CB ${pct}%, #d4eef8 ${pct}%, #d4eef8 100%)`;
+  const trSlider = document.getElementById('tr-slider');
+  function trUpdate() {
+    const t = trTiers[+trSlider.value];
+    const pct = (+trSlider.value / 4) * 100;
+    trSlider.style.background = `linear-gradient(to right,#2CA7CB 0%,#2CA7CB ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
+    document.getElementById('tr-price').textContent       = t.monthly;
+    document.getElementById('tr-range').textContent       = t.range;
+    document.getElementById('annual-range').textContent   = t.range;
+    document.getElementById('annual-price').textContent   = t.annual;
+    document.getElementById('annual-yearly').textContent  = 'Économisez ' + t.economy + '€ par an';
+    document.getElementById('monthly-price').textContent  = t.monthly;
+    document.getElementById('monthly-annual').textContent = 'ou ' + t.annual + '€ / an';
   }
+  trSlider?.addEventListener('input', trUpdate);
+  trUpdate();
 
-  slider?.addEventListener('input', updatePricing);
-  updatePricing();
-
-  // ── FAQ ──
-  document.querySelectorAll('.faq-q').forEach(q => {
-    q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
-  });
 });
 </script>
 </body>
