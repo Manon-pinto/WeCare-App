@@ -150,7 +150,7 @@ function updateMap(data){
       .bindPopup(`<b>${i.nom}</b><br>${i.debut} – ${i.fin}<br>${i.adresse}`).addTo(lmap);
     markers.push(m);
   });
-  if(coords.length>1){polyline=L.polyline(coords,{color:'#3fcdc0',weight:2,dashArray:'8,6',opacity:0.8}).addTo(lmap);lmap.fitBounds(polyline.getBounds(),{padding:[40,40]});}
+  if(coords.length>1){polyline=L.polyline(coords,{color:getComputedStyle(document.documentElement).getPropertyValue('--teal').trim()||'#0f9486',weight:2,dashArray:'8,6',opacity:0.8}).addTo(lmap);lmap.fitBounds(polyline.getBounds(),{padding:[40,40]});}
   else if(coords.length===1){lmap.setView(coords[0],14);}
 }
 

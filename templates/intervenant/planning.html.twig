@@ -20,12 +20,12 @@
 
   .visit-bar { padding:4px 6px; text-align:center; font-size:0.68rem; font-weight:700; background:var(--teal-light); color:var(--text-dark); border-left:1px solid var(--border); border-bottom:1px solid var(--border); }
   .visit-bar.empty-bar { background:var(--bg); color:var(--text-muted); }
-  .today-col { background:rgba(63,205,192,0.06); }
+  .today-col { background:var(--today-bg); }
   .vb-empty { background:#fff; border-bottom:1px solid var(--border); }
 
   .tl-hour { font-size:0.68rem; color:var(--text-muted); text-align:right; padding:0 8px; display:flex; align-items:flex-start; padding-top:6px; height:60px; border-bottom:1px solid var(--border); background:#fff; }
   .tl-cell { border-left:1px solid var(--border); border-bottom:1px solid rgba(0,0,0,0.04); height:60px; position:relative; padding:3px; }
-  .tl-cell.today-col { background:rgba(63,205,192,0.06); }
+  .tl-cell.today-col { background:var(--today-bg); }
 
   .int-card { position:absolute; left:2px; right:2px; border-radius:6px; padding:3px 6px; font-size:0.65rem; font-weight:600; overflow:hidden; cursor:pointer; border:none; background:var(--teal-light); color:var(--text-dark); line-height:1.2; text-align:left; }
   .int-card:hover { opacity:0.82; }
@@ -85,7 +85,7 @@
 
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,0,75,0.35); z-index:200; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
-  .modal { background:#fff; border-radius:14px; padding:26px; width:440px; max-width:94vw; box-shadow:0 20px 60px rgba(15,0,75,0.2); }
+  .modal { background:#fff; border-radius:14px; padding:26px; width:440px; max-width:94vw; box-shadow:0 20px 60px rgba(15,0,75,0.18); }
   .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
   .modal-title { font-size:1rem; font-weight:700; color:var(--text-dark); }
   .modal-close { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:1.1rem; }
