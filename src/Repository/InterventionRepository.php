@@ -141,6 +141,53 @@ class InterventionRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
+    /** @return Intervention[] — tâches sans soignant pour les 30 prochains jours */
+    public function findUnassignedUpcoming(array $benIds, int $days = 30): array
+    {
+        if (empty($benIds)) return [];
+        $from = new \DateTime('today midnight');
+        $to   = (clone $from)->modify("+{$days} days")->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('i')
+            ->join('i.beneficiaire', 'b')
+            ->join('b.utilisateur', 'ub')
+            ->addSelect('b', 'ub')
+            ->andWhere('i.intervenant IS NULL')
+            ->andWhere('b.id IN (:benIds)')
+            ->andWhere('i.dateDebut >= :from')
+            ->andWhere('i.dateDebut <= :to')
+            ->setParameter('benIds', $benIds)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('i.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return Intervention[] — tâches sans soignant pour une date donnée */
+    public function findUnassignedForDate(\DateTimeInterface $date, array $benIds = []): array
+    {
+        $debut = new \DateTime($date->format('Y-m-d') . ' 00:00:00');
+        $fin   = new \DateTime($date->format('Y-m-d') . ' 23:59:59');
+
+        $qb = $this->createQueryBuilder('i')
+            ->join('i.beneficiaire', 'b')
+            ->join('b.utilisateur', 'ub')
+            ->addSelect('b', 'ub')
+            ->andWhere('i.intervenant IS NULL')
+            ->andWhere('i.dateDebut >= :debut')
+            ->andWhere('i.dateDebut <= :fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('i.dateDebut', 'ASC');
+
+        if (!empty($benIds)) {
+            $qb->andWhere('b.id IN (:benIds)')->setParameter('benIds', $benIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     /** @return Intervention[] — prochaines interventions pour une liste de bénéficiaires */
     public function findUpcomingForBeneficiaires(array $benIds, int $days = 30): array
     {

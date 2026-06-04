@@ -4,50 +4,7 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<style>
-  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; height: 100vh; background: #C8DFF0; overflow: hidden; }
-
-  /* Topbar */
-  .topbar { padding: 22px 28px 14px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; flex-wrap: wrap; }
-  .topbar-title { font-size: 24px; font-weight: 800; color: var(--primary); margin-right: auto; }
-  .date-nav { display: flex; align-items: center; gap: 4px; background: #fff; border-radius: 30px; padding: 6px 14px; }
-  .date-nav-btn { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 17px; padding: 0 4px; text-decoration: none; display: flex; align-items: center; }
-  .date-nav-label { font-size: 12px; font-weight: 700; color: var(--primary); padding: 0 6px; white-space: nowrap; }
-  .toggle-group { display: flex; background: #fff; border-radius: 10px; overflow: hidden; }
-  .toggle-btn { padding: 7px 16px; border: none; background: none; font-size: 12px; font-weight: 600; color: #9ca3af; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-block; }
-  .toggle-btn.active { background: var(--primary); color: #fff; border-radius: 8px; }
-
-  /* Map wrapper */
-  .map-wrapper { flex: 1; position: relative; margin: 0 48px 48px 48px; border-radius: 18px; overflow: hidden; min-height: 0; }
-  #map { width: 100%; height: 100%; }
-
-  /* Overlay stats panel */
-  .map-overlay { position: absolute; top: 20px; left: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-  .overlay-card {
-    background: #fff; border-radius: 16px; padding: 14px 18px 14px 16px;
-    display: flex; align-items: center; gap: 16px; min-width: 210px;
-    pointer-events: auto;
-  }
-  .overlay-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .overlay-text { flex: 1; }
-  .overlay-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 2px; }
-  .overlay-value { font-size: 26px; font-weight: 900; color: var(--primary); line-height: 1; }
-  .overlay-sub { font-size: 10.5px; color: #6b7280; margin-top: 3px; font-weight: 500; }
-
-  /* Custom Leaflet markers */
-  .patient-marker {
-    width: 28px; height: 28px; border-radius: 50%; background: #f472b6;
-    border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 800; color: #fff;
-  }
-  .soignant-marker {
-    width: 36px; height: 36px; border-radius: 50%;
-    border: 3px solid #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 800; color: #fff;
-  }
-</style>
+<link rel="stylesheet" href="{{ asset('assets/admin/css/map.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -108,56 +65,10 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-(function () {
-  // Map — zoom 14 pour une vue plus resserrée sur Bordeaux
-  const map = L.map('map', { zoomControl: true }).setView(
-    [{{ centerLat }}, {{ centerLng }}], 14
-  );
-
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © DINUM',
-    maxZoom: 19
-  }).addTo(map);
-
-  function makeIcon(html, size) {
-    return L.divIcon({ html: html, className: '', iconSize: [size, size], iconAnchor: [size/2, size/2] });
-  }
-
-  // Circuits pointillés soignant → patients → soignant
-  const routes = {{ routes|json_encode|raw }};
-  routes.forEach(function (r) {
-    L.polyline(r.points, {
-      color: r.color,
-      weight: 2.5,
-      dashArray: '8, 6',
-      opacity: 0.75
-    }).addTo(map);
-  });
-
-  // Patients (par-dessus les lignes)
-  const patients = {{ patients|json_encode|raw }};
-  patients.forEach(function (p) {
-    const color = p.risque === 'critique' ? '#ef4444'
-                : p.risque === 'eleve'    ? '#f97316'
-                : '#f472b6';
-    const icon = makeIcon(
-      '<div class="patient-marker" style="background:' + color + '">' + p.initiales + '</div>', 28
-    );
-    L.marker([p.lat, p.lng], { icon: icon })
-      .bindPopup('<strong>' + p.nom + '</strong><br>Risque : ' + (p.risque ?? 'normal'))
-      .addTo(map);
-  });
-
-  // Soignants (plus grand, par-dessus tout)
-  const soignants = {{ soignants|json_encode|raw }};
-  soignants.forEach(function (s) {
-    const icon = makeIcon(
-      '<div class="soignant-marker" style="background:' + s.color + '">' + s.initiales + '</div>', 36
-    );
-    L.marker([s.lat, s.lng], { icon: icon })
-      .bindPopup('<strong>' + s.nom + '</strong><br>Soignant actif')
-      .addTo(map);
-  });
-})();
+const MAP_CENTER   = [{{ centerLat }}, {{ centerLng }}];
+const MAP_ROUTES   = {{ routes|json_encode|raw }};
+const MAP_PATIENTS = {{ patients|json_encode|raw }};
+const MAP_SOIGNANTS= {{ soignants|json_encode|raw }};
 </script>
+<script src="{{ asset('assets/admin/js/map.js') }}"></script>
 {% endblock %}

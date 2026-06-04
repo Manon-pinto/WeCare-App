@@ -48,7 +48,7 @@ class Intervenant
     #[ORM\ManyToMany(targetEntity: Planning::class, mappedBy: 'intervenants')]
     private Collection $plannings;
 
-    #[ORM\OneToMany(mappedBy: 'intervenant', targetEntity: Intervention::class, cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'intervenant', targetEntity: Intervention::class)]
     private Collection $interventions;
 
     public function __construct()

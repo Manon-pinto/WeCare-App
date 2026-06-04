@@ -16,11 +16,7 @@ class MapController extends AbstractController
 {
     use AdminTrait;
 
-    private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
-    private const JOURS   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    private const MOIS    = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-
-    #[Route('/map', name: 'admin_map')]
+#[Route('/map', name: 'admin_map')]
     public function index(
         Request                $request,
         BeneficiaireRepository $beneficiaireRepo,
@@ -41,15 +37,15 @@ class MapController extends AbstractController
             $interventionsJour = $interventionRepo->findForWeek($weekStart, $myIvIds);
             $prevDate  = (clone $weekStart)->modify('-1 week');
             $nextDate  = (clone $weekStart)->modify('+1 week');
-            $dateLabel = $weekStart->format('j') . ' ' . self::MOIS[(int)$weekStart->format('n') - 1]
-                       . ' – ' . $weekEnd->format('j') . ' ' . self::MOIS[(int)$weekEnd->format('n') - 1]
+            $dateLabel = $weekStart->format('j') . ' ' . self::MOIS_COURTS[(int)$weekStart->format('n')]
+                       . ' – ' . $weekEnd->format('j') . ' ' . self::MOIS_COURTS[(int)$weekEnd->format('n')]
                        . ' ' . $weekEnd->format('Y');
         } else {
             $interventionsJour = $interventionRepo->findForDate($date, $myIvIds);
             $prevDate  = (clone $date)->modify('-1 day');
             $nextDate  = (clone $date)->modify('+1 day');
-            $dateLabel = self::JOURS[(int)$date->format('w')] . ' '
-                       . $date->format('j') . ' ' . self::MOIS[(int)$date->format('n') - 1]
+            $dateLabel = self::JOURS_COURTS[(int)$date->format('w')] . ' '
+                       . $date->format('j') . ' ' . self::MOIS_COURTS[(int)$date->format('n')]
                        . ' ' . $date->format('Y');
         }
 
@@ -66,11 +62,9 @@ class MapController extends AbstractController
             if (!$ben->getLatitude() || !$ben->getLongitude()) continue;
             $u     = $ben->getUtilisateur();
             $nom   = $u->getNom();
-            $parts = array_values(array_filter(explode(' ', trim($nom))));
-            $init  = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
             $patients[] = [
                 'nom'       => $nom,
-                'initiales' => mb_substr($init, 0, 2),
+                'initiales' => $this->getInitiales($nom),
                 'lat'       => (float) $ben->getLatitude(),
                 'lng'       => (float) $ben->getLongitude(),
                 'risque'    => $ben->getNiveauRisque(),
@@ -84,11 +78,9 @@ class MapController extends AbstractController
             if (!isset($soignantsMap[$ivId])) {
                 $u     = $iv->getUtilisateur();
                 $nom   = $u->getNom();
-                $parts = array_values(array_filter(explode(' ', trim($nom))));
-                $init  = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
                 $soignantsMap[$ivId] = [
                     'nom'      => $nom,
-                    'initiales'=> mb_substr($init, 0, 2),
+                    'initiales'=> $this->getInitiales($nom),
                     'color'    => self::PALETTE[$idx % count(self::PALETTE)],
                     'lats' => [], 'lngs' => [],
                 ];

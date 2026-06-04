@@ -23,13 +23,13 @@ class AbonnementFixtures extends Fixture implements DependentFixtureInterface
             [
                 'entreprise'   => 'entreprise_0',  // Auxiliaire Services Bordeaux
                 'plan'         => 'plan_0',         // Starter (59€, 1-50 bénéf.)
-                'dateDebut'    => '2024-03-01',
+                'dateDebut'    => '2026-01-15',
                 'statut'       => StatutAbonnement::Actif,
             ],
             [
                 'entreprise'   => 'entreprise_1',  // Centre Soins Aquitaine
                 'plan'         => 'plan_2',         // Standard (129€, 101-150 bénéf.)
-                'dateDebut'    => '2024-06-15',
+                'dateDebut'    => '2026-03-10',
                 'statut'       => StatutAbonnement::Actif,
             ],
         ];

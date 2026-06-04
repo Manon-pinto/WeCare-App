@@ -2,144 +2,7 @@
 {% block title %}Prises en charge — WeCare Admin{% endblock %}
 
 {% block stylesheets %}
-<style>
-  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #C8DFF0; }
-
-  /* Topbar */
-  .topbar { padding: 22px 32px 12px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
-  .topbar-title { font-size: 26px; font-weight: 800; color: var(--primary); }
-  .date-nav { display: flex; align-items: center; gap: 4px; background: #fff; border-radius: 30px; padding: 6px 14px; margin-left: auto; }
-  .date-nav-btn { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 17px; padding: 0 4px; text-decoration: none; display: flex; align-items: center; }
-  .date-nav-label { font-size: 12px; font-weight: 700; color: var(--primary); padding: 0 6px; white-space: nowrap; }
-  .btn-ajouter { background: var(--pink); color: #fff; border: none; border-radius: 30px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .btn-ajouter:hover { opacity: 0.88; }
-
-  /* Besoin banner */
-  .besoin-banner { margin: 0 32px 10px; background: #fff3e0; border-radius: 14px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: #92400e; border: 1.5px solid #fed7aa; flex-shrink: 0; }
-  .besoin-banner svg { flex-shrink: 0; }
-
-  /* Body */
-  .pec-body { flex: 1; padding: 0 32px 28px; overflow-y: auto; min-height: 0; }
-  .pec-card { background: #fff; border-radius: 20px; padding: 20px; }
-
-  .search-wrap { position: relative; margin-bottom: 16px; }
-  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
-  .search-input { width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid #e5e7eb; border-radius: 30px; font-size: 13px; color: var(--primary); outline: none; }
-  .search-input:focus { border-color: var(--pink); }
-
-  .pec-table { width: 100%; border-collapse: collapse; }
-  .pec-table thead th { padding: 8px 12px; font-size: 10.5px; font-weight: 600; color: #9ca3af; text-align: left; border-bottom: 1.5px solid #f3f4f6; white-space: nowrap; }
-  .pec-table tbody .data-row { cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f9fafb; }
-  .pec-table tbody .data-row:hover { background: #fafafa; }
-  .pec-table tbody .data-row.selected { background: #f0f4ff; }
-  .pec-table td { padding: 11px 12px; vertical-align: middle; font-size: 12.5px; color: var(--primary); }
-
-  .aidant-name { font-weight: 700; }
-  .contact-phone { font-size: 12px; font-weight: 600; }
-  .contact-email { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
-  .patient-name { font-weight: 700; }
-  .patient-age { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
-
-  .badge-besoin { background: #fff3e0; color: #92400e; border-radius: 20px; padding: 2px 8px; font-size: 9.5px; font-weight: 700; margin-left: 6px; white-space: nowrap; }
-
-  .badge-niveau { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: 10.5px; font-weight: 700; white-space: nowrap; }
-  .badge-niveau.eleve    { background: #fce7f3; color: #be185d; }
-  .badge-niveau.critique { background: #fee2e2; color: #991b1b; }
-  .badge-niveau.modere   { background: #dbeafe; color: #1e40af; }
-  .badge-niveau.faible   { background: #ede9fe; color: #5b21b6; }
-
-  .badge-statut { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: 10.5px; font-weight: 700; white-space: nowrap; border: 1.5px solid; }
-  .badge-statut.actif   { border-color: #2dd4bf; color: #0f766e; background: #f0fdfa; }
-  .badge-statut.inactif { border-color: #fbbf24; color: #92400e; background: #fffbeb; }
-
-  .ref-name { font-size: 12px; font-weight: 600; color: var(--primary); }
-  .ref-spe  { font-size: 10px; color: #9ca3af; }
-  .btn-assigner-inline { background: var(--pink); color: #fff; border: none; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
-
-  /* Row actions */
-  .row-actions { display: flex; align-items: center; gap: 5px; }
-  .btn-row-edit { width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid #e5e7eb; background: #f9fafb; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.13s; }
-  .btn-row-edit:hover { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
-  .btn-row-del { width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid #fecdd3; background: #fff0f2; color: #f43f5e; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.13s; }
-  .btn-row-del:hover { background: #fecdd3; }
-
-  /* Expand row */
-  .expand-row td { padding: 0; border-bottom: 2px solid #e5e7eb; }
-  .expand-panel { background: #f8faff; border-top: 1px solid #e5e7eb; padding: 22px 24px; }
-  .expand-close { float: right; background: none; border: 1.5px solid #d1d5db; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; color: #9ca3af; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-  .expand-title { font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 16px; }
-
-  .expand-cards { display: flex; gap: 14px; margin-bottom: 20px; }
-  .expand-card { flex: 1; background: #dbeafe; border-radius: 12px; padding: 14px 16px; }
-  .expand-card-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 4px; }
-  .expand-card-name { font-size: 14px; font-weight: 800; color: var(--primary); }
-  .expand-card-sub { font-size: 11px; color: #374151; margin-top: 3px; }
-
-  /* Planning mini */
-  .interv-section { margin-bottom: 20px; }
-  .interv-section-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .interv-count-badge { background: var(--primary); color: #fff; border-radius: 20px; padding: 1px 8px; font-size: 9px; font-weight: 700; }
-  .interv-table { width: 100%; border-collapse: collapse; }
-  .interv-table th { padding: 5px 10px; font-size: 9.5px; font-weight: 700; color: #9ca3af; text-align: left; border-bottom: 1px solid #f3f4f6; text-transform: uppercase; letter-spacing: 0.05em; }
-  .interv-table td { padding: 8px 10px; font-size: 12px; color: var(--primary); border-bottom: 1px solid #f9fafb; vertical-align: middle; }
-  .interv-table tr:last-child td { border-bottom: none; }
-  .interv-jour { font-weight: 700; font-size: 10px; color: #9ca3af; text-transform: uppercase; }
-  .interv-date-val { font-weight: 700; color: var(--primary); }
-  .interv-heure { background: #f0f4ff; color: var(--primary); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .interv-type { background: #fce7f3; color: #be185d; border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 600; white-space: nowrap; }
-  .interv-empty { padding: 14px 10px; color: #d1d5db; font-size: 12px; text-align: center; }
-  .btn-cancel-interv { background: none; border: none; cursor: pointer; color: #f43f5e; padding: 2px 4px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
-  .btn-cancel-interv:hover { background: #fee2e2; }
-
-  .expand-divider { border: none; border-top: 1px solid #e5e7eb; margin: 18px 0; }
-
-  /* Créneau selector */
-  .creneau-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 10px; }
-  .creneau-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-  .creneau-chip { background: #f3f4f6; border: 1.5px solid #e5e7eb; border-radius: 20px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; color: #374151; cursor: pointer; transition: all 0.12s; white-space: nowrap; }
-  .creneau-chip:hover { border-color: #a5b4fc; background: #eef2ff; }
-  .creneau-chip.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-  /* Soignants disponibles */
-  .disponibles-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 10px; }
-  .soignant-rows { display: flex; flex-direction: column; gap: 6px; }
-  .soignant-row { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 10px 14px; transition: border-color 0.12s; }
-  .soignant-row.occupied { opacity: 0.55; }
-  .sv-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
-  .sv-info { min-width: 160px; }
-  .sv-name { font-size: 13px; font-weight: 700; color: var(--primary); }
-  .sv-meta { font-size: 10.5px; color: #9ca3af; margin-top: 1px; }
-  .sv-timeline { flex: 1; display: flex; gap: 2px; align-items: center; }
-  .tl-seg { height: 6px; flex: 1; border-radius: 3px; background: #e5e7eb; transition: background 0.1s; }
-  .tl-seg.occ  { background: var(--primary); }
-  .tl-seg.sel  { background: #2dd4bf; }
-  .sv-badge { font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 10px; white-space: nowrap; }
-  .sv-badge.dispo  { background: #d1fae5; color: #065f46; }
-  .sv-badge.occupé { background: #f3f4f6; color: #9ca3af; }
-  .btn-assigner-sv { background: var(--pink); color: #fff; border: none; border-radius: 20px; padding: 7px 16px; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-  .btn-assigner-sv:hover { opacity: 0.88; }
-  .sv-hint { color: #d1d5db; font-size: 12px; text-align: center; padding: 14px; }
-
-  /* Type selector dans la row */
-  .type-select { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 5px 8px; font-size: 11px; color: var(--primary); background: #fafafa; outline: none; }
-
-  /* Modal */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(15,0,75,0.35); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-  .modal-panel { background: #fff; border-radius: 24px; padding: 32px; width: 520px; max-width: calc(100vw - 48px); max-height: 90vh; overflow-y: auto; animation: modalIn 0.18s ease; }
-  @keyframes modalIn { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-  .modal-title { font-size: 17px; font-weight: 800; color: var(--primary); }
-  .modal-close { background: #f3f4f6; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; color: #6b7280; display: flex; align-items: center; justify-content: center; }
-  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
-  .form-input, .form-select { border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; font-size: 13px; color: var(--primary); outline: none; transition: border 0.15s; background: #fafafa; font-family: inherit; }
-  .form-input:focus, .form-select:focus { border-color: var(--pink); background: #fff; }
-  .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
-  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; border-top: 1px solid #f3f4f6; padding-top: 16px; }
-  .btn-cancel { background: #f3f4f6; border: none; border-radius: 10px; padding: 9px 18px; font-size: 12px; font-weight: 600; color: #6b7280; cursor: pointer; }
-  .btn-save   { background: var(--pink); color: #fff; border: none; border-radius: 10px; padding: 9px 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
-</style>
+<link rel="stylesheet" href="{{ asset('assets/admin/css/prises_en_charge.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -177,7 +40,8 @@
     <div class="pec-card">
       <div class="search-wrap">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="search-input" id="pecSearch" placeholder="Rechercher aidant ou patient…">
+        <input type="text" class="search-input" id="pecSearch" placeholder="Rechercher aidant ou patient…"
+               onkeydown="if(event.key==='Enter')event.preventDefault()">
       </div>
 
       <table class="pec-table">
@@ -197,7 +61,9 @@
         <tbody id="pecBody">
           {% for row in rows %}
           <tr class="data-row {{ row.besoinAujourdhui ? 'besoin-row' : '' }}" id="row-{{ row.id }}"
-              onclick="toggleExpand({{ row.id }}, {{ row.benId }}, {{ row|json_encode|e('html_attr') }})">
+              tabindex="-1"
+              onclick="toggleExpand({{ row.id }}, {{ row.benId }}, {{ row|json_encode|e('html_attr') }})"
+              onkeydown="event.preventDefault()">
             <td>
               <span class="aidant-name">{{ row.aidantNom }}</span>
               {% if row.besoinAujourdhui %}<span class="badge-besoin">Besoin aujourd'hui</span>{% endif %}
@@ -296,6 +162,7 @@
                           {% if i.statut != 'terminee' %}
                           <form method="POST" action="{{ path('admin_pec_intervention_annuler', {id: i.id}) }}" onsubmit="return confirm('Annuler cette intervention ?')">
                             <input type="hidden" name="date" value="{{ date }}">
+                            <input type="hidden" name="row_id" value="{{ row.id }}">
                             <button type="submit" class="btn-cancel-interv" title="Annuler">
                               <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                               Annuler
@@ -312,21 +179,78 @@
 
                 <hr class="expand-divider">
 
-                {# Sélecteur de créneau #}
-                <div class="creneau-label">Choisir un créneau</div>
-                <div class="creneau-chips" id="chips-{{ row.id }}">
-                  {% for h in range(6, 19) %}
-                  <div class="creneau-chip" data-h="{{ h }}" data-row="{{ row.id }}" data-ben="{{ row.benId }}"
-                       onclick="selectCreneau({{ row.id }}, {{ h }})">
-                    {{ '%02d'|format(h) }}h–{{ '%02d'|format(h+1) }}h
+                {# Tâches non assignées #}
+                {% if row.tachesNonAssignees is not empty %}
+                <div style="margin-bottom:16px;">
+                  <div class="taches-label">
+                    <svg width="12" height="12" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#f59e0b"/></svg>
+                    Tâches à couvrir — {{ row.tachesNonAssignees|length }} sans soignant
+                  </div>
+                  {% for t in row.tachesNonAssignees %}
+                  <div class="tache-nonassignee">
+                    <span class="tache-heure">{{ t.hDebut }} – {{ t.hFin }}</span>
+                    <span class="tache-meta">{{ t.jour }} {{ t.date }}</span>
+                    <span class="tache-badge">{{ t.type }}</span>
+                    <button type="button" class="btn-tache-assigner"
+                            onclick="selectCreneau({{ row.id }}, {{ t.hDebut|split(':')|first }}, {{ t.id }}, {{ row.benId }})">
+                      Assigner →
+                    </button>
+                    <form method="POST" action="{{ path('admin_pec_intervention_annuler', {id: t.id}) }}" onsubmit="return confirm('Supprimer cette tâche ?')">
+                      <input type="hidden" name="date" value="{{ date }}">
+                      <input type="hidden" name="row_id" value="{{ row.id }}">
+                      <button type="submit" class="btn-cancel-interv" title="Supprimer">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </form>
                   </div>
                   {% endfor %}
                 </div>
+                <hr class="expand-divider">
+                {% endif %}
 
-                {# Liste soignants #}
-                <div class="disponibles-label" id="dispo-label-{{ row.id }}">Choisissez un créneau pour voir les disponibilités.</div>
-                <div class="soignant-rows" id="soignant-list-{{ row.id }}">
-                  {# rempli par JS #}
+                {# Créer une nouvelle tâche #}
+                <div class="creer-tache-section" style="margin-bottom:16px;">
+                  <div class="creer-tache-title">Planifier une nouvelle tâche</div>
+                  <form method="POST" action="{{ path('admin_pec_tache_creer') }}" class="creer-tache-row">
+                    <input type="hidden" name="ben_id" value="{{ row.benId }}">
+                    <input type="hidden" name="pec_date" value="{{ date }}">
+                    <input type="hidden" name="row_id" value="{{ row.id }}">
+                    <div class="creer-tache-field">
+                      <label>Date</label>
+                      <input type="date" name="tache_date" value="{{ date }}" required>
+                    </div>
+                    <div class="creer-tache-field">
+                      <label>Heure</label>
+                      <select name="h_debut">
+                        {% for h in range(6, 19) %}
+                        <option value="{{ h }}">{{ '%02d'|format(h) }}h00</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="creer-tache-field">
+                      <label>Type de soin</label>
+                      <select name="type">
+                        <option value="soins">Soins infirmiers</option>
+                        <option value="toilette">Toilette</option>
+                        <option value="menage">Ménage</option>
+                        <option value="repas">Repas</option>
+                        <option value="accompagnement">Accompagnement</option>
+                        <option value="surveillance">Surveillance</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn-creer-tache">+ Ajouter la tâche</button>
+                  </form>
+                </div>
+                <hr class="expand-divider">
+
+                {# Liste soignants — masquée jusqu'au clic "Assigner" #}
+                <div id="assign-section-{{ row.id }}" style="display:none;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div class="disponibles-label" id="dispo-label-{{ row.id }}" style="margin-bottom:0;">Soignants disponibles</div>
+                    <button type="button" onclick="closeAssignSection({{ row.id }})"
+                            style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1;">×</button>
+                  </div>
+                  <div class="soignant-rows" id="soignant-list-{{ row.id }}"></div>
                 </div>
               </div>
             </td>
@@ -413,154 +337,7 @@
 <script>
 const PAGE_DATE = '{{ date }}';
 const SOIGNANTS = {{ soignantsData|json_encode|raw }};
-const TL_START  = 6;
-const TL_END    = 20;
-
-let selectedCreneaux = {};
-
-function toggleExpand(id, benId, row) {
-  const expandRow = document.getElementById('expand-' + id);
-  const isOpen    = expandRow.style.display !== 'none';
-
-  document.querySelectorAll('.expand-row').forEach(r => r.style.display = 'none');
-  document.querySelectorAll('.data-row').forEach(r => r.classList.remove('selected'));
-
-  if (!isOpen) {
-    expandRow.style.display = '';
-    document.getElementById('row-' + id).classList.add('selected');
-    renderSoignants(id, benId, selectedCreneaux[id] ?? null);
-  }
-}
-
-function closeExpand(id) {
-  document.getElementById('expand-' + id).style.display = 'none';
-  document.getElementById('row-' + id).classList.remove('selected');
-}
-
-function selectCreneau(rowId, h) {
-  selectedCreneaux[rowId] = h;
-  document.querySelectorAll('#chips-' + rowId + ' .creneau-chip').forEach(c => {
-    c.classList.toggle('selected', parseInt(c.dataset.h) === h);
-  });
-  const benId = document.querySelector('#chips-' + rowId + ' .creneau-chip').dataset.ben;
-  renderSoignants(rowId, parseInt(benId), h);
-}
-
-function renderSoignants(rowId, benId, selectedH) {
-  const label = document.getElementById('dispo-label-' + rowId);
-  const list  = document.getElementById('soignant-list-' + rowId);
-
-  if (selectedH === null) {
-    label.textContent = 'Choisissez un créneau pour voir les disponibilités.';
-    list.innerHTML = '';
-    return;
-  }
-
-  label.textContent = 'Soignants disponibles — créneau ' + pad(selectedH) + 'h–' + pad(selectedH + 1) + 'h';
-  list.innerHTML = '';
-
-  SOIGNANTS.forEach(function (s) {
-    const occ       = (s.occupiedHours || []).map(Number);
-    const isOccupied = occ.includes(selectedH);
-
-    const row = document.createElement('div');
-    row.className = 'soignant-row' + (isOccupied ? ' occupied' : '');
-
-    // Avatar
-    const av = document.createElement('div');
-    av.className = 'sv-avatar';
-    av.style.background = s.color;
-    av.textContent = s.initiales;
-    row.appendChild(av);
-
-    // Info
-    const info = document.createElement('div');
-    info.className = 'sv-info';
-    info.innerHTML = '<div class="sv-name">' + escHtml(s.nom) + '</div>'
-      + '<div class="sv-meta">' + escHtml(s.specialite) + ' · ' + s.rayon.toFixed(1) + ' km</div>';
-    row.appendChild(info);
-
-    // Timeline
-    const tl = document.createElement('div');
-    tl.className = 'sv-timeline';
-    for (let h = TL_START; h < TL_END; h++) {
-      const seg = document.createElement('div');
-      seg.className = 'tl-seg'
-        + (h === selectedH ? ' sel' : '')
-        + (occ.includes(h) && h !== selectedH ? ' occ' : '');
-      tl.appendChild(seg);
-    }
-    row.appendChild(tl);
-
-    // Badge + bouton
-    const actions = document.createElement('div');
-    actions.style.display = 'flex';
-    actions.style.alignItems = 'center';
-    actions.style.gap = '8px';
-
-    const badge = document.createElement('span');
-    badge.className = 'sv-badge ' + (isOccupied ? 'occupé' : 'dispo');
-    badge.textContent = isOccupied ? 'Occupé' : 'Disponible';
-    actions.appendChild(badge);
-
-    if (!isOccupied && s.disponible) {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/admin/prises-en-charge/planifier';
-      form.innerHTML =
-        '<input type="hidden" name="ben_id" value="' + benId + '">'
-        + '<input type="hidden" name="iv_id" value="' + s.id + '">'
-        + '<input type="hidden" name="date" value="' + PAGE_DATE + '">'
-        + '<input type="hidden" name="h_debut" value="' + selectedH + '">'
-        + '<select name="type" class="type-select">'
-        + '<option value="soins">Soins</option>'
-        + '<option value="toilette">Toilette</option>'
-        + '<option value="menage">Ménage</option>'
-        + '<option value="repas">Repas</option>'
-        + '<option value="accompagnement">Accompagnement</option>'
-        + '<option value="surveillance">Surveillance</option>'
-        + '</select>'
-        + '<button type="submit" class="btn-assigner-sv">Assigner</button>';
-      actions.appendChild(form);
-    }
-
-    row.appendChild(actions);
-    list.appendChild(row);
-  });
-}
-
-function pad(n) { return n < 10 ? '0' + n : '' + n; }
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function openModifier(id, prenom, nom, telephone, email, lien, patientNom) {
-  document.getElementById('modifier-form').action = '/admin/prises-en-charge/' + id + '/modifier';
-  document.getElementById('modifier-patient-nom').textContent = patientNom;
-  document.getElementById('modifier-prenom').value    = prenom;
-  document.getElementById('modifier-nom').value       = nom;
-  document.getElementById('modifier-telephone').value = telephone;
-  document.getElementById('modifier-email').value     = email;
-  const sel = document.getElementById('modifier-lien');
-  for (let i = 0; i < sel.options.length; i++) {
-    sel.options[i].selected = sel.options[i].value === lien;
-  }
-  document.getElementById('modalModifier').style.display = 'flex';
-}
-
-document.getElementById('pecSearch').addEventListener('input', function () {
-  const q = this.value.toLowerCase();
-  document.querySelectorAll('#pecBody .data-row').forEach(function (row) {
-    const show = row.textContent.toLowerCase().includes(q);
-    row.style.display = show ? '' : 'none';
-    const expRow = document.getElementById('expand-' + row.id.replace('row-', ''));
-    if (!show && expRow) expRow.style.display = 'none';
-  });
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.getElementById('modalAjouter').style.display  = 'none';
-    document.getElementById('modalModifier').style.display = 'none';
-  }
-});
+const OPEN_ROW  = {{ openRow }};
 </script>
+<script src="{{ asset('assets/admin/js/prises_en_charge.js') }}"></script>
 {% endblock %}

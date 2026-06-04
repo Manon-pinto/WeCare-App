@@ -4,9 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Aidant;
 use App\Entity\Intervention;
-use App\Entity\Planning;
 use App\Enum\StatutIntervention;
-use App\Enum\StatutPlanning;
 use App\Enum\TypeIntervention;
 use App\Repository\AidantRepository;
 use App\Repository\BeneficiaireRepository;
@@ -24,9 +22,6 @@ class PrisesEnChargeController extends AbstractController
 {
     use AdminTrait;
 
-    private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
-    private const JOURS   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    private const MOIS    = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
 
     #[Route('/prises-en-charge', name: 'admin_prises_en_charge')]
     public function index(
@@ -43,8 +38,8 @@ class PrisesEnChargeController extends AbstractController
         $date    = new \DateTime($dateStr);
         $prevDate = (clone $date)->modify('-1 day');
         $nextDate = (clone $date)->modify('+1 day');
-        $dateLabel = self::JOURS[(int) $date->format('w')]
-            . ' ' . $date->format('j') . ' ' . self::MOIS[(int) $date->format('n') - 1]
+        $dateLabel = self::JOURS_COURTS[(int) $date->format('w')]
+            . ' ' . $date->format('j') . ' ' . self::MOIS_COURTS[(int) $date->format('n')]
             . ' ' . $date->format('Y');
 
         // Aidants + bénéficiaires filtrés par admin
@@ -58,13 +53,20 @@ class PrisesEnChargeController extends AbstractController
             $upcomingByBen[$interv->getBeneficiaire()->getId()][] = $interv;
         }
 
+        // Tâches non assignées (30 jours) groupées par bénéficiaire
+        $allUnassigned    = $interventionRepo->findUnassignedUpcoming($benIdsWithAidant, 30);
+        $unassignedByBen  = [];
+        foreach ($allUnassigned as $u) {
+            $unassignedByBen[$u->getBeneficiaire()->getId()][] = $u;
+        }
+
         // Interventions du jour pour tous les bénéficiaires admin → qui a déjà rdv aujourd'hui
         $allIvIds      = array_map(fn($iv) => $iv->getId(), $intervenantRepo->findAllWithDetails($admin));
         $intervJour    = $interventionRepo->findForDate($date, $allIvIds ?: null);
         $benIdsAvecRdv = array_unique(array_map(fn($i) => $i->getBeneficiaire()->getId(), $intervJour));
 
-        $joursLbl = self::JOURS;
-        $moisLbl  = self::MOIS;
+        $joursLbl = self::JOURS_COURTS;
+        $moisLbl  = self::MOIS_COURTS;
 
         $rows = [];
         foreach ($aidants as $aidant) {
@@ -75,12 +77,10 @@ class PrisesEnChargeController extends AbstractController
             $refData = null;
             if ($ref) {
                 $nom   = $ref->getUtilisateur()->getNom();
-                $parts = array_values(array_filter(explode(' ', trim($nom))));
-                $init  = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
                 $refData = [
                     'id'        => $ref->getId(),
                     'nom'       => $nom,
-                    'initiales' => mb_substr($init, 0, 2),
+                    'initiales' => $this->getInitiales($nom),
                     'specialite'=> $ref->getSpecialite() ?? 'Soignant',
                 ];
             }
@@ -122,6 +122,17 @@ class PrisesEnChargeController extends AbstractController
                 'nbInterventions' => count($interventions),
                 'rdvParSemaine'   => $ben->getRdvParSemaine() ?? 0,
                 'besoinAujourdhui'=> $besoinAujourdhui,
+                'tachesNonAssignees' => array_map(function ($i) use ($joursLbl, $moisLbl) {
+                    $d = $i->getDateDebut();
+                    return [
+                        'id'    => $i->getId(),
+                        'jour'  => $joursLbl[(int) $d->format('w')],
+                        'date'  => $d->format('j') . ' ' . $moisLbl[(int) $d->format('n') - 1],
+                        'hDebut'=> $d->format('H:i'),
+                        'hFin'  => $i->getDateFin()->format('H:i'),
+                        'type'  => ucfirst($i->getTypeIntervention()->value),
+                    ];
+                }, $unassignedByBen[$ben->getId()] ?? []),
             ];
         }
 
@@ -129,8 +140,6 @@ class PrisesEnChargeController extends AbstractController
         $soignantsData = [];
         foreach ($intervenantRepo->findAllWithDetails($admin) as $idx => $iv) {
             $nom   = $iv->getUtilisateur()->getNom();
-            $parts = array_values(array_filter(explode(' ', trim($nom))));
-            $init  = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
 
             // Heures occupées pour la date sélectionnée
             $occupiedHours = [];
@@ -147,7 +156,7 @@ class PrisesEnChargeController extends AbstractController
             $soignantsData[] = [
                 'id'            => $iv->getId(),
                 'nom'           => $nom,
-                'initiales'     => mb_substr($init, 0, 2),
+                'initiales'     => $this->getInitiales($nom),
                 'color'         => self::PALETTE[$idx % count(self::PALETTE)],
                 'specialite'    => $iv->getSpecialite() ?? 'Soignant',
                 'disponible'    => $iv->isDisponibilite(),
@@ -166,6 +175,7 @@ class PrisesEnChargeController extends AbstractController
         }
 
         $nbBesoin = count(array_filter($rows, fn($r) => $r['besoinAujourdhui']));
+        $openRow  = (int) $request->query->get('open', 0);
 
         return $this->render('admin/prises_en_charge.html.twig', [
             'rows'          => $rows,
@@ -177,6 +187,7 @@ class PrisesEnChargeController extends AbstractController
             'nextUrl'       => $this->generateUrl('admin_prises_en_charge', ['date' => $nextDate->format('Y-m-d')]),
             'isToday'       => $date->format('Y-m-d') === (new \DateTime('today'))->format('Y-m-d'),
             'nbBesoin'      => $nbBesoin,
+            'openRow'       => $openRow,
         ]);
     }
 
@@ -196,6 +207,8 @@ class PrisesEnChargeController extends AbstractController
         $hFin    = $hDebut + 1;
         $type    = $request->request->get('type', 'soins');
 
+        $rowId  = $request->request->get('row_id');
+
         $ben = $benRepo->find($benId);
         $iv  = $intervenantRepo->find($ivId);
         if (!$ben || !$iv) {
@@ -206,26 +219,18 @@ class PrisesEnChargeController extends AbstractController
         $dateDebut = (clone $date)->setTime($hDebut, 0);
         $dateFin   = (clone $date)->setTime($hFin, 0);
 
+        $redirect = array_filter(['date' => $dateStr, 'open' => $rowId]);
+
         if (!$iv->isDisponibilite()) {
             $this->addFlash('error', $iv->getUtilisateur()->getNom() . ' n\'est pas disponible actuellement.');
-            return $this->redirectToRoute('admin_prises_en_charge', ['date' => $dateStr]);
+            return $this->redirectToRoute('admin_prises_en_charge', $redirect);
         }
         if ($interventionRepo->isIntervenantBusy($iv, $dateDebut, $dateFin)) {
             $this->addFlash('error', $iv->getUtilisateur()->getNom() . ' est déjà occupé(e) sur ce créneau.');
-            return $this->redirectToRoute('admin_prises_en_charge', ['date' => $dateStr]);
+            return $this->redirectToRoute('admin_prises_en_charge', $redirect);
         }
 
-        $dow       = (int) $date->format('N');
-        $weekStart = (clone $date)->modify('-' . ($dow - 1) . ' days midnight');
-        $planning  = $planningRepo->findOneBy(['semaine' => $weekStart]);
-        if (!$planning) {
-            $admin    = $this->getCurrentAdmin();
-            $planning = new Planning();
-            $planning->setAdmin($admin);
-            $planning->setSemaine($weekStart);
-            $planning->setStatut(StatutPlanning::Publie);
-            $em->persist($planning);
-        }
+        $planning = $this->findOrCreatePlanning($date, $planningRepo, $em);
 
         $interv = new Intervention();
         $interv->setBeneficiaire($ben);
@@ -243,7 +248,47 @@ class PrisesEnChargeController extends AbstractController
 
         $em->flush();
 
-        return $this->redirectToRoute('admin_prises_en_charge', ['date' => $dateStr]);
+        return $this->redirectToRoute('admin_prises_en_charge', array_filter(['date' => $dateStr, 'open' => $rowId]));
+    }
+
+    #[Route('/prises-en-charge/tache/creer', name: 'admin_pec_tache_creer', methods: ['POST'])]
+    public function tacheCreer(
+        Request                $request,
+        BeneficiaireRepository $benRepo,
+        InterventionRepository $interventionRepo,
+        PlanningRepository     $planningRepo,
+        EntityManagerInterface $em,
+    ): Response {
+        $benId   = (int) $request->request->get('ben_id');
+        $dateStr = $request->request->get('tache_date', (new \DateTime('today'))->format('Y-m-d'));
+        $hDebut  = (int) $request->request->get('h_debut', 9);
+        $type    = $request->request->get('type', 'soins');
+        $pecDate = $request->request->get('pec_date', (new \DateTime('today'))->format('Y-m-d'));
+        $rowId   = $request->request->get('row_id');
+
+        $ben = $benRepo->find($benId);
+        if (!$ben) {
+            return $this->redirectToRoute('admin_prises_en_charge', ['date' => $pecDate]);
+        }
+
+        $date      = new \DateTime($dateStr);
+        $dateDebut = (clone $date)->setTime($hDebut, 0);
+        $dateFin   = (clone $date)->setTime($hDebut + 1, 0);
+
+        $planning = $this->findOrCreatePlanning($date, $planningRepo, $em);
+
+        $interv = new Intervention();
+        $interv->setBeneficiaire($ben);
+        $interv->setIntervenant(null);
+        $interv->setPlanning($planning);
+        $interv->setDateDebut($dateDebut);
+        $interv->setDateFin($dateFin);
+        $interv->setStatut(StatutIntervention::Planifiee);
+        $interv->setTypeIntervention(TypeIntervention::from($type));
+        $em->persist($interv);
+        $em->flush();
+
+        return $this->redirectToRoute('admin_prises_en_charge', array_filter(['date' => $pecDate, 'open' => $rowId]));
     }
 
     #[Route('/prises-en-charge/intervention/{id}/annuler', name: 'admin_pec_intervention_annuler', methods: ['POST'])]
@@ -255,11 +300,12 @@ class PrisesEnChargeController extends AbstractController
     ): Response {
         $interv = $interventionRepo->find($id);
         $date   = $request->request->get('date', (new \DateTime('today'))->format('Y-m-d'));
+        $rowId  = $request->request->get('row_id');
         if ($interv) {
             $em->remove($interv);
             $em->flush();
         }
-        return $this->redirectToRoute('admin_prises_en_charge', ['date' => $date]);
+        return $this->redirectToRoute('admin_prises_en_charge', array_filter(['date' => $date, 'open' => $rowId]));
     }
 
     #[Route('/prises-en-charge/ajouter', name: 'admin_prises_en_charge_ajouter', methods: ['POST'])]

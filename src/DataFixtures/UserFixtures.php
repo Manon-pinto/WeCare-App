@@ -37,10 +37,10 @@ class UserFixtures extends Fixture
 
         // ── Intervenants (4) ──
         $intervenantsData = [
-            ['Léo Lambert',     'leo@wecare.fr',    'Aide à domicile',   '0601020304', 'Renault Clio', 20.0, 'actif',      '2024-09-01'],
-            ['Marie Dumont',    'marie@wecare.fr',  'Soins infirmiers',  '0607080910', 'Peugeot 208',  15.0, 'actif',      '2024-10-15'],
-            ['Karim Benali',    'karim@wecare.fr',  'Auxiliaire de vie', '0611121314', null,            25.0, 'conge',      '2025-01-10'],
-            ['Sophie Marchand', 'sophie@wecare.fr', 'Infirmière',        '0622334455', 'Citroën C3',   18.0, 'actif',      '2025-03-01'],
+            ['Léo Lambert',     'leo@wecare.fr',    'Aide à domicile',   '0601020304', 'Renault Clio', 20.0, 'actif',      '2025-09-01'],
+            ['Marie Dumont',    'marie@wecare.fr',  'Soins infirmiers',  '0607080910', 'Peugeot 208',  15.0, 'actif',      '2025-10-15'],
+            ['Karim Benali',    'karim@wecare.fr',  'Auxiliaire de vie', '0611121314', null,            25.0, 'conge',      '2026-01-10'],
+            ['Sophie Marchand', 'sophie@wecare.fr', 'Infirmière',        '0622334455', 'Citroën C3',   18.0, 'actif',      '2026-03-01'],
         ];
 
         foreach ($intervenantsData as $k => [$nom, $email, $spe, $tel, $veh, $rayon, $statut, $date]) {
@@ -123,8 +123,8 @@ class UserFixtures extends Fixture
 
         // ── Intervenants admin2 (2) ──
         $intervenantsAdmin2 = [
-            ['Antoine Leroy',  'antoine@wecare.fr', 'Infirmier(e)',    '0633445566', null,          15.0, 'actif', '2025-06-01'],
-            ['Julie Martin',   'julie@wecare.fr',   'Aide-soignant(e)','0644556677', 'Ford Focus',   12.0, 'actif', '2025-07-01'],
+            ['Antoine Leroy',  'antoine@wecare.fr', 'Infirmier(e)',    '0633445566', null,          15.0, 'actif', '2026-04-01'],
+            ['Julie Martin',   'julie@wecare.fr',   'Aide-soignant(e)','0644556677', 'Ford Focus',   12.0, 'actif', '2026-05-01'],
         ];
 
         foreach ($intervenantsAdmin2 as $k => [$nom, $email, $spe, $tel, $veh, $rayon, $statut, $date]) {

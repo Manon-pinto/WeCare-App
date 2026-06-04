@@ -18,7 +18,7 @@ class EntrepriseFixtures extends Fixture
                 'siret'           => '12345678901234',
                 'telephone'       => '0556112233',
                 'adresse'         => '15 cours du Chapeau Rouge',
-                'dateInscription' => '2024-03-01',
+                'dateInscription' => '2026-01-15',
                 'statut'          => StatutEntreprise::Active,
             ],
             [
@@ -27,7 +27,7 @@ class EntrepriseFixtures extends Fixture
                 'siret'           => '98765432109876',
                 'telephone'       => '0556445566',
                 'adresse'         => '8 rue Judaïque, 33000 Bordeaux',
-                'dateInscription' => '2024-06-15',
+                'dateInscription' => '2026-03-10',
                 'statut'          => StatutEntreprise::Active,
             ],
         ];

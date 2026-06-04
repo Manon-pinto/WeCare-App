@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PatientsController extends AbstractController
 {
     use AdminTrait;
-    private const PALETTE = ['#8b5cf6', '#2dd4bf', '#ec4899', '#10b981', '#06b6d4', '#f59e0b'];
+    private const PALETTE_BEN = ['#8b5cf6', '#2dd4bf', '#ec4899', '#10b981', '#06b6d4', '#f59e0b'];
 
     private const TYPE_LABELS = [
         'menage'         => 'Ménage',
@@ -112,7 +112,7 @@ class PatientsController extends AbstractController
                 'pathologie'    => $b->getPathologie() ?? '',
                 'rdvParSemaine' => $b->getRdvParSemaine(),
                 'dateNaissance' => $b->getDateNaissance()->format('Y-m-d'),
-                'color'         => self::PALETTE[$idx % count(self::PALETTE)],
+                'color'         => self::PALETTE_BEN[$idx % count(self::PALETTE_BEN)],
                 'crs'           => $crs,
                 'nbCrs'         => count($crs),
                 'soignants'     => array_values($soignantsMap),

@@ -3,9 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Intervention;
-use App\Entity\Planning;
 use App\Enum\StatutIntervention;
-use App\Enum\StatutPlanning;
 use App\Enum\TypeIntervention;
 use App\Repository\BeneficiaireRepository;
 use App\Repository\IntervenantRepository;
@@ -21,10 +19,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class PlanningController extends AbstractController
 {
     use AdminTrait;
-    private const PALETTE   = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
-    private const MOIS      = ['', 'jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-    private const JOURS     = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    private const JOURS_CT  = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
     #[Route('/planning', name: 'admin_planning')]
     public function index(
@@ -45,7 +39,7 @@ class PlanningController extends AbstractController
         $nextDate  = (clone $date)->modify('+1 day');
         $dateLabel = self::JOURS[(int) $date->format('w')]
             . ' ' . $date->format('j')
-            . ' ' . self::MOIS[(int) $date->format('n')]
+            . ' ' . self::MOIS_COURTS[(int) $date->format('n')]
             . ' ' . $date->format('Y');
 
         // Intervenants
@@ -55,12 +49,11 @@ class PlanningController extends AbstractController
         foreach ($intervenants as $idx => $iv) {
             $nom   = $iv->getUtilisateur()->getNom();
             $parts = array_values(array_filter(explode(' ', trim($nom))));
-            $init  = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
             $ivData[$iv->getId()] = [
                 'id'        => $iv->getId(),
                 'nom'       => $nom,
                 'prenom'    => $parts[0] ?? $nom,
-                'initiales' => mb_substr($init, 0, 2),
+                'initiales' => $this->getInitiales($nom),
                 'color'     => self::PALETTE[$idx % count(self::PALETTE)],
                 'specialite'=> $iv->getSpecialite() ?? '',
                 'disponible'=> $iv->isDisponibilite(),
@@ -107,6 +100,21 @@ class PlanningController extends AbstractController
             $patients[] = ['id' => $ben->getId(), 'nom' => $ben->getUtilisateur()->getNom()];
         }
 
+        // Tâches non assignées du jour (tous les patients de l'admin)
+        $allBenIds      = array_map(fn($b) => $b->getId(), $benRepo->findAllNames($admin));
+        $tachesACouvrirRaw = $interventionRepo->findUnassignedForDate($date, $allBenIds);
+        $tachesACouvrir = array_map(function ($i) {
+            $d = $i->getDateDebut();
+            return [
+                'id'      => $i->getId(),
+                'patient' => $i->getBeneficiaire()->getUtilisateur()->getNom(),
+                'hDebut'  => (int) $d->format('H'),
+                'hDebutF' => $d->format('H:i'),
+                'hFinF'   => $i->getDateFin()->format('H:i'),
+                'type'    => ucfirst($i->getTypeIntervention()->value),
+            ];
+        }, $tachesACouvrirRaw);
+
         return $this->render('admin/planning.html.twig', [
             'date'           => $date->format('Y-m-d'),
             'dateLabel'      => $dateLabel,
@@ -121,6 +129,7 @@ class PlanningController extends AbstractController
             'patients'       => $patients,
             'soignants'      => $ivList,
             'occupiedByIv'   => $occupiedByIv,
+            'tachesACouvrir' => $tachesACouvrir,
         ]);
     }
 
@@ -205,18 +214,7 @@ class PlanningController extends AbstractController
             return $this->redirectToRoute('admin_planning', ['date' => $dateStr]);
         }
 
-        $dow       = (int) $date->format('N');
-        $weekStart = (clone $date)->modify('-' . ($dow - 1) . ' days midnight');
-        $planning  = $planningRepo->findOneBy(['semaine' => $weekStart]);
-
-        if (!$planning) {
-            $admin    = $this->getCurrentAdmin();
-            $planning = new Planning();
-            $planning->setAdmin($admin);
-            $planning->setSemaine($weekStart);
-            $planning->setStatut(StatutPlanning::Publie);
-            $em->persist($planning);
-        }
+        $planning = $this->findOrCreatePlanning($date, $planningRepo, $em);
 
         $interv = new Intervention();
         $interv->setBeneficiaire($ben);

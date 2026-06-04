@@ -20,7 +20,7 @@ class Intervention
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Intervenant::class, inversedBy: 'interventions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Intervenant $intervenant = null;
 
     #[ORM\ManyToOne(targetEntity: Beneficiaire::class, inversedBy: 'interventions')]

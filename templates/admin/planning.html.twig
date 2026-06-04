@@ -2,134 +2,7 @@
 {% block title %}Planning — WeCare Admin{% endblock %}
 
 {% block stylesheets %}
-<style>
-  .page-content { margin-left: var(--sidebar-w); display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #C8DFF0; }
-
-  /* Topbar */
-  .topbar { padding: 20px 28px 12px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
-  .topbar-title { font-size: 24px; font-weight: 800; color: var(--primary); margin-right: auto; }
-  .date-nav { display: flex; align-items: center; gap: 4px; background: #fff; border-radius: 30px; padding: 6px 14px; }
-  .date-nav-btn { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 18px; padding: 0 4px; line-height: 1; text-decoration: none; display: flex; align-items: center; }
-  .date-nav-label { font-size: 13px; font-weight: 700; color: var(--primary); padding: 0 8px; white-space: nowrap; }
-  .btn-today {
-    background: {{ isToday ? 'var(--primary)' : '#fff' }};
-    color: {{ isToday ? '#fff' : 'var(--primary)' }};
-    border: 1.5px solid {{ isToday ? 'var(--primary)' : '#e5e7eb' }};
-    border-radius: 30px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer;
-    text-decoration: none; transition: all 0.15s;
-  }
-  .btn-today:hover { border-color: var(--primary); }
-  .nb-badge { background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 700; color: var(--primary); }
-
-  /* Ajouter */
-  .add-wrap { position: relative; }
-  .btn-add-main { background: var(--pink); color: #fff; border: none; border-radius: 10px 0 0 10px; padding: 9px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .btn-add-arrow { background: #e45faa; color: #fff; border: none; border-radius: 0 10px 10px 0; padding: 9px 10px; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.3); }
-  .add-dropdown { position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,0,75,0.14); padding: 8px 0; min-width: 190px; z-index: 200; display: none; }
-  .add-dropdown.open { display: block; }
-  .add-dropdown-section { padding: 6px 14px 2px; font-size: 9.5px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; }
-  .add-dropdown-item { padding: 8px 16px; font-size: 12.5px; color: var(--primary); cursor: pointer; transition: background 0.1s; }
-  .add-dropdown-item:hover { background: #f9fafb; }
-
-  /* Body */
-  .planning-body { flex: 1; display: flex; gap: 16px; padding: 0 28px 24px; min-height: 0; overflow: hidden; }
-
-  /* Sidebar */
-  .plan-sidebar { width: 190px; flex-shrink: 0; background: #fff; border-radius: 20px; padding: 16px; overflow-y: auto; }
-  .sidebar-section-title { font-size: 11px; font-weight: 800; color: var(--primary); margin: 12px 0 6px; }
-  .sidebar-section-title:first-child { margin-top: 0; }
-  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
-  .sidebar-item input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
-  .sidebar-item label { font-size: 11.5px; color: var(--primary); cursor: pointer; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .iv-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  /* Main calendar */
-  .plan-main { flex: 1; background: #fff; border-radius: 20px; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
-  .cal-scroll { overflow-x: auto; overflow-y: auto; flex: 1; }
-  .cal-table { border-collapse: collapse; width: 100%; }
-
-  /* Header soignants */
-  .cal-table thead th { border-bottom: 2px solid #f3f4f6; }
-  .time-th { width: 46px; min-width: 46px; border-right: 1px solid #f3f4f6; }
-  .iv-th { min-width: 120px; padding: 12px 8px 10px; text-align: center; border-right: 1px solid #f9fafb; vertical-align: middle; }
-  .iv-th-inner { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .av-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; margin: 0 auto; }
-  .av-name { font-size: 11px; font-weight: 700; color: var(--primary); white-space: nowrap; }
-  .av-spe  { font-size: 9px; color: #9ca3af; white-space: nowrap; }
-  .av-indispo { font-size: 8.5px; background: #fef3c7; color: #92400e; border-radius: 10px; padding: 1px 6px; margin-top: 2px; font-weight: 600; }
-
-  /* Time rows */
-  .cal-table tbody td { height: 42px; border-top: 1px solid #f9fafb; padding: 2px 4px; vertical-align: top; }
-  .time-cell { text-align: right; padding-right: 8px !important; font-size: 10.5px; color: #d1d5db; font-weight: 600; border-right: 1px solid #f3f4f6; width: 46px; white-space: nowrap; vertical-align: middle !important; }
-  .event-cell { border-right: 1px solid #f9fafb; position: relative; min-width: 110px; }
-
-  .cal-block {
-    border-radius: 8px; padding: 4px 8px; color: #fff; height: 100%;
-    display: flex; flex-direction: column; justify-content: center; gap: 1px;
-    cursor: default; position: relative;
-  }
-  .cal-block .b-name { font-weight: 700; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .cal-block .b-time { opacity: 0.85; font-size: 9px; }
-  .cal-block .b-type { opacity: 0.75; font-size: 8.5px; font-style: italic; }
-  .cal-block .b-del {
-    position: absolute; top: 3px; right: 3px; width: 16px; height: 16px;
-    border-radius: 50%; background: rgba(0,0,0,0.25); border: none; cursor: pointer;
-    color: #fff; font-size: 11px; display: none; align-items: center; justify-content: center; padding: 0;
-  }
-  .cal-block .b-swap {
-    position: absolute; top: 3px; right: 22px; width: 16px; height: 16px;
-    border-radius: 50%; background: rgba(0,0,0,0.25); border: none; cursor: pointer;
-    color: #fff; font-size: 9px; display: none; align-items: center; justify-content: center; padding: 0;
-  }
-  .cal-block:hover .b-del,
-  .cal-block:hover .b-swap { display: flex; }
-
-  /* Blocs soignant indisponible */
-  .cal-block.indispo {
-    background: repeating-linear-gradient(
-      45deg, rgba(239,68,68,0.9) 0px, rgba(239,68,68,0.9) 5px,
-      rgba(185,28,28,0.75) 5px, rgba(185,28,28,0.75) 10px
-    ) !important;
-    border: 1.5px solid #fca5a5;
-  }
-  .cal-block.indispo .b-warn {
-    font-size: 9px; margin-bottom: 1px;
-  }
-
-  /* Modal réaffectation */
-  .reassign-info { background: #f0f4ff; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #374151; }
-  .reassign-info strong { color: var(--primary); }
-  .reassign-soignant-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
-  .reassign-item { display: flex; align-items: center; gap: 10px; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 8px 12px; cursor: pointer; transition: border-color 0.12s; }
-  .reassign-item:hover { border-color: var(--pink); background: #fdf4ff; }
-  .reassign-item.conflict { opacity: 0.45; cursor: not-allowed; }
-  .reassign-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0; }
-  .reassign-name { font-size: 12.5px; font-weight: 700; color: var(--primary); }
-  .reassign-spe  { font-size: 10.5px; color: #9ca3af; }
-  .reassign-badge-occ  { background: #f3f4f6; color: #9ca3af; border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 600; margin-left: auto; }
-  .reassign-badge-dispo { background: #d1fae5; color: #065f46; border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 600; margin-left: auto; }
-
-  .empty-hour { color: #f3f4f6; font-size: 18px; text-align: center; padding-top: 8px; display: none; }
-  .event-cell:hover .empty-hour { display: block; cursor: pointer; }
-
-  /* Modal */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(15,0,75,0.35); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-  .modal-panel { background: #fff; border-radius: 24px; padding: 32px; width: 540px; max-width: calc(100vw - 48px); max-height: 90vh; overflow-y: auto; animation: mIn 0.18s ease; }
-  @keyframes mIn { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-  .modal-title { font-size: 18px; font-weight: 800; color: var(--primary); }
-  .modal-close { background: #f3f4f6; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; color: #6b7280; display: flex; align-items: center; justify-content: center; }
-  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
-  .form-input, .form-select { border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; font-size: 13px; color: var(--primary); outline: none; transition: border 0.15s; background: #fafafa; font-family: inherit; width: 100%; box-sizing: border-box; }
-  .form-input:focus, .form-select:focus { border-color: var(--pink); background: #fff; }
-  .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
-  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; border-top: 1px solid #f3f4f6; padding-top: 16px; }
-  .btn-cancel { background: #f3f4f6; border: none; border-radius: 10px; padding: 9px 18px; font-size: 12px; font-weight: 600; color: #6b7280; cursor: pointer; }
-  .btn-save { background: var(--pink); color: #fff; border: none; border-radius: 10px; padding: 9px 22px; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .btn-save:hover { opacity: 0.88; }
-</style>
+<link rel="stylesheet" href="{{ asset('assets/admin/css/planning.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -152,7 +25,7 @@
       <a href="{{ path('admin_planning', {date: nextDate}) }}" class="date-nav-btn">&#8250;</a>
     </div>
 
-    <a href="{{ path('admin_planning') }}" class="btn-today">Aujourd'hui</a>
+    <a href="{{ path('admin_planning') }}" class="btn-today {{ isToday ? 'btn-today--active' : '' }}">Aujourd'hui</a>
 
     {% if nbInterventions > 0 %}
     <span class="nb-badge">{{ nbInterventions }} intervention{{ nbInterventions > 1 ? 's' : '' }}</span>
@@ -176,6 +49,20 @@
       </div>
     </div>
   </div>
+
+  {% if tachesACouvrir|length > 0 %}
+  <div class="a-couvrir-bar">
+    <span class="a-couvrir-title">⚠ À couvrir ({{ tachesACouvrir|length }}) —</span>
+    {% for t in tachesACouvrir %}
+    <span class="a-couvrir-chip" onclick="openReassignModal({{ t.id }}, '{{ t.patient|e('js') }}', '{{ t.hDebutF }}', '{{ t.hFinF }}', 0)"
+          title="Cliquer pour assigner un soignant">
+      {{ t.patient }}
+      <span class="chip-h">{{ t.hDebutF }}–{{ t.hFinF }}</span>
+      <span class="chip-type">{{ t.type }}</span>
+    </span>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <div class="planning-body">
 
@@ -354,149 +241,9 @@
 </div>
 
 <script>
-// Dropdown
-document.getElementById('addToggle').addEventListener('click', function (e) {
-  e.stopPropagation();
-  document.getElementById('addDropdown').classList.toggle('open');
-});
-document.addEventListener('click', () => document.getElementById('addDropdown').classList.remove('open'));
-
-const OCCUPIED  = {{ occupiedByIv|json_encode|raw }};
-const PAGE_DATE = '{{ date }}';
-
-function checkConflict() {
-  const warn = document.getElementById('conflict-warning');
-  const btn  = document.getElementById('btn-submit-planning');
-
-  // Si la date sélectionnée dans la modale ≠ date de la page,
-  // on ne peut pas savoir les dispo → le serveur vérifiera
-  const modalDate = document.getElementById('f-date')?.value;
-  if (modalDate && modalDate !== PAGE_DATE) {
-    warn.style.display = 'none';
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
-    return;
-  }
-
-  const ivId   = document.getElementById('f-iv').value;
-  const hDebut = parseInt(document.getElementById('f-h-debut').value);
-  const hFin   = parseInt(document.getElementById('f-h-fin').value);
-  const occ    = (OCCUPIED[ivId] || []).map(Number);
-  const ivData = SOIGNANTS_DATA.find(s => String(s.id) === String(ivId));
-  let conflict = false;
-  let conflictMsg = '⚠ Ce soignant est déjà occupé sur ce créneau — choisissez un autre horaire ou un autre soignant.';
-  if (ivData && !ivData.disponible) {
-    const sl = {conge:'En congé', arret:'Arrêt maladie', formation:'En formation', indisponible:'Indisponible'};
-    conflict = true;
-    conflictMsg = '⚠ ' + ivData.nom + ' est actuellement : ' + (sl[ivData.statut] || 'Indisponible') + ' — impossible d\'assigner une intervention.';
-  } else {
-    for (let h = hDebut; h < hFin; h++) {
-      if (occ.includes(h)) { conflict = true; break; }
-    }
-  }
-  warn.textContent = conflictMsg;
-  warn.style.display = conflict ? 'block' : 'none';
-  if (btn) { btn.disabled = conflict; btn.style.opacity = conflict ? '0.5' : ''; }
-}
-
-// Modal
-function openInterventionModal(date, ivId, heure) {
-  if (date)  document.getElementById('f-date').value   = date;
-  if (ivId)  document.getElementById('f-iv').value     = ivId;
-  if (heure !== undefined) {
-    document.getElementById('f-h-debut').value = heure;
-    document.getElementById('f-h-fin').value   = heure + 1;
-  }
-  checkConflict();
-  document.getElementById('modalIntervention').style.display = 'flex';
-}
-function closeModal() {
-  document.getElementById('modalIntervention').style.display = 'none';
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeReassignModal(); }
-});
-
-// ── Réaffectation ──────────────────────────────────────────────────────────
+const OCCUPIED    = {{ occupiedByIv|json_encode|raw }};
+const PAGE_DATE   = '{{ date }}';
 const SOIGNANTS_DATA = {{ soignants|json_encode|raw }};
-
-function openReassignModal(intervId, patient, hdebut, hfin, currentIvId) {
-  const hD = parseInt(hdebut.split(':')[0]);
-  const hF = parseInt(hfin.split(':')[0]);
-
-  document.getElementById('reassign-info').innerHTML =
-    '<strong>' + escH(patient) + '</strong> · ' + hdebut + '–' + hfin;
-
-  document.getElementById('reassign-form').action =
-    '/admin/planning/intervention/' + intervId + '/reassigner';
-
-  const list = document.getElementById('reassign-list');
-  list.innerHTML = '';
-  document.getElementById('reassign-conflict-warn').style.display = 'none';
-
-  SOIGNANTS_DATA.forEach(function (s) {
-    if (s.id === currentIvId) return; // skip current
-
-    const occ = (OCCUPIED[s.id] || []).map(Number);
-    let timeConflict = false;
-    for (let h = hD; h < hF; h++) { if (occ.includes(h)) { timeConflict = true; break; } }
-    const unavail = !s.disponible;
-    const conflict = timeConflict || unavail;
-
-    const statutLabels = {conge:'En congé', arret:'Arrêt maladie', formation:'En formation', indisponible:'Indisponible'};
-    const badgeLabel = unavail
-      ? (statutLabels[s.statut] || 'Indisponible')
-      : (timeConflict ? 'Occupé' : 'Disponible');
-
-    const item = document.createElement('div');
-    item.className = 'reassign-item' + (conflict ? ' conflict' : '');
-
-    item.innerHTML =
-      '<div class="reassign-avatar" style="background:' + s.color + '">' + escH(s.initiales) + '</div>'
-      + '<div><div class="reassign-name">' + escH(s.nom) + '</div>'
-      + '<div class="reassign-spe">' + escH(s.specialite) + '</div></div>'
-      + '<span class="' + (conflict ? 'reassign-badge-occ' : 'reassign-badge-dispo') + '">'
-      + badgeLabel + '</span>';
-
-    if (!conflict) {
-      item.onclick = function () {
-        const form = document.getElementById('reassign-form');
-        let inp = form.querySelector('input[name="iv_id"]');
-        if (!inp) { inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'iv_id'; form.appendChild(inp); }
-        inp.value = s.id;
-        form.submit();
-      };
-    }
-
-    list.appendChild(item);
-  });
-
-  document.getElementById('modalReassign').style.display = 'flex';
-}
-
-function closeReassignModal() {
-  document.getElementById('modalReassign').style.display = 'none';
-}
-
-function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// Valider heure fin > début + vérifier conflit
-document.getElementById('f-h-debut').addEventListener('change', function () {
-  const fin = document.getElementById('f-h-fin');
-  if (parseInt(fin.value) <= parseInt(this.value)) fin.value = parseInt(this.value) + 1;
-  checkConflict();
-});
-document.getElementById('f-h-fin').addEventListener('change', checkConflict);
-document.getElementById('f-iv').addEventListener('change', checkConflict);
-document.getElementById('f-date').addEventListener('change', checkConflict);
-
-// Toggle colonnes
-document.querySelectorAll('.iv-checkbox').forEach(cb => {
-  cb.addEventListener('change', function () {
-    const id = this.dataset.iv;
-    document.querySelectorAll('[data-iv="' + id + '"]').forEach(el => {
-      el.style.display = this.checked ? '' : 'none';
-    });
-  });
-});
 </script>
+<script src="{{ asset('assets/admin/js/planning.js') }}"></script>
 {% endblock %}

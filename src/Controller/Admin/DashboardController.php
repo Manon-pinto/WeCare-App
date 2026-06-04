@@ -18,10 +18,6 @@ class DashboardController extends AbstractController
 {
     use AdminTrait;
 
-    private const JOURS   = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    private const MOIS    = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                             'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    private const PALETTE = ['#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
 
     #[Route('/dashboard', name: 'admin_dashboard')]
     public function index(
@@ -109,13 +105,12 @@ class DashboardController extends AbstractController
             if (!array_key_exists($ivId, $intervenantsPlanning)) {
                 $colorIdx  = count($intervenantsPlanning) % count(self::PALETTE);
                 $nom       = $iv->getUtilisateur()->getNom();
-                $parts     = array_filter(explode(' ', trim($nom)));
-                $initiales = mb_strtoupper(implode('', array_map(fn($p) => mb_substr($p, 0, 1), $parts)));
+                $parts     = array_values(array_filter(explode(' ', trim($nom))));
                 $intervenantsPlanning[$ivId] = [
                     'id'        => $ivId,
                     'nom'       => $nom,
-                    'prenom'    => array_values($parts)[0] ?? $nom,
-                    'initiales' => mb_substr($initiales, 0, 2),
+                    'prenom'    => $parts[0] ?? $nom,
+                    'initiales' => $this->getInitiales($nom),
                     'color'     => self::PALETTE[$colorIdx],
                 ];
             }
