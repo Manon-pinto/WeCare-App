@@ -50,12 +50,23 @@
 
   {% set u = app.user %}
   {% set initiales = u ? u.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) : '?' %}
-  <a href="#" class="sidebar-user">
-    <div class="sidebar-user-avatar">{{ initiales }}</div>
-    <div>
-      <div class="sidebar-user-name">{{ u ? u.nom : '' }}</div>
-      <div class="sidebar-user-role">{{ u and u.role is not null ? u.role.value|capitalize : 'Administrateur' }}</div>
-    </div>
-  </a>
+  <div class="sidebar-user">
+    <a href="{{ path('admin_parametres') }}" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;">
+      <div class="sidebar-user-avatar">{{ initiales }}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="sidebar-user-name">{{ u ? u.nom : '' }}</div>
+        <div class="sidebar-user-role">{{ u and u.role is not null ? u.role.value|capitalize : 'Administrateur' }}</div>
+      </div>
+    </a>
+    <a href="{{ path('app_logout') }}" title="Déconnexion"
+       style="color:rgba(255,255,255,0.4);display:flex;align-items:center;padding:4px;border-radius:6px;transition:color 0.14s;flex-shrink:0;"
+       onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </a>
+  </div>
 </div>
 <div class="sidebar-corner-deco"></div>
