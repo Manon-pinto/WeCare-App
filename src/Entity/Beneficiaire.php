@@ -43,6 +43,13 @@ class Beneficiaire
     #[ORM\Column(length: 50)]
     private ?string $niveauRisque = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $rdvParSemaine = null;
+
+    #[ORM\ManyToOne(targetEntity: Intervenant::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Intervenant $soignantReferent = null;
+
     #[ORM\OneToMany(mappedBy: 'beneficiaire', targetEntity: Intervention::class)]
     private Collection $interventions;
 
@@ -138,6 +145,16 @@ class Beneficiaire
     public function setPathologie(?string $pathologie): static
     {
         $this->pathologie = $pathologie;
+        return $this;
+    }
+
+    public function getRdvParSemaine(): ?int { return $this->rdvParSemaine; }
+    public function setRdvParSemaine(?int $rdvParSemaine): static { $this->rdvParSemaine = $rdvParSemaine; return $this; }
+
+    public function getSoignantReferent(): ?Intervenant { return $this->soignantReferent; }
+    public function setSoignantReferent(?Intervenant $soignantReferent): static
+    {
+        $this->soignantReferent = $soignantReferent;
         return $this;
     }
 

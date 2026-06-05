@@ -33,6 +33,9 @@ class Intervenant
     #[ORM\Column]
     private ?bool $disponibilite = null;
 
+    #[ORM\Column(length: 30, nullable: true, options: ['default' => 'actif'])]
+    private ?string $statut = 'actif';
+
     #[ORM\Column]
     private ?float $rayonIntervention = null;
 
@@ -111,6 +114,18 @@ class Intervenant
     public function setDisponibilite(bool $disponibilite): static
     {
         $this->disponibilite = $disponibilite;
+        return $this;
+    }
+
+    public function getStatut(): string
+    {
+        return $this->statut ?? 'actif';
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut      = $statut;
+        $this->disponibilite = ($statut === 'actif');
         return $this;
     }
 

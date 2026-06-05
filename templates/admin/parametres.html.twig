@@ -1,0 +1,204 @@
+{% extends 'base.html.twig' %}
+{% block title %}Paramètres — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/admin/css/parametres.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <h1 class="topbar-title">Paramètres</h1>
+  </div>
+
+  <div class="params-body">
+
+    <!-- Nav gauche -->
+    <nav class="params-nav">
+      <a href="#" class="nav-param-item" data-section="profil" onclick="showSection('profil',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Mon profil
+      </a>
+      <a href="#" class="nav-param-item" data-section="structure" onclick="showSection('structure',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Structure
+      </a>
+      <a href="#" class="nav-param-item active" data-section="assignation" onclick="showSection('assignation',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Assignation
+      </a>
+      <a href="#" class="nav-param-item" data-section="notifications" onclick="showSection('notifications',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifications
+      </a>
+      <a href="#" class="nav-param-item" data-section="acces" onclick="showSection('acces',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Accès &amp; rôles
+      </a>
+      <a href="#" class="nav-param-item" data-section="zone" onclick="showSection('zone',this);return false;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Zone critique
+      </a>
+    </nav>
+
+    <!-- Contenu -->
+    <div class="params-main">
+
+      <!-- Mon profil -->
+      <div class="params-section" id="section-profil">
+        <div class="section-title">Mon profil</div>
+        <div class="section-sub">Informations de votre compte administrateur</div>
+        <div class="profile-avatar-row">
+          {% set u = app.user %}
+          {% set initiales = u ? u.nom|split(' ')|map(w => w|slice(0,1))|join('')|upper|slice(0,2) : '?' %}
+          <div class="profile-avatar">{{ initiales }}</div>
+          <button class="btn-change-photo">Changer la photo</button>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" type="text" value="{{ u ? u.nom|split(' ')|first : '' }}"></div>
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" type="text" value="{{ u ? u.nom|split(' ')|last : '' }}"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" value="{{ u ? u.email : '' }}"></div>
+          <div class="form-group"><label class="form-label">Rôle</label><input class="form-input" type="text" value="Administrateur" readonly></div>
+        </div>
+        <div class="params-footer">
+          <button class="btn-annuler">Annuler</button>
+          <button class="btn-save">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Structure -->
+      <div class="params-section" id="section-structure">
+        <div class="section-title">Structure</div>
+        <div class="section-sub">Informations de votre organisation</div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Nom de la structure</label><input class="form-input" type="text" value="WeCare Bordeaux"></div>
+          <div class="form-group"><label class="form-label">SIRET</label><input class="form-input" type="text" placeholder="000 000 000 00000"></div>
+          <div class="form-group"><label class="form-label">Adresse</label><input class="form-input" type="text" value="12 rue des Pins, 33000 Bordeaux"></div>
+          <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" type="tel" placeholder="06 00 00 00 00"></div>
+        </div>
+        <div class="params-footer">
+          <button class="btn-annuler">Annuler</button>
+          <button class="btn-save">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Assignation -->
+      <div class="params-section active" id="section-assignation">
+        <div class="section-title">Règles d'assignation</div>
+        <div class="section-sub">Paramètres utilisés lors de l'assignation d'un soignant à un patient</div>
+
+        <div class="param-group">
+          <div class="param-label">Périmètre par défaut pour un nouveau soignant</div>
+          <div class="slider-row">
+            <div class="slider-wrap">
+              <input type="range" min="1" max="50" value="6" id="sliderPerimetre"
+                oninput="document.getElementById('valPerimetre').textContent = this.value + ' KM'">
+            </div>
+            <span class="slider-val" id="valPerimetre">6 KM</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-label">Durée maximale de trajet acceptable entre deux patients</div>
+          <div class="slider-row">
+            <div class="slider-wrap">
+              <input type="range" min="5" max="120" value="30" id="sliderTrajet"
+                oninput="document.getElementById('valTrajet').textContent = this.value + ' min'">
+            </div>
+            <span class="slider-val" id="valTrajet">30 min</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-label">Vitesse moyenne estimée pour le calcul des trajets</div>
+          <select class="param-select">
+            <option selected>30 km/h — milieu urbain</option>
+            <option>50 km/h — périurbain</option>
+            <option>80 km/h — route</option>
+            <option>110 km/h — autoroute</option>
+          </select>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-text">
+            <div class="toggle-title">Autoriser l'assignation hors périmètre</div>
+            <div class="toggle-desc">L'admin peut forcer l'assignation si aucun soignant n'est disponible dans la zone</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-text">
+            <div class="toggle-title">Alerte si trajet trop long</div>
+            <div class="toggle-desc">Affiche un avertissement si le trajet dépasse la durée maximale configurée</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-text">
+            <div class="toggle-title">Alerte si soignant hors zone</div>
+            <div class="toggle-desc">Affiche un avertissement si le soignant intervient en dehors de son périmètre</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="params-footer">
+          <button class="btn-annuler">Annuler</button>
+          <button class="btn-save">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="params-section" id="section-notifications">
+        <div class="section-title">Notifications</div>
+        <div class="section-sub">Gérez les alertes et rappels envoyés par la plateforme</div>
+        <div class="toggle-row">
+          <div class="toggle-text"><div class="toggle-title">Incidents signalés</div><div class="toggle-desc">Recevoir une notification à chaque incident signalé</div></div>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-text"><div class="toggle-title">Compte rendu soumis</div><div class="toggle-desc">Notification quand un soignant soumet un compte rendu</div></div>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-text"><div class="toggle-title">Patient non assigné depuis 48h</div><div class="toggle-desc">Alerte si un patient reste sans soignant plus de 48 heures</div></div>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-track"></span></label>
+        </div>
+        <div class="params-footer">
+          <button class="btn-annuler">Annuler</button>
+          <button class="btn-save">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Accès & rôles -->
+      <div class="params-section" id="section-acces">
+        <div class="section-title">Accès &amp; rôles</div>
+        <div class="section-sub">Gérez les niveaux d'accès des utilisateurs à la plateforme</div>
+        <div style="padding: 32px; text-align:center; color:#d1d5db; font-size:13px;">Fonctionnalité à venir</div>
+      </div>
+
+      <!-- Zone critique -->
+      <div class="params-section" id="section-zone">
+        <div class="section-title">Zone critique</div>
+        <div class="section-sub">Définissez les zones géographiques à surveiller en priorité</div>
+        <div style="padding: 32px; text-align:center; color:#d1d5db; font-size:13px;">Fonctionnalité à venir</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ asset('assets/admin/js/parametres.js') }}"></script>
+{% endblock %}

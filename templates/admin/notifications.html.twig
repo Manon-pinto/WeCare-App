@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/admin/css/notifications.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <h1 class="topbar-title">Notifications</h1>
+  </div>
+
+  <div class="notif-body">
+
+    <!-- Liste -->
+    <div class="list-panel">
+      <div class="list-head">
+        <div class="search-wrap">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Rechercher…">
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="alertes">
+            Alertes <span class="tab-badge">{{ alertes|length }}</span>
+          </button>
+          <button class="tab-btn" data-tab="messages">
+            Messages <span class="tab-badge" style="background:#9ca3af;">0</span>
+          </button>
+          <button class="tab-btn" data-tab="historique">Historique</button>
+        </div>
+      </div>
+
+      <!-- Alertes tab -->
+      <div class="tab-content active" id="tab-alertes">
+        <div class="notif-list">
+          {% for alerte in alertes %}
+          <a href="{{ path('admin_notifications', {id: alerte.id}) }}"
+             class="notif-item {{ selected and selected.id == alerte.id ? 'active' : '' }}">
+            <div class="notif-icon-wrap {{ alerte.gravite }}">
+              {% if alerte.gravite == 'critique' or alerte.gravite == 'grave' %}
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              {% elseif alerte.gravite == 'moderee' %}
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {% else %}
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              {% endif %}
+            </div>
+            <div class="notif-content">
+              <div class="notif-header">
+                <span class="notif-title">{{ alerte.titre }}</span>
+                <span class="notif-time">{{ alerte.timeAgo }}</span>
+              </div>
+              <div class="notif-text">{{ alerte.texte }}</div>
+            </div>
+          </a>
+          {% else %}
+          <div style="padding: 32px; text-align: center; color: #d1d5db; font-size: 13px;">Aucune alerte</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Messages tab -->
+      <div class="tab-content" id="tab-messages">
+        <div style="padding: 32px; text-align: center; color: #d1d5db; font-size: 13px; flex: 1;">Aucun message</div>
+      </div>
+
+      <!-- Historique tab -->
+      <div class="tab-content" id="tab-historique">
+        <div style="padding: 32px; text-align: center; color: #d1d5db; font-size: 13px; flex: 1;">Historique vide</div>
+      </div>
+    </div>
+
+    <!-- Détail -->
+    <div class="detail-panel">
+      {% if selected %}
+      <button class="detail-dots">···</button>
+
+      <span class="badge-gravite {{ selected.gravite }}">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          {% if selected.gravite == 'critique' or selected.gravite == 'grave' %}
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          {% else %}
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          {% endif %}
+        </svg>
+        {{ selected.gravite|capitalize }}
+      </span>
+
+      <div class="detail-title-row">
+        <div class="detail-main-title">{{ selected.titre }}</div>
+        <div class="detail-subtitle">{{ selected.signalePar }} · {{ selected.timeAgo }}</div>
+      </div>
+
+      <div>
+        <div class="detail-section-title">Détails</div>
+        <div class="detail-rows">
+          <div class="detail-row">
+            <span class="detail-row-label">Signalé par</span>
+            <span class="detail-row-value">{{ selected.signalePar }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Patient</span>
+            <span class="detail-row-value">{{ selected.patient }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Date</span>
+            <span class="detail-row-value">{{ selected.date }} à {{ selected.heure }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Type / Zone</span>
+            <span class="detail-row-value">{{ selected.zone }}</span>
+          </div>
+          {% if selected.description %}
+          <div class="detail-row">
+            <span class="detail-row-label">Description</span>
+            <span class="detail-row-value" style="font-weight:500; color:#374151; line-height:1.5;">{{ selected.description }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="detail-footer">
+        <button class="btn-compte-rendu">Voir le compte rendu</button>
+      </div>
+      {% else %}
+      <div class="no-selected">Sélectionnez une alerte pour voir les détails</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ asset('assets/admin/js/notifications.js') }}"></script>
+{% endblock %}

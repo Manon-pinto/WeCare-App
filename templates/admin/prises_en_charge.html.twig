@@ -1,0 +1,343 @@
+{% extends 'base.html.twig' %}
+{% block title %}Prises en charge — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/admin/css/prises_en_charge.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  {% for msg in app.flashes('error') %}
+  <div style="background:#fee2e2;color:#991b1b;padding:10px 28px;font-size:12px;font-weight:600;flex-shrink:0;">⚠ {{ msg }}</div>
+  {% endfor %}
+
+  <div class="topbar">
+    <h1 class="topbar-title">Prises en charge</h1>
+    <div class="date-nav">
+      <a href="{{ prevUrl }}" class="date-nav-btn">&#8249;</a>
+      <span class="date-nav-label">{{ dateLabel }}</span>
+      <a href="{{ nextUrl }}" class="date-nav-btn">&#8250;</a>
+    </div>
+    {% if not isToday %}
+    <a href="{{ path('admin_prises_en_charge') }}" style="background:#fff;border:1.5px solid #e5e7eb;color:var(--primary);border-radius:30px;padding:7px 16px;font-size:12px;font-weight:600;text-decoration:none;">Aujourd'hui</a>
+    {% endif %}
+    <button class="btn-ajouter" onclick="document.getElementById('modalAjouter').style.display='flex'">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvelle prise en charge
+    </button>
+  </div>
+
+  {% if nbBesoin > 0 %}
+  <div class="besoin-banner">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+    {{ nbBesoin }} patient{{ nbBesoin > 1 ? 's ont' : ' a' }} besoin d'une intervention ce jour et n'ont pas encore de rendez-vous planifié.
+  </div>
+  {% endif %}
+
+  <div class="pec-body">
+    <div class="pec-card">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="pecSearch" placeholder="Rechercher aidant ou patient…"
+               onkeydown="if(event.key==='Enter')event.preventDefault()">
+      </div>
+
+      <table class="pec-table">
+        <thead>
+          <tr>
+            <th>Aidant</th>
+            <th>Contact</th>
+            <th>Lien</th>
+            <th>Patient</th>
+            <th>Adresse patient</th>
+            <th>Niveau</th>
+            <th>Statut</th>
+            <th>Soignant</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="pecBody">
+          {% for row in rows %}
+          <tr class="data-row {{ row.besoinAujourdhui ? 'besoin-row' : '' }}" id="row-{{ row.id }}"
+              tabindex="-1"
+              onclick="toggleExpand({{ row.id }}, {{ row.benId }}, {{ row|json_encode|e('html_attr') }})"
+              onkeydown="event.preventDefault()">
+            <td>
+              <span class="aidant-name">{{ row.aidantNom }}</span>
+              {% if row.besoinAujourdhui %}<span class="badge-besoin">Besoin aujourd'hui</span>{% endif %}
+            </td>
+            <td>
+              <div class="contact-phone">{{ row.telephone }}</div>
+              <div class="contact-email">{{ row.email }}</div>
+            </td>
+            <td>{{ row.lien }}</td>
+            <td>
+              <div class="patient-name">{{ row.patientNom }}</div>
+              <div class="patient-age">{{ row.patientAge }} ans</div>
+            </td>
+            <td style="font-size:11.5px;color:#374151;">{{ row.adresse }}</td>
+            <td>
+              <span class="badge-niveau {{ row.niveau }}">
+                {% if row.niveau == 'eleve' %}Élevé
+                {% elseif row.niveau == 'modere' %}Modéré
+                {% elseif row.niveau == 'critique' %}Critique
+                {% else %}Faible{% endif %}
+              </span>
+            </td>
+            <td>
+              <span class="badge-statut {{ row.actif ? 'actif' : 'inactif' }}">
+                {{ row.actif ? 'Actif' : 'À assigner' }}
+              </span>
+            </td>
+            <td onclick="event.stopPropagation()">
+              {% if row.ref %}
+              <div>
+                <div class="ref-name">{{ row.ref.nom }}</div>
+                <div class="ref-spe">{{ row.ref.specialite }}</div>
+              </div>
+              {% else %}
+              <button class="btn-assigner-inline"
+                      onclick="event.stopPropagation(); toggleExpand({{ row.id }}, {{ row.benId }}, {{ row|json_encode|e('html_attr') }})">
+                + Assigner
+              </button>
+              {% endif %}
+            </td>
+            <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+              <div class="row-actions">
+                <button class="btn-row-edit" title="Modifier"
+                        onclick="openModifier({{ row.id }}, '{{ row.aidantPrenom|e('js') }}', '{{ row.aidantNomFamille|e('js') }}', '{{ row.telephone|e('js') }}', '{{ row.email|e('js') }}', '{{ row.lien|e('js') }}', '{{ row.patientNom|e('js') }}')">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <form method="POST" action="{{ path('admin_prises_en_charge_supprimer', {id: row.id}) }}"
+                      onsubmit="return confirm('Supprimer la prise en charge de {{ row.patientNom|e('js') }} ?')">
+                  <button type="submit" class="btn-row-del" title="Supprimer">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+
+          {# Panneau d'assignation #}
+          <tr class="expand-row" id="expand-{{ row.id }}" style="display:none;">
+            <td colspan="9">
+              <div class="expand-panel">
+                <button class="expand-close" onclick="closeExpand({{ row.id }})">×</button>
+                <div class="expand-title">Assigner un soignant — {{ row.patientNom }}</div>
+
+                <div class="expand-cards">
+                  <div class="expand-card">
+                    <div class="expand-card-label">Aidant</div>
+                    <div class="expand-card-name">{{ row.aidantNom }}</div>
+                    <div class="expand-card-sub">{{ row.telephone }} · {{ row.lien }}</div>
+                  </div>
+                  <div class="expand-card">
+                    <div class="expand-card-label">Patient</div>
+                    <div class="expand-card-name">{{ row.patientNom }}</div>
+                    <div class="expand-card-sub">{{ row.patientAge }} ans · {{ row.adresse }}</div>
+                  </div>
+                </div>
+
+                {# Prochaines interventions #}
+                <div class="interv-section">
+                  <div class="interv-section-label">
+                    Prochaines interventions (30 jours)
+                    {% if row.nbInterventions > 0 %}<span class="interv-count-badge">{{ row.nbInterventions }}</span>{% endif %}
+                  </div>
+                  {% if row.interventions is empty %}
+                    <div class="interv-empty">Aucune intervention planifiée — <a href="{{ path('admin_planning') }}" style="color:var(--pink);font-weight:600;">aller dans le Planning</a>.</div>
+                  {% else %}
+                  <table class="interv-table">
+                    <thead><tr><th>Date</th><th>Horaire</th><th>Soignant</th><th>Type</th><th></th></tr></thead>
+                    <tbody>
+                      {% for i in row.interventions %}
+                      <tr>
+                        <td><span class="interv-jour">{{ i.jour }}</span> <span class="interv-date-val">{{ i.date }}</span></td>
+                        <td><span class="interv-heure">{{ i.hDebut }} – {{ i.hFin }}</span></td>
+                        <td>{{ i.soignant }}</td>
+                        <td><span class="interv-type">{{ i.type }}</span></td>
+                        <td>
+                          {% if i.statut != 'terminee' %}
+                          <form method="POST" action="{{ path('admin_pec_intervention_annuler', {id: i.id}) }}" onsubmit="return confirm('Annuler cette intervention ?')">
+                            <input type="hidden" name="date" value="{{ date }}">
+                            <input type="hidden" name="row_id" value="{{ row.id }}">
+                            <button type="submit" class="btn-cancel-interv" title="Annuler">
+                              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              Annuler
+                            </button>
+                          </form>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% endif %}
+                </div>
+
+                <hr class="expand-divider">
+
+                {# Tâches non assignées #}
+                {% if row.tachesNonAssignees is not empty %}
+                <div style="margin-bottom:16px;">
+                  <div class="taches-label">
+                    <svg width="12" height="12" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#f59e0b"/></svg>
+                    Tâches à couvrir — {{ row.tachesNonAssignees|length }} sans soignant
+                  </div>
+                  {% for t in row.tachesNonAssignees %}
+                  <div class="tache-nonassignee">
+                    <span class="tache-heure">{{ t.hDebut }} – {{ t.hFin }}</span>
+                    <span class="tache-meta">{{ t.jour }} {{ t.date }}</span>
+                    <span class="tache-badge">{{ t.type }}</span>
+                    <button type="button" class="btn-tache-assigner"
+                            onclick="selectCreneau({{ row.id }}, {{ t.hDebut|split(':')|first }}, {{ t.id }}, {{ row.benId }})">
+                      Assigner →
+                    </button>
+                    <form method="POST" action="{{ path('admin_pec_intervention_annuler', {id: t.id}) }}" onsubmit="return confirm('Supprimer cette tâche ?')">
+                      <input type="hidden" name="date" value="{{ date }}">
+                      <input type="hidden" name="row_id" value="{{ row.id }}">
+                      <button type="submit" class="btn-cancel-interv" title="Supprimer">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                  {% endfor %}
+                </div>
+                <hr class="expand-divider">
+                {% endif %}
+
+                {# Créer une nouvelle tâche #}
+                <div class="creer-tache-section" style="margin-bottom:16px;">
+                  <div class="creer-tache-title">Planifier une nouvelle tâche</div>
+                  <form method="POST" action="{{ path('admin_pec_tache_creer') }}" class="creer-tache-row">
+                    <input type="hidden" name="ben_id" value="{{ row.benId }}">
+                    <input type="hidden" name="pec_date" value="{{ date }}">
+                    <input type="hidden" name="row_id" value="{{ row.id }}">
+                    <div class="creer-tache-field">
+                      <label>Date</label>
+                      <input type="date" name="tache_date" value="{{ date }}" required>
+                    </div>
+                    <div class="creer-tache-field">
+                      <label>Heure</label>
+                      <select name="h_debut">
+                        {% for h in range(6, 19) %}
+                        <option value="{{ h }}">{{ '%02d'|format(h) }}h00</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="creer-tache-field">
+                      <label>Type de soin</label>
+                      <select name="type">
+                        <option value="soins">Soins infirmiers</option>
+                        <option value="toilette">Toilette</option>
+                        <option value="menage">Ménage</option>
+                        <option value="repas">Repas</option>
+                        <option value="accompagnement">Accompagnement</option>
+                        <option value="surveillance">Surveillance</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn-creer-tache">+ Ajouter la tâche</button>
+                  </form>
+                </div>
+                <hr class="expand-divider">
+
+                {# Liste soignants — masquée jusqu'au clic "Assigner" #}
+                <div id="assign-section-{{ row.id }}" style="display:none;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div class="disponibles-label" id="dispo-label-{{ row.id }}" style="margin-bottom:0;">Soignants disponibles</div>
+                    <button type="button" onclick="closeAssignSection({{ row.id }})"
+                            style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1;">×</button>
+                  </div>
+                  <div class="soignant-rows" id="soignant-list-{{ row.id }}"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="9" style="padding:32px;text-align:center;color:#d1d5db;font-size:13px;">Aucune prise en charge enregistrée</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal — Modifier -->
+<div class="modal-overlay" id="modalModifier" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Modifier la prise en charge</span>
+      <button class="modal-close" onclick="document.getElementById('modalModifier').style.display='none'">×</button>
+    </div>
+    <div style="background:#f0f4ff;border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#374151;">
+      <strong>Patient :</strong> <span id="modifier-patient-nom" style="font-weight:700;color:var(--primary)"></span>
+    </div>
+    <form method="POST" id="modifier-form" action="">
+      <div class="modal-grid">
+        <div class="form-group"><label class="form-label">Prénom aidant</label><input class="form-input" name="prenom" id="modifier-prenom" type="text"></div>
+        <div class="form-group"><label class="form-label">Nom aidant *</label><input class="form-input" name="nom" id="modifier-nom" type="text" required></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" name="telephone" id="modifier-telephone" type="tel"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" name="email" id="modifier-email" type="email"></div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Lien avec le patient</label>
+          <select class="form-select" name="lien" id="modifier-lien">
+            <option value="">— Sélectionner —</option>
+            <option>Fils</option><option>Fille</option><option>Conjoint(e)</option>
+            <option>Parent</option><option>Frère / Sœur</option><option>Voisin(e)</option><option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="document.getElementById('modalModifier').style.display='none'">Annuler</button>
+        <button type="submit" class="btn-save">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal — Nouvelle prise en charge -->
+<div class="modal-overlay" id="modalAjouter" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Nouvelle prise en charge</span>
+      <button class="modal-close" onclick="document.getElementById('modalAjouter').style.display='none'">×</button>
+    </div>
+    <form method="POST" action="{{ path('admin_prises_en_charge_ajouter') }}">
+      <div class="modal-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Patient *</label>
+          <select class="form-select" name="ben_id" required>
+            <option value="">— Sélectionner un patient —</option>
+            {% for b in beneficiaires %}<option value="{{ b.id }}">{{ b.nom }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Prénom aidant *</label><input class="form-input" name="prenom" type="text" required placeholder="Claire"></div>
+        <div class="form-group"><label class="form-label">Nom aidant *</label><input class="form-input" name="nom" type="text" required placeholder="Martin"></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" name="telephone" type="tel" placeholder="06 00 00 00 00"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" name="email" type="email" placeholder="claire@mail.fr"></div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Lien avec le patient</label>
+          <select class="form-select" name="lien">
+            <option value="">— Sélectionner —</option>
+            <option>Fils</option><option>Fille</option><option>Conjoint(e)</option>
+            <option>Parent</option><option>Frère / Sœur</option><option>Voisin(e)</option><option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="document.getElementById('modalAjouter').style.display='none'">Annuler</button>
+        <button type="submit" class="btn-save">Créer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const PAGE_DATE = '{{ date }}';
+const SOIGNANTS = {{ soignantsData|json_encode|raw }};
+const OPEN_ROW  = {{ openRow }};
+</script>
+<script src="{{ asset('assets/admin/js/prises_en_charge.js') }}"></script>
+{% endblock %}

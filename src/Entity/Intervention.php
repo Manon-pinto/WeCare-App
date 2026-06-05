@@ -20,7 +20,7 @@ class Intervention
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Intervenant::class, inversedBy: 'interventions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Intervenant $intervenant = null;
 
     #[ORM\ManyToOne(targetEntity: Beneficiaire::class, inversedBy: 'interventions')]
@@ -49,7 +49,7 @@ class Intervention
     #[ORM\OneToOne(mappedBy: 'intervention', targetEntity: CompteRendu::class, cascade: ['persist', 'remove'])]
     private ?CompteRendu $compteRendu = null;
 
-    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Incident::class)]
+    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Incident::class, cascade: ['remove'])]
     private Collection $incidents;
 
     public function __construct()

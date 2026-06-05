@@ -1,0 +1,274 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Patients — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/admin/css/patients.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+
+  <div class="topbar">
+    <h1>Dossiers patients</h1>
+    <button class="btn-nouveau" onclick="openCreateModal()">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouveau dossier
+    </button>
+  </div>
+
+  <div class="patients-body">
+
+    {# ── Left panel ── #}
+    <div class="patients-list-panel">
+
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Rechercher un patient..." id="searchInput">
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('tous', this)">Tous</button>
+        <button class="filter-btn" onclick="setFilter('actif', this)">Actifs</button>
+        <button class="filter-btn" onclick="setFilter('attente', this)">Attente</button>
+        <button class="filter-btn" onclick="setFilter('inactif', this)">Inactifs</button>
+      </div>
+
+      <div class="patients-list" id="patientsList">
+        {% for p in patients %}
+        <div class="patient-item{% if loop.first %} active{% endif %}"
+             data-id="{{ p.id }}"
+             onclick="selectPatient({{ p.id }})">
+          <div class="patient-avatar" style="background: {{ p.color }}">{{ p.initiales }}</div>
+          <div class="patient-info">
+            <div class="patient-nom">{{ p.nom }}</div>
+            <div class="patient-meta">{{ p.age }}ans — {{ p.ville }}</div>
+            <div class="patient-badges">
+              <span class="badge badge-actif">Actif</span>
+              <span class="badge badge-{{ p.risque }}">{{ p.risqueLabel }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="patients-footer">
+        <span class="footer-count">{{ nbPatients }} Dossier{{ nbPatients > 1 ? 's' : '' }}</span>
+      </div>
+
+    </div>
+
+    {# ── Right panel : detail per patient ── #}
+    {% for p in patients %}
+    <div class="patient-detail{% if loop.first %} visible{% endif %}"
+         id="detail-{{ p.id }}"
+         data-nom="{{ p.nom|e('html_attr') }}"
+         data-email="{{ p.email|e('html_attr') }}"
+         data-datenaissance="{{ p.dateNaissance }}"
+         data-adresse="{{ p.adresse|e('html_attr') }}"
+         data-pathologie="{{ p.pathologie|e('html_attr') }}"
+         data-risque="{{ p.risque }}"
+         data-rdv="{{ p.rdvParSemaine ?? '' }}"
+         data-edit-url="{{ path('admin_patients_edit', {id: p.id}) }}"
+         data-delete-url="{{ path('admin_patients_delete', {id: p.id}) }}"
+         data-edit-token="{{ csrf_token('edit_patient_' ~ p.id) }}"
+         data-delete-token="{{ csrf_token('delete_patient_' ~ p.id) }}">
+
+      <div class="detail-header">
+        <div class="detail-avatar" style="background: {{ p.color }}">{{ p.initiales }}</div>
+        <div style="flex: 1;">
+          <div class="detail-header-top">
+            <div>
+              <div class="detail-nom">{{ p.nom }}</div>
+              <div class="detail-sub">{{ p.age }}ans — {{ p.adresse }}</div>
+              <div class="patient-badges">
+                <span class="badge badge-actif">Actif</span>
+                <span class="badge badge-{{ p.risque }}">{{ p.risqueLabel }}</span>
+              </div>
+            </div>
+            <div class="detail-actions">
+              <button class="btn-edit" onclick="openEditModal({{ p.id }})">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Modifier
+              </button>
+              <button class="btn-del" onclick="openDeleteModal({{ p.id }}, '{{ p.nom|e('js') }}')">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-tabs">
+        <button class="tab-btn" onclick="showTab('info', {{ p.id }})">Informations</button>
+        <button class="tab-btn" onclick="showTab('soignants', {{ p.id }})">Soignants assignés</button>
+        <button class="tab-btn active" onclick="showTab('crs', {{ p.id }})">Comptes-rendus</button>
+      </div>
+
+      {# Tab Informations #}
+      <div class="tab-pane" id="tab-info-{{ p.id }}">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Âge</label>
+            <span>{{ p.age }} ans</span>
+          </div>
+          <div class="info-item">
+            <label>Niveau de risque</label>
+            <span>{{ p.risqueLabel }}</span>
+          </div>
+          <div class="info-item" style="grid-column: 1/-1;">
+            <label>Adresse</label>
+            <span>{{ p.adresse }}</span>
+          </div>
+          {% if p.pathologie %}
+          <div class="info-item" style="grid-column: 1/-1;">
+            <label>Pathologie</label>
+            <span>{{ p.pathologie }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Tab Soignants #}
+      <div class="tab-pane" id="tab-soignants-{{ p.id }}">
+        {% if p.soignants is empty %}
+          <p style="color: #9ca3af; font-size: 12px;">Aucun soignant assigné.</p>
+        {% else %}
+          {% for s in p.soignants %}
+          <div class="soignant-item">
+            <div class="soignant-avatar">{{ s.initiales }}</div>
+            <div>
+              <div class="soignant-nom">{{ s.nom }}</div>
+              {% if s.specialite %}<div class="soignant-spe">{{ s.specialite }}</div>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      {# Tab Comptes-rendus #}
+      <div class="tab-pane active" id="tab-crs-{{ p.id }}">
+        {% if p.crs is empty %}
+          <div class="empty-panel">
+            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <p>Aucun compte-rendu</p>
+          </div>
+        {% else %}
+          <div class="crs-header">Comptes rendus — {{ p.nbCrs }}</div>
+          {% for cr in p.crs %}
+          <div class="cr-item">
+            <div class="cr-row">
+              <span class="cr-titre">{{ cr.titre }}</span>
+              <span class="cr-date">{{ cr.dateLabel }}</span>
+            </div>
+            <p class="cr-contenu">{{ cr.contenu }}</p>
+            <div class="cr-soignant">
+              <div class="mini-avatar">{{ cr.soignantInitiales }}</div>
+              <span class="cr-soignant-nom">{{ cr.soignant }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+
+    {# Placeholder si aucun patient #}
+    {% if patients is empty %}
+    <div class="patient-detail visible">
+      <div class="empty-panel">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p>Aucun patient enregistré</p>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{# ── Create / Edit modal ── #}
+<div id="modal-patient" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modal-title">Nouveau dossier</h2>
+      <button type="button" onclick="closeModal()" class="modal-close">×</button>
+    </div>
+    <form id="modal-form" method="post" action="{{ path('admin_patients_new') }}">
+      <input type="hidden" name="_token" id="modal-token" value="{{ csrf_token('new_patient') }}">
+      <div class="modal-grid">
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input type="text" name="nom" id="f-nom" required placeholder="Jean Dupont">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" id="f-email" required placeholder="jean@exemple.fr">
+        </div>
+        <div class="form-group">
+          <label id="password-label">Mot de passe</label>
+          <input type="password" name="motDePasse" id="f-password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label>Date de naissance</label>
+          <input type="date" name="dateNaissance" id="f-datenaissance" required>
+        </div>
+        <div class="form-group" style="grid-column: 1/-1">
+          <label>Adresse</label>
+          <input type="text" name="adresse" id="f-adresse" required placeholder="12 rue de la Paix, Paris">
+        </div>
+        <div class="form-group" style="grid-column: 1/-1">
+          <label>Pathologie</label>
+          <input type="text" name="pathologie" id="f-pathologie" placeholder="Optionnel">
+        </div>
+        <div class="form-group">
+          <label>Niveau de risque</label>
+          <select name="niveauRisque" id="f-risque">
+            <option value="faible">Faible</option>
+            <option value="modere" selected>Modéré</option>
+            <option value="eleve">Élevé</option>
+            <option value="critique">Critique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>RDV par semaine</label>
+          <input type="number" name="rdvParSemaine" id="f-rdv" min="0" max="14" placeholder="3">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal()" class="btn-cancel">Annuler</button>
+        <button type="submit" class="btn-save">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ── Delete confirmation modal ── #}
+<div id="modal-delete" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <h2>Supprimer le dossier</h2>
+      <button type="button" onclick="closeDeleteModal()" class="modal-close">×</button>
+    </div>
+    <p class="delete-warning">Vous êtes sur le point de supprimer définitivement le dossier de :</p>
+    <p class="delete-name" id="delete-name"></p>
+    <p class="delete-warning">Cette action supprimera toutes les interventions, comptes-rendus et données associées. Elle est irréversible.</p>
+    <form id="delete-form" method="post" action="">
+      <input type="hidden" name="_token" id="delete-token">
+      <div class="modal-actions">
+        <button type="button" onclick="closeDeleteModal()" class="btn-cancel">Annuler</button>
+        <button type="submit" class="btn-delete-confirm">Supprimer définitivement</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const PATIENT_NEW_URL = '{{ path('admin_patients_new') }}';
+const PATIENT_NEW_TOKEN = '{{ csrf_token('new_patient') }}';
+</script>
+<script src="{{ asset('assets/admin/js/patients.js') }}"></script>
+{% endblock %}

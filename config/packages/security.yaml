@@ -1,9 +1,7 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         app_user_provider:
             entity:
@@ -24,6 +22,7 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                success_handler: App\Security\LoginSuccessHandler
             json_login:
                 check_path: /api/login
                 username_path: email
@@ -33,24 +32,23 @@ security:
                 path: app_logout
                 target: app_login
 
-    # Note: Only the *first* matching rule is applied
+    # Règles d'accès par rôle
     access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/inscription, roles: PUBLIC_ACCESS }
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/inscription, roles: PUBLIC_ACCESS }
-        - { path: ^/api/intervenant, roles: ROLE_INTERVENANT }
+        - { path: ^/login,            roles: PUBLIC_ACCESS }
+        - { path: ^/inscription,      roles: PUBLIC_ACCESS }
+        - { path: ^/api/login,        roles: PUBLIC_ACCESS }
+        - { path: ^/api/inscription,  roles: PUBLIC_ACCESS }
+        - { path: ^/admin,            roles: ROLE_ADMINISTRATEUR }
+        - { path: ^/intervenant,      roles: ROLE_INTERVENANT }
+        - { path: ^/beneficiaire,     roles: ROLE_BENEFICIAIRE }
+        - { path: ^/api/intervenant,  roles: ROLE_INTERVENANT }
         - { path: ^/api/beneficiaire, roles: ROLE_BENEFICIAIRE }
-        - { path: ^/intervenant, roles: ROLE_INTERVENANT }
-        - { path: ^/beneficiaire, roles: ROLE_BENEFICIAIRE }
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

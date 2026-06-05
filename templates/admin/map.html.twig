@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte — WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="{{ asset('assets/admin/css/map.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+  <div class="topbar">
+    <span class="topbar-title">Carte des interventions</span>
+    <div class="date-nav">
+      <a href="{{ prevUrl }}" class="date-nav-btn">&#8249;</a>
+      <span class="date-nav-label">{{ dateLabel }}</span>
+      <a href="{{ nextUrl }}" class="date-nav-btn">&#8250;</a>
+    </div>
+    <div class="toggle-group">
+      <a href="{{ jourUrl }}"    class="toggle-btn {{ mode == 'jour'    ? 'active' : '' }}">Jour</a>
+      <a href="{{ semaineUrl }}" class="toggle-btn {{ mode == 'semaine' ? 'active' : '' }}">Semaine</a>
+    </div>
+  </div>
+
+  <div class="map-wrapper">
+    <!-- Overlay stats -->
+    <div class="map-overlay">
+      <div class="overlay-card">
+        <div class="overlay-icon" style="background: #fce7f3;">
+          <svg width="18" height="18" fill="none" stroke="#f472b6" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="overlay-text">
+          <div class="overlay-label">Interventions aujourd'hui</div>
+          <div class="overlay-value">{{ nbInterventions }}</div>
+          {% if nbTerminees > 0 %}<div class="overlay-sub">dont {{ nbTerminees }} effectuées</div>{% endif %}
+        </div>
+      </div>
+      <div class="overlay-card">
+        <div class="overlay-icon" style="background: #e0f2fe;">
+          <svg width="18" height="18" fill="none" stroke="#06b6d4" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="overlay-text">
+          <div class="overlay-label">Soignants actifs</div>
+          <div class="overlay-value">{{ nbSoignants }}</div>
+          <div class="overlay-sub">sur le terrain</div>
+        </div>
+      </div>
+      <div class="overlay-card">
+        <div class="overlay-icon" style="background: #fff3e0;">
+          <svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg>
+        </div>
+        <div class="overlay-text">
+          <div class="overlay-label">Hors zone</div>
+          <div class="overlay-value">{{ nbHorsZone }}</div>
+          <div class="overlay-sub">{{ nbHorsZone <= 1 ? 'patient non couvert' : 'patients non couverts' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="map"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const MAP_CENTER   = [{{ centerLat }}, {{ centerLng }}];
+const MAP_ROUTES   = {{ routes|json_encode|raw }};
+const MAP_PATIENTS = {{ patients|json_encode|raw }};
+const MAP_SOIGNANTS= {{ soignants|json_encode|raw }};
+</script>
+<script src="{{ asset('assets/admin/js/map.js') }}"></script>
+{% endblock %}
