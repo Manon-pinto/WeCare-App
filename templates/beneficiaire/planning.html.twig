@@ -12,7 +12,7 @@
   .week-nav {
     display: flex; align-items: center; gap: 10px;
     background: #fff; border-radius: 30px; padding: 6px 14px;
-    box-shadow: 0 2px 8px rgba(65,160,150,0.12);
+    box-shadow: 0 2px 8px rgba(204,117,202,0.12);
   }
   .week-nav button {
     background: none; border: none; cursor: pointer; color: var(--teal);
@@ -53,7 +53,7 @@
     font-size: 0.65rem; font-weight: 700; border-radius: 4px;
     padding: 3px 0; text-align: center;
   }
-  .visits-badge.empty { background: #b8e8e3; color: var(--teal); }
+  .visits-badge.empty { background: var(--teal-light); color: var(--teal); }
 
   /* ── Grid body ── */
   .cal-body {
@@ -72,19 +72,19 @@
   .day-col {
     border-left: 1px solid var(--border); position: relative;
   }
-  .day-col.today-col { background: #e8f7fc; }
-  .day-col.weekend-col { background: #f0faf9; }
+  .day-col.today-col { background: var(--today-bg); }
+  .day-col.weekend-col { background: #fdf5ff; }
 
   /* Hour rows inside day col */
-  .hour-slot { height: 60px; border-top: 1px dashed #e2ddf0; }
+  .hour-slot { height: 60px; border-top: 1px dashed var(--border); }
 
   /* Now line */
   .now-line {
     position: absolute; left: 0; right: 0; height: 2px;
-    background: #3fcdc0; z-index: 5; pointer-events: none;
+    background: var(--teal-mid); z-index: 5; pointer-events: none;
   }
   .now-dot {
-    width: 8px; height: 8px; background: #3fcdc0; border-radius: 50%;
+    width: 8px; height: 8px; background: var(--teal-mid); border-radius: 50%;
     position: absolute; left: -4px; top: -3px;
   }
 
@@ -95,11 +95,11 @@
     transition: opacity 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.10);
   }
   .cal-event:hover { opacity: 0.88; }
-  .cal-event.type-toilette, .cal-event.type-soin { background: #3fcdc0; color: #fff; }
-  .cal-event.type-menage  { background: #b8e8e3; color: var(--teal); }
-  .cal-event.type-repas   { background: #c5ebe6; color: var(--teal); }
-  .cal-event.type-accompagnement { background: #a8d8ea; color: #1a5f7a; }
-  .cal-event.type-default { background: var(--teal-light); color: var(--teal); }
+  .cal-event.type-toilette, .cal-event.type-soin { background: var(--teal-mid); color: #fff; }
+  .cal-event.type-menage  { background: var(--teal-light); color: var(--text-dark); }
+  .cal-event.type-repas   { background: var(--teal-pale); color: var(--text-dark); }
+  .cal-event.type-accompagnement { background: #e8e4f7; color: var(--text-dark); }
+  .cal-event.type-default { background: var(--teal-light); color: var(--text-dark); }
   .event-type { font-size: 0.67rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .event-name { font-size: 0.63rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -111,7 +111,7 @@
   .modal-overlay.open { display: flex; }
   .modal-box {
     background: #fff; border-radius: 18px; padding: 28px 32px;
-    max-width: 380px; width: 90%; box-shadow: 0 8px 40px rgba(15,0,75,0.18);
+    max-width: 380px; width: 90%; box-shadow: 0 8px 40px rgba(15,0,75,0.14);
   }
   .modal-box h2 { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 16px; }
   .modal-box textarea {

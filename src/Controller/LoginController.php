@@ -51,11 +51,12 @@ class LoginController extends AbstractController
         EntityManagerInterface $em,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
+        $nom = trim($data['nom'] ?? '');
         $email = trim($data['email'] ?? '');
         $mdp = $data['motDePasse'] ?? '';
 
-        if (!$email || !$mdp) {
-            return $this->json(['error' => 'Email et mot de passe requis.'], 400);
+        if (!$nom || !$email || !$mdp) {
+            return $this->json(['error' => 'Nom, email et mot de passe requis.'], 400);
         }
 
         $existing = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
@@ -65,7 +66,7 @@ class LoginController extends AbstractController
 
         $user = new Utilisateur();
         $user->setEmail($email);
-        $user->setNom($email);
+        $user->setNom($nom);
         $user->setMdp($hasher->hashPassword($user, $mdp));
         $user->setRole(RoleUtilisateur::Intervenant);
 
