@@ -44,23 +44,3 @@ Accès : http://127.0.0.1:8000
 | Madeleine Blanc | madeleine@mail.fr | patient123 | modéré | — |
 
 ---
-
-### WeCare Lyon (second admin)
-
-#### Administrateur
-| Email | Mot de passe | Rôle |
-|---|---|---|
-| admin2@wecare.fr | admin456 | Administrateur |
-
-#### Intervenants
-| Nom | Email | Mot de passe | Spécialité | Statut |
-|---|---|---|---|---|
-| Antoine Leroy | antoine@wecare.fr | interv123 | Infirmier(e) | actif |
-| Julie Martin | julie@wecare.fr | interv123 | Aide-soignant(e) | actif |
-
-#### Bénéficiaires
-| Nom | Email | Mot de passe | Risque | Pathologie |
-|---|---|---|---|---|
-| Pierre Blanc | pierre@mail.fr | patient123 | modéré | Arthrose |
-| Lucie Bernard | lucie2@mail.fr | patient123 | faible | — |
-| Roger Petit | roger@mail.fr | patient123 | élevé | Diabète type 2 |
