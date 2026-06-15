@@ -4,9 +4,7 @@
             "turbo-core": {
                 "enabled": true,
                 "fetch": "eager",
-                "autoimport": {
-                    "@symfony/ux-turbo/dist/mercure_stream_source_element.js": true
-                }
+                "autoimport": {}
             },
             "mercure-turbo-stream": {
                 "enabled": false,
