@@ -6,11 +6,468 @@
   <title>Centre d'aide – WeCare</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   {{ include('landing/_styles.html.twig') }}
+  <style>
+
+    /* ── HERO ── */
+    .ha-hero {
+      background: #fff;
+      text-align: center;
+      padding: 72px 48px 56px;
+    }
+    .ha-dots {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 22px;
+    }
+    .ha-dots span {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }
+    .ha-dots span:nth-child(1) { background: #2CA7CB; }
+    .ha-dots span:nth-child(2) { background: #0ea899; }
+    .ha-dots span:nth-child(3) { background: #0c0052; }
+    .ha-hero h1 {
+      font-size: 2.6rem; font-weight: 800; color: #0c0052;
+      line-height: 1.2; margin-bottom: 14px;
+    }
+    .ha-hero h1 span { color: #0ea899; }
+    .ha-hero p {
+      font-size: 0.94rem; color: #8a85b0;
+      max-width: 520px; margin: 0 auto 28px; line-height: 1.75;
+    }
+    .ha-search {
+      max-width: 480px; margin: 0 auto;
+      display: flex; align-items: center;
+      background: #fff; border: 1.5px solid #d4e8f0;
+      border-radius: 50px; padding: 10px 20px;
+      gap: 10px; box-shadow: 0 2px 12px rgba(44,167,203,0.10);
+    }
+    .ha-search svg { flex-shrink: 0; color: #8a85b0; }
+    .ha-search input {
+      flex: 1; border: none; outline: none;
+      font-size: 0.9rem; color: #0c0052;
+      font-family: 'Poppins', sans-serif; background: transparent;
+    }
+    .ha-search input::placeholder { color: #b0acd0; }
+    @media (max-width: 768px) {
+      .ha-hero { padding: 52px 24px 40px; }
+      .ha-hero h1 { font-size: 1.8rem; }
+    }
+
+    /* ── CATEGORIES ── */
+    .ha-cats {
+      background: #fff; padding: 0 48px 32px;
+    }
+    .ha-cats-inner {
+      max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .ha-cat-card {
+      background: #fff; border: 1.5px solid #e0edf5;
+      border-radius: 14px; padding: 20px 22px;
+      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+      text-decoration: none;
+    }
+    .ha-cat-card:hover {
+      border-color: #0ea899;
+      box-shadow: 0 4px 16px rgba(14,168,153,0.12);
+    }
+    .ha-cat-card h3 {
+      font-size: 0.88rem; font-weight: 700; color: #0c0052; margin-bottom: 4px;
+    }
+    .ha-cat-card p {
+      font-size: 0.78rem; color: #8a85b0; line-height: 1.5;
+    }
+    @media (max-width: 768px) {
+      .ha-cats { padding: 0 20px 24px; }
+      .ha-cats-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .ha-cats-inner { grid-template-columns: 1fr; }
+    }
+
+    /* ── FAQ SECTION ── */
+    .ha-faq {
+      background: #fff; padding: 16px 48px 80px;
+    }
+    .ha-faq-inner { max-width: 760px; margin: 0 auto; }
+    .ha-section-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #0ea899;
+      margin-bottom: 8px;
+    }
+    .ha-section-title {
+      font-size: 1.5rem; font-weight: 800; color: #0c0052;
+      margin-bottom: 28px;
+    }
+    .ha-group { margin-bottom: 36px; }
+    .ha-group-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.82rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #8a85b0; margin-bottom: 12px;
+    }
+    .ha-group-title::after {
+      content: ''; flex: 1; height: 1px; background: #e0edf5;
+    }
+    .ha-item {
+      background: #fff; border: 1.5px solid #e0edf5;
+      border-radius: 12px; margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .ha-item-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; color: #0c0052;
+      gap: 12px; user-select: none;
+      transition: background 0.15s;
+    }
+    .ha-item-q:hover { background: #f7feff; }
+    .ha-item-q svg {
+      flex-shrink: 0; transition: transform 0.25s; color: #8a85b0;
+    }
+    .ha-item.open .ha-item-q svg { transform: rotate(180deg); color: #0ea899; }
+    .ha-item.open .ha-item-q { color: #0ea899; }
+    .ha-item-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.2s;
+      padding: 0 20px;
+      font-size: 0.86rem; color: #6b7280; line-height: 1.75;
+    }
+    .ha-item.open .ha-item-a {
+      max-height: 400px;
+      padding: 0 20px 18px;
+    }
+    .ha-item-a a { color: #0ea899; text-decoration: underline; }
+    @media (max-width: 768px) {
+      .ha-faq { padding: 16px 20px 60px; }
+      .ha-section-title { font-size: 1.25rem; }
+    }
+
+    /* ── CTA BANDE ── */
+    .ha-cta {
+      background: linear-gradient(135deg, #0c0052 0%, #1a0a7c 100%);
+      padding: 60px 48px; text-align: center;
+    }
+    .ha-cta h2 {
+      font-size: 1.8rem; font-weight: 800; color: #fff;
+      margin-bottom: 12px;
+    }
+    .ha-cta p {
+      font-size: 0.92rem; color: rgba(255,255,255,0.65);
+      margin-bottom: 28px; max-width: 460px; margin-left: auto; margin-right: auto;
+    }
+    .ha-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .ha-cta-btn-ghost {
+      padding: 12px 28px; border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,0.35); color: #fff;
+      font-size: 0.88rem; font-weight: 600; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .ha-cta-btn-ghost:hover { background: rgba(255,255,255,0.10); }
+    .ha-cta-btn-teal {
+      padding: 12px 28px; border-radius: 10px;
+      background: #0ea899; color: #fff;
+      font-size: 0.88rem; font-weight: 700; text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .ha-cta-btn-teal:hover { background: #0db8a6; transform: translateY(-1px); }
+    @media (max-width: 768px) {
+      .ha-cta { padding: 48px 24px; }
+      .ha-cta h2 { font-size: 1.4rem; }
+    }
+  </style>
 </head>
 <body>
 {{ include('landing/_nav.html.twig') }}
+
+<!-- HERO -->
+<section class="ha-hero" id="aide">
+  <div class="ha-dots"><span></span><span></span><span></span></div>
+  <h1>Centre <span>d'aide</span></h1>
+  <p>Tout ce dont vous avez besoin pour utiliser WeCare efficacement. Guides, FAQ et bonnes pratiques.</p>
+  <div class="ha-search">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="Rechercher dans l'aide…" id="haSearch">
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="ha-cats">
+  <div class="ha-cats-inner">
+    <a href="#demarrage" class="ha-cat-card">
+      <h3>Premiers pas</h3>
+      <p>Créer votre compte, configurer votre espace et inviter votre équipe.</p>
+    </a>
+    <a href="#beneficiaires" class="ha-cat-card">
+      <h3>Bénéficiaires</h3>
+      <p>Ajouter, modifier et suivre les profils des personnes prises en charge.</p>
+    </a>
+    <a href="#planning" class="ha-cat-card">
+      <h3>Planning & interventions</h3>
+      <p>Créer et gérer les plannings, affecter les soignants aux interventions.</p>
+    </a>
+    <a href="#comptes-rendus" class="ha-cat-card">
+      <h3>Comptes rendus</h3>
+      <p>Rédiger, consulter et archiver les comptes rendus d'intervention.</p>
+    </a>
+    <a href="#abonnement" class="ha-cat-card">
+      <h3>Abonnement & facturation</h3>
+      <p>Plans tarifaires, renouvellement et gestion de votre abonnement.</p>
+    </a>
+    <a href="#securite" class="ha-cat-card">
+      <h3>Sécurité & données</h3>
+      <p>Protection des données, RGPD, rôles et gestion des accès.</p>
+    </a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="ha-faq">
+  <div class="ha-faq-inner">
+    <div class="ha-section-label">Foire aux questions</div>
+    <div class="ha-section-title">Questions fréquentes</div>
+
+    <!-- Premiers pas -->
+    <div class="ha-group" id="demarrage">
+      <div class="ha-group-title">Premiers pas</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment créer mon compte WeCare ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Rendez-vous sur la page <a href="{{ path('landing_pricing') }}">Tarifs</a> et cliquez sur « Essai gratuit ». Remplissez le formulaire d'inscription avec les informations de votre structure. Un email de confirmation vous sera envoyé dans les minutes qui suivent.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment inviter des soignants sur ma plateforme ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Depuis le tableau de bord administrateur, accédez à la section « Soignants » dans la barre latérale. Cliquez sur « Ajouter un soignant », renseignez ses informations, et un compte lui sera automatiquement créé. Il recevra ses identifiants par email.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Quels sont les différents rôles disponibles ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          WeCare propose trois rôles : <strong>Administrateur</strong> (gestion complète de la structure), <strong>Intervenant / Soignant</strong> (accès à son planning, ses patients et ses comptes rendus) et <strong>Bénéficiaire</strong> (consultation de son planning et communication avec son équipe soignante).
+        </div>
+      </div>
+    </div>
+
+    <!-- Bénéficiaires -->
+    <div class="ha-group" id="beneficiaires">
+      <div class="ha-group-title">Bénéficiaires</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment ajouter un nouveau bénéficiaire ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Dans l'espace administrateur, rendez-vous dans « Patients » puis cliquez sur « Ajouter un patient ». Renseignez les informations personnelles, médicales et de contact. Le bénéficiaire recevra un accès à son espace personnel par email.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Un bénéficiaire peut-il voir ses informations médicales ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Le bénéficiaire a accès à son planning d'interventions, aux comptes rendus de ses soignants et à la messagerie. Les informations médicales sensibles sont réservées aux administrateurs et aux intervenants autorisés.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment affecter un aidant à un bénéficiaire ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Dans la fiche du bénéficiaire, accédez à l'onglet « Entourage ». Vous pouvez y associer un ou plusieurs aidants (famille, proches) qui pourront accéder en lecture au planning et aux actualités du bénéficiaire.
+        </div>
+      </div>
+    </div>
+
+    <!-- Planning -->
+    <div class="ha-group" id="planning">
+      <div class="ha-group-title">Planning & interventions</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment créer un planning hebdomadaire ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Depuis « Planning » dans le menu admin, cliquez sur « Nouveau planning ». Sélectionnez la semaine, ajoutez les intervenants concernés, puis créez les créneaux d'intervention un par un ou par glisser-déposer. Une fois finalisé, publiez le planning pour qu'il soit visible par les soignants et bénéficiaires.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Quelle est la différence entre un planning « Brouillon » et « Publié » ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Un planning en <strong>Brouillon</strong> n'est visible que par l'administrateur — il peut être modifié librement. Une fois <strong>Publié</strong>, les soignants et bénéficiaires y ont accès. Les plannings <strong>Archivés</strong> correspondent aux semaines passées et servent d'historique.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment signaler un incident lors d'une intervention ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Le soignant peut déclarer un incident directement depuis son application, dans la fiche de l'intervention concernée. L'administrateur est notifié en temps réel et peut consulter le détail depuis « Incidents » dans son tableau de bord.
+        </div>
+      </div>
+    </div>
+
+    <!-- Comptes rendus -->
+    <div class="ha-group" id="comptes-rendus">
+      <div class="ha-group-title">Comptes rendus</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment rédiger un compte rendu d'intervention ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Après chaque intervention, le soignant accède à « Comptes rendus » dans son espace et clique sur « Nouveau compte rendu ». Il sélectionne l'intervention correspondante, renseigne ses observations et valide. Le compte rendu est immédiatement accessible à l'administrateur.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Le bénéficiaire peut-il consulter les comptes rendus ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Oui, le bénéficiaire a accès aux comptes rendus qui le concernent depuis son espace personnel. Seuls les comptes rendus marqués « visibles par le bénéficiaire » par l'administrateur sont affichés.
+        </div>
+      </div>
+    </div>
+
+    <!-- Abonnement -->
+    <div class="ha-group" id="abonnement">
+      <div class="ha-group-title">Abonnement & facturation</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Puis-je changer de plan tarifaire en cours d'abonnement ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Oui, vous pouvez évoluer vers un plan supérieur à tout moment depuis les paramètres de votre compte. La différence de prix est calculée au prorata de la période restante. Pour un downgrade, le changement prend effet à la prochaine date de renouvellement.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Que se passe-t-il si je dépasse le nombre de bénéficiaires de mon plan ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Une notification vous est envoyée lorsque vous approchez de la limite. Vous ne pourrez pas ajouter de nouveaux bénéficiaires sans passer à un plan supérieur. Vos données et accès existants restent intacts pendant cette période.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment résilier mon abonnement ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Vous pouvez résilier depuis les paramètres de votre compte ou en contactant notre support via la page <a href="{{ path('landing_contact') }}">Contact</a>. L'accès reste actif jusqu'à la fin de la période en cours. Vos données sont exportables sur demande.
+        </div>
+      </div>
+    </div>
+
+    <!-- Sécurité -->
+    <div class="ha-group" id="securite">
+      <div class="ha-group-title">Sécurité & données</div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          WeCare est-il conforme au RGPD ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Oui. WeCare est hébergé en France sur des serveurs certifiés HDS (Hébergeur de Données de Santé). Toutes les données sont chiffrées au repos et en transit. Vous pouvez exercer vos droits d'accès, de rectification et de suppression en nous contactant à tout moment.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Comment gérer les accès et permissions de mon équipe ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Depuis « Paramètres » dans le menu admin, vous gérez les rôles et niveaux d'accès de chaque membre de l'équipe. Vous pouvez désactiver un compte instantanément, réinitialiser un mot de passe ou modifier les permissions sans perte de données.
+        </div>
+      </div>
+
+      <div class="ha-item">
+        <div class="ha-item-q">
+          Puis-je exporter les données de ma structure ?
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ha-item-a">
+          Oui, les administrateurs peuvent exporter l'ensemble des données (bénéficiaires, plannings, comptes rendus) au format CSV ou PDF depuis les paramètres. Pour une extraction complète, contactez notre équipe support.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="ha-cta">
+  <h2>Vous n'avez pas trouvé votre réponse ?</h2>
+  <p>Notre équipe support est disponible du lundi au vendredi, de 9h à 18h.</p>
+  <div class="ha-cta-btns">
+    <a href="{{ path('landing_contact') }}" class="ha-cta-btn-ghost">Nous contacter</a>
+    <a href="{{ path('landing_pricing') }}" class="ha-cta-btn-teal">Essai gratuit</a>
+  </div>
+</section>
+
 {{ include('landing/_footer.html.twig') }}
+
+<script>
+  // Accordion FAQ
+  document.querySelectorAll('.ha-item-q').forEach(function(q) {
+    q.addEventListener('click', function() {
+      var item = this.closest('.ha-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.ha-item.open').forEach(function(el) { el.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Recherche simple (filtre les questions visibles)
+  document.getElementById('haSearch').addEventListener('input', function() {
+    var q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.ha-item').forEach(function(item) {
+      var text = item.textContent.toLowerCase();
+      item.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+    document.querySelectorAll('.ha-group').forEach(function(group) {
+      var visible = Array.from(group.querySelectorAll('.ha-item')).some(function(i) { return i.style.display !== 'none'; });
+      group.style.display = visible ? '' : 'none';
+    });
+  });
+</script>
 </body>
 </html>

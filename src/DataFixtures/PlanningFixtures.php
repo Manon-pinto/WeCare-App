@@ -23,10 +23,10 @@ class PlanningFixtures extends Fixture implements DependentFixtureInterface
 
         // [semaine, statut, intervenant refs inclus]
         $planningsData = [
-            ['monday last week',  StatutPlanning::Archive,  ['interv_0', 'interv_2']],
-            ['monday this week',  StatutPlanning::Publie,   ['interv_0', 'interv_1', 'interv_2', 'interv_3']],
-            ['monday this week',  StatutPlanning::Publie,   ['interv2_0', 'interv2_1']],
-            ['monday next week',  StatutPlanning::Brouillon, ['interv_0', 'interv_1']],
+            ['2026-06-15',  StatutPlanning::Archive,  ['interv_0', 'interv_2']],
+            ['2026-06-22',  StatutPlanning::Publie,   ['interv_0', 'interv_1', 'interv_2', 'interv_3']],
+            ['2026-06-22',  StatutPlanning::Publie,   ['interv2_0', 'interv2_1']],
+            ['2026-06-29',  StatutPlanning::Brouillon, ['interv_0', 'interv_1']],
         ];
 
         foreach ($planningsData as $k => [$semaine, $statut, $ivRefs]) {
