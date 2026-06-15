@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande envoyée – WeCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+    .confirm-page {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      background: #F1FAF9;
+    }
+    .confirm-center {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 60px 24px;
+    }
+    .confirm-card {
+      background: #fff; border-radius: 24px;
+      padding: 56px 48px; max-width: 520px; width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 48px rgba(15,0,75,0.08);
+    }
+    .confirm-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, #41A096, #5be8dc);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 24px rgba(65,160,150,0.35);
+    }
+    .confirm-title {
+      font-size: 1.7rem; font-weight: 800; color: #0c0052;
+      line-height: 1.25; margin-bottom: 12px;
+    }
+    .confirm-sub {
+      font-size: 0.88rem; color: #7a75a0; line-height: 1.75;
+      margin-bottom: 32px;
+    }
+    .confirm-steps {
+      display: flex; flex-direction: column; gap: 12px;
+      text-align: left; margin-bottom: 36px;
+    }
+    .confirm-step {
+      display: flex; align-items: center; gap: 14px;
+      background: #F1FAF9; border-radius: 12px; padding: 14px 16px;
+    }
+    .confirm-step-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #fff; border: 1.5px solid #b8ede9;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .confirm-step-text { font-size: 0.84rem; color: #0c0052; font-weight: 500; }
+    .confirm-step-text span { color: #41A096; font-weight: 700; }
+
+    .confirm-plan-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(65,160,150,0.1); border: 1.5px solid #b8ede9;
+      border-radius: 20px; padding: 6px 16px; margin-bottom: 28px;
+      font-size: 0.80rem; font-weight: 700; color: #41A096;
+    }
+
+    .confirm-btns {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .confirm-btn-main {
+      display: block; padding: 13px; background: #41A096; color: #fff;
+      border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+      text-align: center; transition: opacity 0.15s;
+    }
+    .confirm-btn-main:hover { opacity: 0.88; }
+    .confirm-btn-sec {
+      display: block; padding: 13px; background: transparent; color: #7a75a0;
+      border-radius: 10px; font-weight: 600; font-size: 0.86rem;
+      text-align: center; border: 1.5px solid #e8e4f0;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .confirm-btn-sec:hover { border-color: #41A096; color: #41A096; }
+
+    @media (max-width: 600px) {
+      .confirm-card { padding: 36px 24px; }
+      .confirm-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body class="confirm-page">
+
+{{ include('landing/_nav.html.twig') }}
+
+<div class="confirm-center">
+  <div class="confirm-card">
+
+    <div class="confirm-icon">
+      <svg width="32" height="32" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+
+    <div class="confirm-plan-badge" id="plan-badge">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Forfait Gratuit sélectionné
+    </div>
+
+    <h1 class="confirm-title">Votre demande<br>a bien été envoyée !</h1>
+    <p class="confirm-sub">
+      Notre équipe commerciale analyse votre demande et vous fera parvenir un devis personnalisé dans les <strong>24 heures ouvrées</strong>.
+    </p>
+
+    <div class="confirm-steps">
+      <div class="confirm-step">
+        <div class="confirm-step-icon">
+          <svg width="16" height="16" fill="none" stroke="#41A096" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="confirm-step-text">Vous recevrez votre devis par <span>email</span> sous 24h ouvrées</div>
+      </div>
+      <div class="confirm-step">
+        <div class="confirm-step-icon">
+          <svg width="16" height="16" fill="none" stroke="#41A096" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.66a16 16 0 0 0 6.06 6.06l1.27-.85a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="confirm-step-text">Notre équipe peut vous appeler pour <span>affiner votre offre</span></div>
+      </div>
+      <div class="confirm-step">
+        <div class="confirm-step-icon">
+          <svg width="16" height="16" fill="none" stroke="#41A096" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="confirm-step-text">Signature électronique du devis → <span>accès immédiat</span></div>
+      </div>
+    </div>
+
+    <div class="confirm-btns">
+      <a href="/" class="confirm-btn-main">Retour à l'accueil</a>
+      <a href="/fonctionnalites" class="confirm-btn-sec">Découvrir les fonctionnalités</a>
+    </div>
+
+  </div>
+</div>
+
+{{ include('landing/_footer.html.twig') }}
+
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get('plan') || 'gratuit';
+  const labels = { gratuit: 'Forfait Gratuit', mensuel: 'Forfait Mensuel', annuel: 'Forfait Annuel' };
+  document.getElementById('plan-badge').innerHTML =
+    '<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' +
+    (labels[plan] || 'Forfait Gratuit') + ' sélectionné';
+})();
+</script>
+
+</body>
+</html>

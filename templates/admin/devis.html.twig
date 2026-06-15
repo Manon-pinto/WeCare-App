@@ -1,0 +1,409 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devis – WeCare Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/admin/css/sidebar.css') }}">
+<style>
+  .page-content { margin-left: 240px; padding: 32px 36px; min-height: 100vh; background: #f5f4fb; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .topbar h1 { font-size: 1.3rem; font-weight: 800; color: #0c0052; }
+  .topbar p  { font-size: 0.82rem; color: #9a95b8; margin-top: 2px; }
+
+  /* ── Stats rapides ── */
+  .devis-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px;
+  }
+  .devis-stat {
+    background: #fff; border-radius: 14px; padding: 18px 20px;
+    border: 1px solid #f0eef8;
+  }
+  .devis-stat-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b0a8cc; margin-bottom: 8px; }
+  .devis-stat-value { font-size: 1.7rem; font-weight: 800; color: #0c0052; }
+  .devis-stat-sub   { font-size: 0.76rem; color: #9a95b8; margin-top: 3px; }
+
+  /* ── Filtres ── */
+  .devis-filters {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 16px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+    border: 1.5px solid #e8e4f0; background: #fff; color: #7a75a0; cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .filter-btn.active, .filter-btn:hover { background: #0c0052; color: #fff; border-color: #0c0052; }
+  .filter-btn.active-en-attente { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+  .filter-btn.active-envoye     { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  .filter-btn.active-signe      { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+  .filter-btn.active-refuse     { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+
+  /* ── Table ── */
+  .devis-table-wrap { background: #fff; border-radius: 16px; border: 1px solid #f0eef8; overflow: hidden; }
+  .devis-table { width: 100%; border-collapse: collapse; }
+  .devis-table thead tr { background: #faf9fd; }
+  .devis-table th {
+    padding: 13px 16px; text-align: left; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #b0a8cc;
+    border-bottom: 1px solid #f0eef8;
+  }
+  .devis-table td {
+    padding: 14px 16px; font-size: 0.84rem; color: #3a357f;
+    border-bottom: 1px solid #f8f7fc; vertical-align: middle;
+  }
+  .devis-table tbody tr:last-child td { border-bottom: none; }
+  .devis-table tbody tr:hover { background: #faf9fd; }
+
+  .td-name { font-weight: 700; color: #0c0052; }
+  .td-struct { font-size: 0.78rem; color: #7a75a0; margin-top: 2px; }
+
+  /* Badges statut */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px; font-size: 0.70rem; font-weight: 700;
+  }
+  .badge-en-attente { background: #fef9c3; color: #854d0e; }
+  .badge-envoye     { background: #dbeafe; color: #1e40af; }
+  .badge-signe      { background: #dcfce7; color: #15803d; }
+  .badge-refuse     { background: #fee2e2; color: #b91c1c; }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Badge plan */
+  .plan-pill {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.68rem; font-weight: 700;
+  }
+  .plan-pill-gratuit { background: #e8f5f3; color: #41A096; }
+  .plan-pill-mensuel { background: #ede9fe; color: #7c3aed; }
+  .plan-pill-annuel  { background: #0c0052; color: #fff; }
+
+  /* Actions */
+  .td-actions { display: flex; align-items: center; gap: 8px; }
+  .action-btn {
+    padding: 6px 12px; border-radius: 8px; font-size: 0.76rem; font-weight: 600;
+    border: none; cursor: pointer; font-family: inherit; transition: opacity 0.15s;
+  }
+  .action-btn:hover { opacity: 0.82; }
+  .btn-voir    { background: #f0eef8; color: #3a357f; }
+  .btn-envoyer { background: #0c0052; color: #fff; }
+  .btn-signer  { background: #41A096; color: #fff; }
+  .btn-refus   { background: #fee2e2; color: #b91c1c; }
+
+  /* ── Modale détail / ajustement ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(12,0,82,0.45); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 20px; padding: 36px 32px;
+    width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: #f0eef8; border: none; border-radius: 8px;
+    width: 32px; height: 32px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #7a75a0; font-size: 1.1rem;
+  }
+  .modal-title { font-size: 1.1rem; font-weight: 800; color: #0c0052; margin-bottom: 4px; }
+  .modal-sub   { font-size: 0.80rem; color: #9a95b8; margin-bottom: 24px; }
+
+  .modal-section { margin-bottom: 20px; }
+  .modal-section-title {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: #b0a8cc; margin-bottom: 10px;
+  }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-field-label { font-size: 0.72rem; color: #9a95b8; margin-bottom: 3px; }
+  .modal-field-value { font-size: 0.86rem; font-weight: 600; color: #0c0052; }
+
+  .modal-input {
+    width: 100%; padding: 10px 14px; border: 1.5px solid #e2ddf0;
+    border-radius: 10px; font-family: inherit; font-size: 0.86rem;
+    color: #0c0052; background: #faf9fd; outline: none;
+    transition: border-color 0.15s; margin-top: 4px;
+  }
+  .modal-input:focus { border-color: #41A096; }
+  textarea.modal-input { min-height: 80px; resize: vertical; }
+
+  .modal-btns { display: flex; gap: 10px; margin-top: 24px; }
+  .modal-btn  {
+    flex: 1; padding: 12px; border-radius: 10px; border: none;
+    font-family: inherit; font-size: 0.88rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .modal-btn:hover { opacity: 0.85; }
+  .modal-btn-save   { background: #0c0052; color: #fff; }
+  .modal-btn-send   { background: #41A096; color: #fff; }
+  .modal-btn-cancel { background: #f0eef8; color: #7a75a0; }
+
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: #0c0052; color: #fff; border-radius: 12px;
+    padding: 14px 20px; font-size: 0.84rem; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(12,0,82,0.25);
+    transform: translateY(80px); opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+    z-index: 2000;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="page-content">
+
+  <div class="topbar">
+    <div>
+      <h1>Demandes de devis</h1>
+      <p>Gérez et envoyez les devis à vos prospects</p>
+    </div>
+  </div>
+
+  {# ── Stats rapides ── #}
+  <div class="devis-stats">
+    <div class="devis-stat">
+      <div class="devis-stat-label">Total reçus</div>
+      <div class="devis-stat-value">{{ devis|length }}</div>
+      <div class="devis-stat-sub">toutes périodes</div>
+    </div>
+    <div class="devis-stat">
+      <div class="devis-stat-label">En attente</div>
+      <div class="devis-stat-value" style="color:#854d0e">{{ devis|filter(d => d.statut == 'en_attente')|length }}</div>
+      <div class="devis-stat-sub">à traiter</div>
+    </div>
+    <div class="devis-stat">
+      <div class="devis-stat-label">Envoyés</div>
+      <div class="devis-stat-value" style="color:#1e40af">{{ devis|filter(d => d.statut == 'envoye')|length }}</div>
+      <div class="devis-stat-sub">en attente de signature</div>
+    </div>
+    <div class="devis-stat">
+      <div class="devis-stat-label">Signés</div>
+      <div class="devis-stat-value" style="color:#15803d">{{ devis|filter(d => d.statut == 'signe')|length }}</div>
+      <div class="devis-stat-sub">clients actifs</div>
+    </div>
+  </div>
+
+  {# ── Filtres ── #}
+  <div class="devis-filters">
+    <button class="filter-btn active" onclick="filterDevis('tous', this)">Tous</button>
+    <button class="filter-btn" onclick="filterDevis('en_attente', this)">En attente</button>
+    <button class="filter-btn" onclick="filterDevis('envoye', this)">Envoyés</button>
+    <button class="filter-btn" onclick="filterDevis('signe', this)">Signés</button>
+    <button class="filter-btn" onclick="filterDevis('refuse', this)">Refusés</button>
+  </div>
+
+  {# ── Table ── #}
+  <div class="devis-table-wrap">
+    <table class="devis-table">
+      <thead>
+        <tr>
+          <th>Contact</th>
+          <th>Plan</th>
+          <th>Structure</th>
+          <th>Intervenants</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="devis-tbody">
+        {% for d in devis %}
+        <tr data-statut="{{ d.statut }}" data-id="{{ d.id }}">
+          <td>
+            <div class="td-name">{{ d.prenom }} {{ d.nom }}</div>
+            <div class="td-struct">{{ d.email }}</div>
+          </td>
+          <td>
+            <span class="plan-pill plan-pill-{{ d.plan }}">
+              {% if d.plan == 'gratuit' %}Gratuit
+              {% elseif d.plan == 'mensuel' %}Mensuel
+              {% else %}Annuel{% endif %}
+            </span>
+          </td>
+          <td>
+            <div style="font-weight:600;color:#0c0052">{{ d.structure }}</div>
+            <div style="font-size:0.76rem;color:#9a95b8">{{ d.typeStructure|upper }}</div>
+          </td>
+          <td>{{ d.nbIntervenants ?: '—' }}</td>
+          <td style="font-size:0.78rem;color:#9a95b8">{{ d.createdAt|date('d/m/Y') }}</td>
+          <td>
+            {% if d.statut == 'en_attente' %}
+              <span class="badge badge-en-attente">En attente</span>
+            {% elseif d.statut == 'envoye' %}
+              <span class="badge badge-envoye">Envoyé</span>
+            {% elseif d.statut == 'signe' %}
+              <span class="badge badge-signe">Signé</span>
+            {% else %}
+              <span class="badge badge-refuse">Refusé</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="td-actions">
+              <button class="action-btn btn-voir" onclick="openModal({{ {
+                id: d.id,
+                prenom: d.prenom,
+                nom: d.nom,
+                email: d.email,
+                telephone: d.telephone,
+                structure: d.structure,
+                typeStructure: d.typeStructure,
+                nbIntervenants: d.nbIntervenants,
+                nbBeneficiaires: d.nbBeneficiaires,
+                plan: d.plan,
+                message: d.message,
+                statut: d.statut,
+                montant: d.montant,
+                note: d.note
+              }|json_encode|raw }})">Voir</button>
+              {% if d.statut == 'en_attente' %}
+                <button class="action-btn btn-envoyer" onclick="sendDevis({{ d.id }})">Envoyer</button>
+              {% elseif d.statut == 'envoye' %}
+                <button class="action-btn btn-signer" onclick="markSigned({{ d.id }})">Signé</button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align:center;padding:48px;color:#b0a8cc;font-size:0.88rem">
+            Aucune demande de devis pour le moment.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{# ── Modale détail / ajustement ── #}
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Demande de devis</div>
+    <div class="modal-sub" id="modal-sub"></div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Informations prospect</div>
+      <div class="modal-grid">
+        <div><div class="modal-field-label">Prénom / Nom</div><div class="modal-field-value" id="m-nom"></div></div>
+        <div><div class="modal-field-label">Email</div><div class="modal-field-value" id="m-email"></div></div>
+        <div><div class="modal-field-label">Téléphone</div><div class="modal-field-value" id="m-tel"></div></div>
+        <div><div class="modal-field-label">Structure</div><div class="modal-field-value" id="m-structure"></div></div>
+        <div><div class="modal-field-label">Type</div><div class="modal-field-value" id="m-type"></div></div>
+        <div><div class="modal-field-label">Intervenants</div><div class="modal-field-value" id="m-intervenants"></div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Message du prospect</div>
+      <div class="modal-field-value" id="m-message" style="font-weight:400;color:#5a5580;font-size:0.84rem;line-height:1.6"></div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Ajustement du devis</div>
+      <div class="modal-field-label">Montant proposé (€ HT)</div>
+      <input type="number" class="modal-input" id="m-montant" placeholder="Ex : 539">
+      <div class="modal-field-label" style="margin-top:12px">Note interne / conditions particulières</div>
+      <textarea class="modal-input" id="m-note" placeholder="Conditions spéciales, remise accordée, date de démarrage…"></textarea>
+    </div>
+
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-save"   onclick="saveDevis()">Enregistrer</button>
+      <button class="modal-btn modal-btn-send"   onclick="sendFromModal()">Envoyer au prospect</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentId = null;
+
+function openModal(d) {
+  currentId = d.id;
+  document.getElementById('modal-title').textContent = 'Devis – ' + d.prenom + ' ' + d.nom;
+  document.getElementById('modal-sub').textContent   = d.structure + ' · ' + (d.plan.charAt(0).toUpperCase() + d.plan.slice(1));
+  document.getElementById('m-nom').textContent        = d.prenom + ' ' + d.nom;
+  document.getElementById('m-email').textContent      = d.email;
+  document.getElementById('m-tel').textContent        = d.telephone || '—';
+  document.getElementById('m-structure').textContent  = d.structure;
+  document.getElementById('m-type').textContent       = (d.typeStructure || '—').toUpperCase();
+  document.getElementById('m-intervenants').textContent = d.nbIntervenants || '—';
+  document.getElementById('m-message').textContent    = d.message || 'Aucun message.';
+  document.getElementById('m-montant').value          = d.montant || '';
+  document.getElementById('m-note').value             = d.note || '';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentId = null;
+}
+
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color || '#0c0052';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function saveDevis() {
+  const montant = document.getElementById('m-montant').value;
+  const note    = document.getElementById('m-note').value;
+  try {
+    await fetch('/admin/devis/' + currentId + '/ajuster', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ montant, note })
+    });
+    showToast('Devis enregistré ✓', '#0c0052');
+    closeModal();
+  } catch { showToast('Erreur lors de la sauvegarde', '#b91c1c'); }
+}
+
+async function sendFromModal() {
+  await saveDevis();
+  await sendDevis(currentId);
+}
+
+async function sendDevis(id) {
+  try {
+    const r = await fetch('/admin/devis/' + id + '/envoyer', { method: 'POST' });
+    if (r.ok) {
+      showToast('Devis envoyé au prospect ✓', '#41A096');
+      setTimeout(() => location.reload(), 1500);
+    } else { showToast('Erreur lors de l\'envoi', '#b91c1c'); }
+  } catch { showToast('Erreur réseau', '#b91c1c'); }
+}
+
+async function markSigned(id) {
+  try {
+    const r = await fetch('/admin/devis/' + id + '/signer', { method: 'POST' });
+    if (r.ok) {
+      showToast('Devis marqué comme signé ✓', '#15803d');
+      setTimeout(() => location.reload(), 1500);
+    }
+  } catch { showToast('Erreur réseau', '#b91c1c'); }
+}
+
+function filterDevis(statut, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#devis-tbody tr[data-statut]').forEach(row => {
+    row.style.display = (statut === 'tous' || row.dataset.statut === statut) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

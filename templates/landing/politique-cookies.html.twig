@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politique de cookies – WeCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+    .ml-hero {
+      background: #fff;
+      padding: 64px 48px 40px;
+      text-align: center;
+      border-bottom: 1px solid #f0eef8;
+    }
+    .ml-hero-bar {
+      width: 36px; height: 4px;
+      background: #41A096;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .ml-hero-title {
+      font-size: 2.2rem; font-weight: 800; color: #0c0052;
+      line-height: 1.15; margin-bottom: 12px;
+    }
+    .ml-hero-date { font-size: 0.82rem; color: #9a95b8; }
+
+    .ml-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 48px 80px;
+    }
+    .ml-section { margin-bottom: 48px; }
+    .ml-section-title {
+      font-size: 1.05rem; font-weight: 700; color: #0c0052;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ml-section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 18px;
+      background: #41A096;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .ml-section p, .ml-section li {
+      font-size: 0.88rem; color: #5a5580; line-height: 1.75;
+    }
+    .ml-section ul {
+      list-style: none; padding: 0; margin: 10px 0 0;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ml-section ul li {
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .ml-section ul li::before {
+      content: '•'; color: #41A096; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+    }
+    .ml-section a { color: #41A096; font-weight: 600; text-decoration: underline; }
+    .ml-divider { height: 1px; background: #f0eef8; margin: 0 0 48px; }
+
+    /* Tableau des cookies */
+    .cookie-table {
+      width: 100%; border-collapse: collapse; margin-top: 16px;
+      font-size: 0.84rem;
+    }
+    .cookie-table thead tr {
+      background: #0c0052; color: #fff;
+    }
+    .cookie-table th {
+      padding: 12px 16px; text-align: left; font-weight: 600;
+      font-size: 0.78rem; letter-spacing: 0.04em;
+    }
+    .cookie-table th:first-child { border-radius: 10px 0 0 0; }
+    .cookie-table th:last-child { border-radius: 0 10px 0 0; }
+    .cookie-table tbody tr {
+      border-bottom: 1px solid #f0eef8;
+      transition: background 0.15s;
+    }
+    .cookie-table tbody tr:hover { background: #FDFBFF; }
+    .cookie-table td {
+      padding: 12px 16px; color: #5a5580; vertical-align: top;
+    }
+    .cookie-table td:first-child { font-weight: 600; color: #0c0052; }
+
+    /* Badge durée */
+    .cookie-badge {
+      display: inline-block;
+      background: #e8f5f3; color: #41A096;
+      font-size: 0.70rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .cookie-badge.session { background: #f0eef8; color: #7a60cc; }
+    .cookie-badge.required { background: #e8f5f3; color: #41A096; }
+    .cookie-badge.optional { background: #fff3e0; color: #e08000; }
+
+    /* Toggle consent */
+    .cookie-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #FDFBFF; border: 1px solid #e8e4f8;
+      border-radius: 12px; padding: 16px 20px; margin-top: 12px;
+    }
+    .cookie-toggle-label { font-size: 0.88rem; font-weight: 600; color: #0c0052; }
+    .cookie-toggle-desc { font-size: 0.78rem; color: #9a95b8; margin-top: 2px; }
+    .cookie-toggle {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .cookie-toggle input { opacity: 0; width: 0; height: 0; }
+    .cookie-toggle-slider {
+      position: absolute; inset: 0;
+      background: #d0cce8; border-radius: 24px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cookie-toggle-slider::before {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; left: 3px; top: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .cookie-toggle input:checked + .cookie-toggle-slider { background: #41A096; }
+    .cookie-toggle input:checked + .cookie-toggle-slider::before { transform: translateX(20px); }
+    .cookie-toggle input:disabled + .cookie-toggle-slider { opacity: 0.5; cursor: not-allowed; }
+
+    .cookie-save-btn {
+      margin-top: 20px;
+      padding: 12px 32px; background: #41A096; color: #fff;
+      border: none; border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif; cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .cookie-save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      .ml-hero { padding: 48px 24px 32px; }
+      .ml-wrap { padding: 40px 24px 60px; }
+      .ml-hero-title { font-size: 1.7rem; }
+      .cookie-table { font-size: 0.78rem; }
+      .cookie-table th, .cookie-table td { padding: 10px 10px; }
+    }
+    @media (max-width: 480px) {
+      .ml-hero { padding: 36px 20px 28px; }
+      .ml-wrap { padding: 32px 20px 48px; }
+    }
+  </style>
+</head>
+<body>
+
+{{ include('landing/_nav.html.twig') }}
+
+<section class="ml-hero">
+  <div class="ml-hero-bar"></div>
+  <h1 class="ml-hero-title">Politique de cookies</h1>
+  <p class="ml-hero-date">Dernière mise à jour : 15 juin 2026</p>
+</section>
+
+<div class="ml-wrap">
+
+  {# ── 1. Qu'est-ce qu'un cookie ? ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Qu'est-ce qu'un cookie ?</h2>
+    <p>
+      Un cookie est un petit fichier texte déposé sur votre terminal (ordinateur, tablette, smartphone) lors de la visite d'un site web. Il permet au site de mémoriser des informations sur votre visite et de vous reconnaître lors de vos prochaines connexions.
+    </p>
+    <p style="margin-top:10px;">
+      Conformément à la directive ePrivacy et aux recommandations de la <strong>CNIL</strong>, certains cookies nécessitent votre consentement préalable. D'autres, strictement nécessaires au fonctionnement du site, sont déposés sans consentement.
+    </p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 2. Cookies utilisés ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Cookies utilisés sur wecare-app.fr</h2>
+    <table class="cookie-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Finalité</th>
+          <th>Durée</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PHPSESSID</td>
+          <td>Maintien de votre session utilisateur authentifiée</td>
+          <td><span class="cookie-badge session">Session</span></td>
+          <td><span class="cookie-badge required">Nécessaire</span></td>
+        </tr>
+        <tr>
+          <td>wc_remember</td>
+          <td>Option « se souvenir de moi » à la connexion</td>
+          <td><span class="cookie-badge">30 jours</span></td>
+          <td><span class="cookie-badge required">Nécessaire</span></td>
+        </tr>
+        <tr>
+          <td>wc_consent</td>
+          <td>Mémorisation de vos préférences de cookies</td>
+          <td><span class="cookie-badge">12 mois</span></td>
+          <td><span class="cookie-badge required">Nécessaire</span></td>
+        </tr>
+        <tr>
+          <td>wc_csrf</td>
+          <td>Protection contre les attaques CSRF (sécurité des formulaires)</td>
+          <td><span class="cookie-badge session">Session</span></td>
+          <td><span class="cookie-badge required">Nécessaire</span></td>
+        </tr>
+        <tr>
+          <td>_ga, _gid</td>
+          <td>Mesure d'audience anonymisée via Google Analytics</td>
+          <td><span class="cookie-badge">2 ans / 24h</span></td>
+          <td><span class="cookie-badge optional">Analytique</span></td>
+        </tr>
+        <tr>
+          <td>wc_lang</td>
+          <td>Mémorisation de la langue préférée de l'interface</td>
+          <td><span class="cookie-badge">12 mois</span></td>
+          <td><span class="cookie-badge required">Préférence</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 3. Gérer mes préférences ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Gérer mes préférences</h2>
+    <p>Vous pouvez accepter ou refuser les cookies non essentiels ci-dessous. Votre choix est enregistré pour 12 mois et modifiable à tout moment.</p>
+
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">Cookies strictement nécessaires</div>
+        <div class="cookie-toggle-desc">Indispensables au fonctionnement du site – ne peuvent pas être désactivés</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" checked disabled>
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">Cookies analytiques</div>
+        <div class="cookie-toggle-desc">Nous aident à comprendre comment vous utilisez le site (données anonymisées)</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" id="toggle-analytics">
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">Cookies de préférences</div>
+        <div class="cookie-toggle-desc">Permettent de mémoriser vos paramètres (langue, thème…)</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" id="toggle-prefs" checked>
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <button class="cookie-save-btn" id="cookie-save">Enregistrer mes préférences</button>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 4. Paramétrage navigateur ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Paramétrage via votre navigateur</h2>
+    <p>Vous pouvez également configurer votre navigateur pour accepter ou refuser les cookies. Voici les liens vers les instructions des principaux navigateurs :</p>
+    <ul>
+      <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Google Chrome</a></li>
+      <li><a href="https://support.mozilla.org/fr/kb/activer-desactiver-cookies-preferences" target="_blank" rel="noopener">Mozilla Firefox</a></li>
+      <li><a href="https://support.apple.com/fr-fr/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Apple Safari</a></li>
+      <li><a href="https://support.microsoft.com/fr-fr/microsoft-edge/supprimer-les-cookies-dans-microsoft-edge-63947406" target="_blank" rel="noopener">Microsoft Edge</a></li>
+    </ul>
+    <p style="margin-top:10px;">Attention : le blocage de certains cookies peut altérer le fonctionnement du site ou vous empêcher de vous connecter à votre compte.</p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 5. Contact ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Contact</h2>
+    <p>
+      Pour toute question relative à notre utilisation des cookies ou pour exercer vos droits, contactez notre DPO à l'adresse : <a href="mailto:dpo@wecare-app.fr">dpo@wecare-app.fr</a>
+    </p>
+    <p style="margin-top:10px;">
+      Vous pouvez également introduire une réclamation auprès de la <strong>CNIL</strong> : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>
+    </p>
+  </div>
+
+</div>
+
+{{ include('landing/_footer.html.twig') }}
+
+<script>
+document.getElementById('cookie-save').addEventListener('click', function() {
+  const analytics = document.getElementById('toggle-analytics').checked;
+  const prefs = document.getElementById('toggle-prefs').checked;
+  document.cookie = 'wc_consent=' + JSON.stringify({ analytics, prefs }) + '; max-age=' + 60*60*24*365 + '; path=/; SameSite=Lax';
+  this.textContent = 'Préférences enregistrées ✓';
+  this.style.background = '#2d7a71';
+  setTimeout(() => { this.textContent = 'Enregistrer mes préférences'; this.style.background = ''; }, 2500);
+});
+</script>
+
+</body>
+</html>

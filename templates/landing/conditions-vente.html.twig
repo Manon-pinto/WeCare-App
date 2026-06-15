@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conditions Générales de Vente – WeCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  {{ include('landing/_styles.html.twig') }}
+  <style>
+    .ml-hero {
+      background: #fff;
+      padding: 64px 48px 40px;
+      text-align: center;
+      border-bottom: 1px solid #f0eef8;
+    }
+    .ml-hero-bar {
+      width: 36px; height: 4px;
+      background: #41A096;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .ml-hero-title {
+      font-size: 2.2rem; font-weight: 800; color: #0c0052;
+      line-height: 1.15; margin-bottom: 12px;
+    }
+    .ml-hero-date { font-size: 0.82rem; color: #9a95b8; }
+
+    .ml-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 48px 80px;
+    }
+    .ml-section { margin-bottom: 48px; }
+    .ml-section-title {
+      font-size: 1.05rem; font-weight: 700; color: #0c0052;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ml-section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 18px;
+      background: #41A096;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .ml-section p, .ml-section li {
+      font-size: 0.88rem; color: #5a5580; line-height: 1.75;
+    }
+    .ml-section ul {
+      list-style: none; padding: 0; margin: 10px 0 0;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ml-section ul li {
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .ml-section ul li::before {
+      content: '•'; color: #41A096; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+    }
+    .ml-section a { color: #41A096; font-weight: 600; text-decoration: underline; }
+    .ml-info-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+      margin-top: 16px;
+    }
+    .ml-info-card {
+      background: #FDFBFF;
+      border: 1px solid #e8e4f8;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .ml-info-card-label {
+      font-size: 0.70rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #41A096; margin-bottom: 6px;
+    }
+    .ml-info-card-value {
+      font-size: 0.86rem; font-weight: 600; color: #0c0052; line-height: 1.5;
+    }
+    .ml-divider { height: 1px; background: #f0eef8; margin: 0 0 48px; }
+    .ml-highlight {
+      background: #FDFBFF; border-left: 3px solid #41A096;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin-top: 14px;
+      font-size: 0.86rem; color: #5a5580; line-height: 1.7;
+    }
+    @media (max-width: 768px) {
+      .ml-hero { padding: 48px 24px 32px; }
+      .ml-wrap { padding: 40px 24px 60px; }
+      .ml-info-grid { grid-template-columns: 1fr; }
+      .ml-hero-title { font-size: 1.7rem; }
+    }
+    @media (max-width: 480px) {
+      .ml-hero { padding: 36px 20px 28px; }
+      .ml-wrap { padding: 32px 20px 48px; }
+    }
+  </style>
+</head>
+<body>
+
+{{ include('landing/_nav.html.twig') }}
+
+<section class="ml-hero">
+  <div class="ml-hero-bar"></div>
+  <h1 class="ml-hero-title">Conditions Générales de Vente</h1>
+  <p class="ml-hero-date">Dernière mise à jour : 15 juin 2026</p>
+</section>
+
+<div class="ml-wrap">
+
+  {# ── 1. Objet ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Objet</h2>
+    <p>
+      Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre la société <strong>WeCare SAS</strong> (ci-après « WeCare ») et tout client professionnel (ci-après « le Client ») souscrivant à l'un des abonnements ou services proposés sur la plateforme wecare-app.fr.
+    </p>
+    <p style="margin-top:10px;">
+      Toute souscription à un service WeCare implique l'acceptation sans réserve des présentes CGV. WeCare se réserve le droit de les modifier à tout moment ; les modifications prennent effet dès leur publication en ligne.
+    </p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 2. Services proposés ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Services proposés</h2>
+    <p>WeCare propose une solution SaaS de gestion destinée aux structures de services à la personne (SAAD, SSIAD, EHPAD, CRT), comprenant notamment :</p>
+    <ul>
+      <li>Planification et optimisation des tournées d'intervenants</li>
+      <li>Gestion des bénéficiaires et des dossiers de soins</li>
+      <li>Application mobile pour les intervenants terrain</li>
+      <li>Télégestion et pointage électronique</li>
+      <li>Tableau de bord et reporting en temps réel</li>
+      <li>Espace famille et portail bénéficiaires</li>
+    </ul>
+    <p style="margin-top:10px;">Le détail des fonctionnalités par offre est disponible sur la page <a href="/tarifs">Tarifs</a>.</p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 3. Abonnements et tarifs ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Abonnements et tarifs</h2>
+    <p>Les services WeCare sont accessibles via des abonnements mensuels ou annuels. Les tarifs en vigueur sont ceux affichés sur la page <a href="/tarifs">Tarifs</a> au moment de la souscription.</p>
+    <div class="ml-info-grid">
+      <div class="ml-info-card">
+        <div class="ml-info-card-label">Facturation</div>
+        <div class="ml-info-card-value">Mensuelle ou annuelle, en début de période</div>
+      </div>
+      <div class="ml-info-card">
+        <div class="ml-info-card-label">Devise</div>
+        <div class="ml-info-card-value">Euros (€) HT, TVA applicable en sus</div>
+      </div>
+      <div class="ml-info-card">
+        <div class="ml-info-card-label">Renouvellement</div>
+        <div class="ml-info-card-value">Automatique, sauf résiliation avant la date d'échéance</div>
+      </div>
+      <div class="ml-info-card">
+        <div class="ml-info-card-label">Période d'essai</div>
+        <div class="ml-info-card-value">14 jours gratuits, sans engagement, sans CB</div>
+      </div>
+    </div>
+    <p style="margin-top:14px;">WeCare se réserve le droit de modifier ses tarifs avec un préavis d'au moins <strong>30 jours</strong> par email.</p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 4. Modalités de paiement ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Modalités de paiement</h2>
+    <p>Le paiement s'effectue en ligne par carte bancaire ou virement SEPA via notre prestataire de paiement sécurisé. Aucune donnée bancaire n'est conservée par WeCare.</p>
+    <ul>
+      <li>Paiement sécurisé par carte bancaire (Visa, Mastercard, CB)</li>
+      <li>Prélèvement SEPA pour les abonnements annuels sur devis</li>
+      <li>Paiement différé par virement sur devis pour les structures de + 50 intervenants</li>
+    </ul>
+    <div class="ml-highlight">
+      En cas de défaut de paiement, WeCare se réserve le droit de suspendre l'accès au service après mise en demeure restée infructueuse pendant 15 jours.
+    </div>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 5. Durée et résiliation ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Durée et résiliation</h2>
+    <p>
+      Les abonnements sont souscrits pour une durée d'un mois ou d'un an, renouvelables tacitement. Le Client peut résilier son abonnement à tout moment depuis son espace client, avec effet à la fin de la période en cours.
+    </p>
+    <ul>
+      <li><strong>Abonnement mensuel</strong> : résiliation sans préavis, effective à la fin du mois en cours</li>
+      <li><strong>Abonnement annuel</strong> : résiliation avec un préavis de 30 jours avant la date d'échéance annuelle</li>
+      <li>Aucun remboursement partiel pour les périodes entamées</li>
+    </ul>
+    <p style="margin-top:10px;">WeCare peut résilier le contrat en cas de violation grave des CGU ou de défaut de paiement persistant.</p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 6. Disponibilité et SLA ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Disponibilité du service (SLA)</h2>
+    <p>WeCare s'engage à maintenir une disponibilité de la plateforme de <strong>99,5 % par mois</strong>, hors maintenances planifiées notifiées au moins 48h à l'avance.</p>
+    <ul>
+      <li>Les maintenances planifiées ont lieu en dehors des heures de bureau (22h–6h)</li>
+      <li>Un tableau de bord de statut est disponible en temps réel</li>
+      <li>En cas d'incident majeur, le Client est notifié par email dans les 2 heures</li>
+    </ul>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 7. Responsabilités ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Responsabilités</h2>
+    <p>WeCare s'engage à mettre en œuvre tous les moyens raisonnables pour assurer la sécurité et la disponibilité du service. En revanche, WeCare ne saurait être tenu responsable :</p>
+    <ul>
+      <li>Des interruptions dues à des causes extérieures (force majeure, panne réseau, etc.)</li>
+      <li>D'une mauvaise utilisation du service par le Client ou ses utilisateurs</li>
+      <li>Des pertes de données résultant d'une erreur de manipulation du Client</li>
+      <li>Des conséquences indirectes liées à l'utilisation du service</li>
+    </ul>
+    <p style="margin-top:10px;">La responsabilité totale de WeCare est limitée au montant des sommes effectivement versées par le Client au cours des 12 derniers mois.</p>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 8. Données et confidentialité ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Données et confidentialité</h2>
+    <p>
+      Dans le cadre de la fourniture du service, WeCare agit en qualité de <strong>sous-traitant</strong> au sens du RGPD. Le Client demeure responsable du traitement des données personnelles de ses bénéficiaires et intervenants.
+    </p>
+    <ul>
+      <li>Un DPA (Data Processing Agreement) est disponible sur demande</li>
+      <li>Les données sont hébergées en France sur infrastructure certifiée HDS</li>
+      <li>WeCare s'engage à ne pas revendre ni exploiter les données du Client à des fins commerciales</li>
+      <li>À la résiliation, les données sont exportables pendant 90 jours puis supprimées</li>
+    </ul>
+  </div>
+
+  <div class="ml-divider"></div>
+
+  {# ── 9. Droit applicable ── #}
+  <div class="ml-section">
+    <h2 class="ml-section-title">Droit applicable et litiges</h2>
+    <p>
+      Les présentes CGV sont soumises au droit français. En cas de litige, les parties s'engagent à rechercher une solution amiable avant tout recours judiciaire. À défaut, les tribunaux de Paris seront seuls compétents.
+    </p>
+    <p style="margin-top:10px;">Pour toute question : <a href="mailto:contact@wecare-app.fr">contact@wecare-app.fr</a></p>
+  </div>
+
+</div>
+
+{{ include('landing/_footer.html.twig') }}
+
+</body>
+</html>
