@@ -2,15 +2,242 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Contact – WeCare</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   {{ include('landing/_styles.html.twig') }}
+  <style>
+
+    /* ── HERO ── */
+    .ct-hero {
+      background: #fff;
+      text-align: center;
+      padding: 72px 48px 56px;
+    }
+    .ct-dots {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 22px;
+    }
+    .ct-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+      display: inline-block;
+    }
+    .ct-dots span:nth-child(1) { background: #2CA7CB; }
+    .ct-dots span:nth-child(2) { background: #ff91fd; }
+    .ct-dots span:nth-child(3) { background: #0c0052; }
+
+    .ct-hero h1 {
+      font-size: 2.6rem; font-weight: 800; color: #0c0052;
+      line-height: 1.2; margin-bottom: 14px;
+    }
+    .ct-hero h1 span { color: #0ea899; }
+    .ct-hero p {
+      font-size: 0.94rem; color: #8a85b0;
+      max-width: 500px; margin: 0 auto; line-height: 1.75;
+    }
+    @media (max-width: 768px) {
+      .ct-hero { padding: 52px 24px 40px; }
+      .ct-hero h1 { font-size: 1.8rem; }
+    }
+
+    /* ── BODY ── */
+    .ct-body {
+      background: #fff;
+      padding: 0 48px 80px;
+    }
+    .ct-inner {
+      max-width: 980px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.6fr;
+      gap: 28px; align-items: start;
+    }
+
+    /* ── LEFT CARDS ── */
+    .ct-card {
+      background: #fff;
+      border: 1.5px solid #e0edf5;
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-bottom: 16px;
+    }
+    .ct-card-tag {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-radius: 50px;
+      padding: 4px 12px; margin-bottom: 14px;
+    }
+    .ct-card-tag.pink { color: #cc2ca7; background: rgba(204,44,167,0.08); }
+    .ct-card-tag.teal { color: #0ea899; background: rgba(14,168,153,0.10); }
+
+    .ct-card h3 {
+      font-size: 1rem; font-weight: 700; color: #0c0052;
+      margin-bottom: 8px;
+    }
+    .ct-card p {
+      font-size: 0.84rem; color: #8a85b0; line-height: 1.65;
+      margin-bottom: 20px;
+    }
+    .ct-card-btn {
+      display: inline-block;
+      padding: 10px 22px; border-radius: 10px;
+      font-size: 0.83rem; font-weight: 600;
+      border: 1.5px solid #0c0052; color: #0c0052;
+      text-decoration: none; transition: all 0.15s;
+    }
+    .ct-card-btn:hover { background: #0c0052; color: #fff; }
+
+    .ct-phone {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: #3a357f; font-weight: 500;
+      padding: 10px 4px;
+    }
+    .ct-phone a { color: #2CA7CB; font-weight: 600; text-decoration: underline; }
+
+    /* ── RIGHT FORM ── */
+    .ct-form-wrap {
+      background: #fff;
+      border: 1.5px solid #e0edf5;
+      border-radius: 16px;
+      padding: 36px 32px;
+    }
+    .ct-form-group { margin-bottom: 18px; }
+    .ct-form-group label {
+      display: block;
+      font-size: 0.78rem; font-weight: 600;
+      color: #0c0052; margin-bottom: 7px;
+    }
+    .ct-form-group label span { color: #0ea899; }
+    .ct-form-group input,
+    .ct-form-group textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #d4e8f0;
+      border-radius: 10px;
+      font-size: 0.88rem; color: #0c0052;
+      font-family: 'Poppins', sans-serif;
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .ct-form-group input::placeholder,
+    .ct-form-group textarea::placeholder { color: #b0acd0; }
+    .ct-form-group input:focus,
+    .ct-form-group textarea:focus {
+      border-color: #0ea899;
+      box-shadow: 0 0 0 3px rgba(14,168,153,0.13);
+    }
+    .ct-form-group textarea {
+      resize: vertical; min-height: 120px;
+    }
+    .ct-submit {
+      background: #0ea899; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 0.9rem; font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .ct-submit:hover { background: #0db8a6; transform: translateY(-1px); }
+    .ct-submit:active { transform: translateY(0); }
+
+    .ct-success {
+      display: none;
+      align-items: center; gap: 10px;
+      background: rgba(14,168,153,0.10);
+      border: 1px solid #0ea899;
+      border-radius: 10px; padding: 13px 16px;
+      font-size: 0.86rem; font-weight: 600; color: #0a7a6e;
+      margin-top: 16px;
+    }
+    .ct-success.show { display: flex; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .ct-body { padding: 0 20px 60px; }
+      .ct-inner { grid-template-columns: 1fr; }
+      .ct-form-wrap { padding: 24px 18px; }
+    }
+  </style>
 </head>
 <body>
 {{ include('landing/_nav.html.twig') }}
+
+<!-- HERO -->
+<section class="ct-hero">
+  <div class="ct-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <h1>Contactez <span>WeCare</span></h1>
+  <p>Des questions ? Notre équipe est à votre disposition pour vous apporter toutes les informations nécessaires.</p>
+</section>
+
+<!-- BODY -->
+<section class="ct-body">
+  <div class="ct-inner">
+
+    <!-- Colonne gauche -->
+    <div>
+      <div class="ct-card">
+        <span class="ct-card-tag pink">Essai gratuit</span>
+        <h3>WeCare gratuit</h3>
+        <p>Bénéficiez d'un accès gratuit à WeCare jusqu'au 31 juin 2027.</p>
+        <a href="{{ path('landing_pricing') }}" class="ct-card-btn">Démarrer gratuitement</a>
+      </div>
+
+      <div class="ct-card">
+        <span class="ct-card-tag teal">Centre d'aide</span>
+        <h3>Documentation WeCare</h3>
+        <p>Découvrez nos guides et ressources d'utilisation pour maîtriser pleinement WeCare.</p>
+        <a href="{{ path('landing_ressources') }}" class="ct-card-btn">Découvrir le centre d'aide</a>
+      </div>
+
+      <div class="ct-phone">
+        <svg width="16" height="16" fill="none" stroke="#8a85b0" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.37a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z"/>
+        </svg>
+        Téléphone : <a href="tel:+33552243788">+33 5 52 24 37 88</a>
+      </div>
+    </div>
+
+    <!-- Colonne droite : formulaire -->
+    <div class="ct-form-wrap">
+      <form id="contactForm" novalidate>
+        <div class="ct-form-group">
+          <label for="ct-nom">Nom<span>*</span></label>
+          <input type="text" id="ct-nom" name="nom" placeholder="Votre nom" required>
+        </div>
+        <div class="ct-form-group">
+          <label for="ct-email">Email<span>*</span></label>
+          <input type="email" id="ct-email" name="email" placeholder="Votre email" required>
+        </div>
+        <div class="ct-form-group">
+          <label for="ct-message">Message<span>*</span></label>
+          <textarea id="ct-message" name="message" placeholder="Votre message..." required></textarea>
+        </div>
+        <button type="submit" class="ct-submit">Envoyer</button>
+        <div class="ct-success" id="ctSuccess">
+          <svg width="18" height="18" fill="none" stroke="#0ea899" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Message envoyé ! Nous vous répondrons dans les plus brefs délais.
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+
 {{ include('landing/_footer.html.twig') }}
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const nom     = document.getElementById('ct-nom').value.trim();
+  const email   = document.getElementById('ct-email').value.trim();
+  const message = document.getElementById('ct-message').value.trim();
+  if (!nom || !email || !message) return;
+  this.querySelectorAll('input, textarea, button').forEach(el => el.disabled = true);
+  document.getElementById('ctSuccess').classList.add('show');
+});
+</script>
 </body>
 </html>
