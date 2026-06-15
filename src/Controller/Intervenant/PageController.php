@@ -56,10 +56,9 @@ class PageController extends AbstractController
         $effectuees = count(array_filter($interventions, fn($i) => $i->getStatut()?->value === 'terminee'));
         $derniere = count($interventions) ? $interventions[count($interventions) - 1] : null;
 
-        $now = new \DateTime();
-        $crARediger = count(array_filter($interventions, fn($i) =>
-            $i->getDateDebut() < $now && $i->getCompteRendu() === null
-        ));
+        $crARediger = $intervenant
+            ? $interventionRepo->countSansCompteRenduByIntervenant($intervenant)
+            : 0;
 
         return $this->render('intervenant/dashboard.html.twig', [
             'nom' => $user->getNom(),

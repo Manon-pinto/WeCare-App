@@ -11,13 +11,13 @@
   <style>
     /* ── Blog page ── */
     .blog-hero {
-      background: #F2FBFF;
+      background: #fff;
       padding: 64px 48px 48px;
       text-align: center;
     }
     .blog-hero-bar {
       width: 36px; height: 4px;
-      background: #2CA7CB;
+      background: #41A096;
       border-radius: 2px;
       margin: 0 auto 20px;
     }
@@ -38,7 +38,7 @@
     .blog-featured-card {
       display: grid; grid-template-columns: 1fr 420px;
       gap: 40px; align-items: center;
-      background: #F2FBFF;
+      background: #FDFBFF;
       border-radius: 20px;
       overflow: hidden;
       padding: 40px;
@@ -65,14 +65,14 @@
       display: flex; align-items: flex-start; gap: 8px;
     }
     .blog-featured-list li::before {
-      content: '•'; color: #2CA7CB; font-weight: 800; margin-top: 1px; flex-shrink: 0;
+      content: '•'; color: #41A096; font-weight: 800; margin-top: 1px; flex-shrink: 0;
     }
     .blog-featured-meta {
       font-size: 0.78rem; color: #9a95b8; margin-bottom: 20px;
     }
     .blog-featured-btn {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 24px; background: #2CA7CB; color: #fff;
+      padding: 11px 24px; background: #41A096; color: #fff;
       border-radius: 10px; font-weight: 700; font-size: 0.88rem;
       transition: opacity 0.15s, transform 0.15s;
     }
@@ -87,8 +87,8 @@
     .blog-featured-play {
       position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
       width: 44px; height: 44px; border-radius: 50%;
-      background: #2CA7CB; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(44,167,203,0.4);
+      background: #41A096; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(65,160,150,0.4);
     }
     .blog-featured-play svg { margin-left: 3px; }
     /* Overlay profil app sur l'image featured */
@@ -148,11 +148,11 @@
       flex-shrink: 0; transition: border-color 0.15s;
     }
     .blog-filter-btn.active .blog-filter-radio {
-      border-color: #2CA7CB;
+      border-color: #41A096;
     }
     .blog-filter-radio-inner {
       width: 7px; height: 7px; border-radius: 50%;
-      background: #2CA7CB;
+      background: #41A096;
       display: none;
     }
     .blog-filter-btn.active .blog-filter-radio-inner { display: block; }
@@ -173,7 +173,7 @@
       padding: 10px 16px; background: #faf9fd;
       transition: border-color 0.15s;
     }
-    .blog-search-field:focus-within { border-color: #2CA7CB; }
+    .blog-search-field:focus-within { border-color: #41A096; }
     .blog-search-field svg { stroke: #a09abe; flex-shrink: 0; }
     .blog-search-field input {
       border: none; background: transparent; outline: none;
@@ -195,7 +195,7 @@
     }
     .blog-search-btn {
       width: 42px; height: 42px; border-radius: 10px;
-      background: #2CA7CB; border: none; cursor: pointer;
+      background: #41A096; border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: opacity 0.15s;
     }
@@ -203,7 +203,7 @@
 
     /* ── Articles grid ── */
     .blog-grid-wrap {
-      background: #F2FBFF; padding: 48px 48px 64px;
+      background: #fff; padding: 48px 48px 64px;
     }
     .blog-grid {
       max-width: 1200px; margin: 0 auto;
@@ -232,7 +232,7 @@
     .blog-card-tag {
       display: inline-block;
       font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-      color: #2CA7CB;
+      color: #41A096;
       margin-bottom: 8px;
     }
     .blog-card-title {
@@ -251,16 +251,16 @@
     .blog-card-date { display: flex; align-items: center; gap: 5px; }
     .blog-card-read {
       display: flex; align-items: center; gap: 4px;
-      color: #2CA7CB; font-weight: 600; font-size: 0.76rem;
+      color: #41A096; font-weight: 600; font-size: 0.76rem;
     }
 
     /* ── Load more ── */
     .blog-loadmore {
       display: flex; justify-content: center; padding: 0 0 64px;
-      background: #F2FBFF;
+      background: #fff;
     }
     .blog-loadmore-btn {
-      padding: 12px 40px; background: #2CA7CB; color: #fff;
+      padding: 12px 40px; background: #41A096; color: #fff;
       border-radius: 10px; font-weight: 700; font-size: 0.9rem;
       border: none; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
       font-family: 'Poppins', sans-serif;
@@ -309,7 +309,7 @@
         <div class="blog-featured-meta">2 juin 2026 &nbsp;·&nbsp; Webinaire · 45 min</div>
       </div>
       <div class="blog-featured-img">
-        <img src="/images/blog-featured.jpg" alt="Planification SAAD" onerror="this.style.display='none'">
+        <img src="/images/service-daide-a-la-personne.jpg" alt="Planification SAAD" onerror="this.style.display='none'">
         <div class="blog-featured-play">
           <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </div>
@@ -369,18 +369,18 @@
 
 {# ── Grille d'articles ── #}
 {% set articles = [
-  { cat: 'interventions', tag: 'Interventions terrain', title: "Comment réduire les temps de trajet de vos intervenants de 30%", excerpt: "Découvrez les stratégies d'optimisation des tournées qui permettent aux SAAD de gagner en efficacité.", date: '2 juin 2026', read: '5 min', img: '/images/blog-1.jpg' },
-  { cat: 'interventions', tag: 'Interventions terrain', title: "Gestion des incidents terrain : bonnes pratiques 2026", excerpt: "Retour d'expérience sur la gestion en temps réel des aléas lors des interventions à domicile.", date: '2 juin 2026', read: '7 min', img: '/images/blog-2.jpg' },
-  { cat: 'interventions', tag: 'Interventions terrain', title: "L'application mobile au cœur de la qualité de service", excerpt: "Comment nos intervenants utilisent WeCare sur le terrain pour améliorer le suivi des bénéficiaires.", date: '2 juin 2026', read: '4 min', img: '/images/blog-3.jpg' },
-  { cat: 'planification', tag: 'Planification & Tournées', title: "Planification intelligente : les clés d'une organisation optimale", excerpt: "L'IA de WeCare analyse vos contraintes pour générer des tournées équilibrées en quelques secondes.", date: '2 juin 2026', read: '6 min', img: '/images/blog-4.jpg' },
-  { cat: 'planification', tag: 'Planification & Tournées', title: "Gérer les remplacements de dernière minute sans stress", excerpt: "Protocoles et outils pour assurer la continuité du service même en cas d'absence imprévue.", date: '2 juin 2026', read: '5 min', img: '/images/blog-5.jpg' },
-  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "L'espace bénéficiaire : un lien essentiel avec la famille", excerpt: "Faites-en sorte que les proches aidants soient toujours informés et rassurés grâce au portail WeCare.", date: '2 juin 2026', read: '4 min', img: '/images/blog-6.jpg' },
-  { cat: 'actualites', tag: 'Actualités', title: "WeCare certifié HDS & ISO 27001 : ce que ça change pour vous", excerpt: "La sécurité des données de santé de vos bénéficiaires est notre priorité absolue.", date: '2 juin 2026', read: '3 min', img: '/images/blog-7.jpg' },
-  { cat: 'guides', tag: 'Guides & Ressources', title: "Guide complet : réussir sa transition numérique en SAAD", excerpt: "De la décision à la mise en place, toutes les étapes pour adopter un logiciel de gestion sans friction.", date: '2 juin 2026', read: '10 min', img: '/images/blog-8.jpg' },
-  { cat: 'interventions', tag: 'Interventions terrain', title: "Télégestion et pointage électronique : guide pratique", excerpt: "Comprendre les exigences réglementaires et choisir la solution adaptée à votre structure.", date: '2 juin 2026', read: '6 min', img: '/images/blog-9.jpg' },
-  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "Améliorer la communication avec les familles : les outils WeCare", excerpt: "Notifications, comptes rendus d'intervention, messagerie sécurisée — tout pour rassurer les proches.", date: '2 juin 2026', read: '5 min', img: '/images/blog-10.jpg' },
-  { cat: 'planification', tag: 'Planification & Tournées', title: "Modulation des heures : comment WeCare simplifie le suivi", excerpt: "Suivez en temps réel les heures modulées et évitez les dépassements budgétaires grâce au tableau de bord.", date: '2 juin 2026', read: '4 min', img: '/images/blog-11.jpg' },
-  { cat: 'guides', tag: 'Guides & Ressources', title: "Checklist : préparer votre SAAD à l'inspection de qualité", excerpt: "Les 20 points de contrôle essentiels pour aborder sereinement une inspection ou un audit qualité.", date: '2 juin 2026', read: '8 min', img: '/images/blog-12.jpg' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Comment réduire les temps de trajet de vos intervenants de 30%", excerpt: "Découvrez les stratégies d'optimisation des tournées qui permettent aux SAAD de gagner en efficacité.", date: '2 juin 2026', read: '5 min', img: '/images/aide-a-domicile-1024x682.webp' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Gestion des incidents terrain : bonnes pratiques 2026", excerpt: "Retour d'expérience sur la gestion en temps réel des aléas lors des interventions à domicile.", date: '2 juin 2026', read: '7 min', img: '/images/Gemini_Generated_Image_eb0lyweb0lyweb0l-clean.png' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "L'application mobile au cœur de la qualité de service", excerpt: "Comment nos intervenants utilisent WeCare sur le terrain pour améliorer le suivi des bénéficiaires.", date: '2 juin 2026', read: '4 min', img: '/images/Gemini_Generated_Image_60bpzs60bpzs60bp-clean.png' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Planification intelligente : les clés d'une organisation optimale", excerpt: "L'IA de WeCare analyse vos contraintes pour générer des tournées équilibrées en quelques secondes.", date: '2 juin 2026', read: '6 min', img: '/images/ADV_emploi_aide_a_dom_bloc1_13cb6117ce.jpg' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Gérer les remplacements de dernière minute sans stress", excerpt: "Protocoles et outils pour assurer la continuité du service même en cas d'absence imprévue.", date: '2 juin 2026', read: '5 min', img: '/images/Gemini_Generated_Image_sr62rvsr62rvsr62-clean.png' },
+  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "L'espace bénéficiaire : un lien essentiel avec la famille", excerpt: "Faites-en sorte que les proches aidants soient toujours informés et rassurés grâce au portail WeCare.", date: '2 juin 2026', read: '4 min', img: '/images/aide-a-domicile-seniors.jpg' },
+  { cat: 'actualites', tag: 'Actualités', title: "WeCare certifié HDS & ISO 27001 : ce que ça change pour vous", excerpt: "La sécurité des données de santé de vos bénéficiaires est notre priorité absolue.", date: '2 juin 2026', read: '3 min', img: '/images/Gemini_Generated_Image_11u53q11u53q11u5.png' },
+  { cat: 'guides', tag: 'Guides & Ressources', title: "Guide complet : réussir sa transition numérique en SAAD", excerpt: "De la décision à la mise en place, toutes les étapes pour adopter un logiciel de gestion sans friction.", date: '2 juin 2026', read: '10 min', img: '/images/Header_journee_aides_a_domicile.avif' },
+  { cat: 'interventions', tag: 'Interventions terrain', title: "Télégestion et pointage électronique : guide pratique", excerpt: "Comprendre les exigences réglementaires et choisir la solution adaptée à votre structure.", date: '2 juin 2026', read: '6 min', img: '/images/Jai-besoin-dune-aide-a-domicile-pour-la-premiere-fois-comment-faire-2-1024x683.jpg' },
+  { cat: 'aidants', tag: 'Aidants & Bénéficiaires', title: "Améliorer la communication avec les familles : les outils WeCare", excerpt: "Notifications, comptes rendus d'intervention, messagerie sécurisée — tout pour rassurer les proches.", date: '2 juin 2026', read: '5 min', img: '/images/Gemini_Generated_Image_pidor5pidor5pido.png' },
+  { cat: 'planification', tag: 'Planification & Tournées', title: "Modulation des heures : comment WeCare simplifie le suivi", excerpt: "Suivez en temps réel les heures modulées et évitez les dépassements budgétaires grâce au tableau de bord.", date: '2 juin 2026', read: '4 min', img: '/images/Gemini_Generated_Image_rmbi14rmbi14rmbi.png' },
+  { cat: 'guides', tag: 'Guides & Ressources', title: "Checklist : préparer votre SAAD à l'inspection de qualité", excerpt: "Les 20 points de contrôle essentiels pour aborder sereinement une inspection ou un audit qualité.", date: '2 juin 2026', read: '8 min', img: '/images/alternative_maison_de_retraite_1200.jpg' },
 ] %}
 
 <div class="blog-grid-wrap">

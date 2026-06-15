@@ -37,7 +37,29 @@
 <div class="nav-mobile-drawer" id="nav-drawer">
   <a href="/fonctionnalites">Fonctionnalités</a>
   <a href="/tarifs">Tarifs</a>
-  <a href="/ressources">Ressources</a>
+  <button class="drawer-accordion" id="drawer-ressources-btn" aria-expanded="false">
+    Ressources
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="drawer-accordion-icon"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="drawer-accordion-panel" id="drawer-ressources-panel">
+    <a href="/blog" class="drawer-sub-link">Blog</a>
+    <a href="/contact" class="drawer-sub-link">Contact</a>
+    <a href="/ressources#aide" class="drawer-sub-link">Centre d'aide</a>
+  </div>
   <a href="/login"       class="drawer-ghost">Se connecter</a>
   <a href="/inscription" class="drawer-primary">Essai gratuit</a>
 </div>
+<script>
+  (function(){
+    var btn = document.getElementById('drawer-ressources-btn');
+    var panel = document.getElementById('drawer-ressources-panel');
+    if(btn && panel){
+      btn.addEventListener('click', function(){
+        var open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        panel.style.maxHeight = open ? '0' : panel.scrollHeight + 'px';
+        btn.querySelector('.drawer-accordion-icon').style.transform = open ? '' : 'rotate(180deg)';
+      });
+    }
+  })();
+</script>

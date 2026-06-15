@@ -48,4 +48,28 @@ class LandingController extends AbstractController
     {
         return $this->render('landing/blog.html.twig');
     }
+
+    #[Route('/mentions-legales', name: 'landing_mentions_legales')]
+    public function mentionsLegales(): Response
+    {
+        return $this->render('landing/mentions-legales.html.twig');
+    }
+
+    #[Route('/conditions-de-vente', name: 'landing_conditions_vente')]
+    public function conditionsVente(): Response
+    {
+        return $this->render('landing/conditions-vente.html.twig');
+    }
+
+    #[Route('/politique-cookies', name: 'landing_politique_cookies')]
+    public function politiqueCookies(): Response
+    {
+        return $this->render('landing/politique-cookies.html.twig');
+    }
+
+    #[Route('/devis-envoye', name: 'landing_devis_envoye')]
+    public function devisEnvoye(): Response
+    {
+        return $this->render('landing/devis-envoye.html.twig');
+    }
 }

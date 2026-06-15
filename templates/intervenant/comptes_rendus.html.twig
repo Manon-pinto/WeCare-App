@@ -209,11 +209,13 @@ function renderEditor(d){
       </div>
     </div>
 
-    <textarea class="cr-textarea" id="cr-contenu" placeholder="Rédiger ici…">${cr?.contenu||''}</textarea>
+    <textarea class="cr-textarea" id="cr-contenu" placeholder="Rédiger ici…" ${cr?.valide?'readonly':''}>${cr?.contenu||''}</textarea>
     <div id="cr-err" style="display:none" class="alert-danger"></div>
     <div class="ed-footer">
-      <button class="btn-brouillon" onclick="saveCR('brouillon')">Brouillon</button>
-      <button class="btn-valider" onclick="saveCR('valider')">Valider le CR</button>
+      ${cr
+        ? '<span style="color:var(--teal-mid);font-size:0.82rem;font-weight:600">✓ Compte rendu ' + (cr.valide ? 'validé' : 'rédigé') + '</span>'
+        : '<button class="btn-valider" onclick="saveCR(\'valider\')">Valider le CR</button>'
+      }
     </div>`;
 }
 
@@ -298,7 +300,13 @@ async function saveCR(mode){
 function load(){
   fetch('/api/intervenant/comptes-rendus').then(r=>r.ok?r.json():Promise.reject()).then(data=>{
     crData=data;
-    if(selected){ const s=data.find(d=>d.interventionId===selected.interventionId); if(s){ selected=s; renderEditor(s); } }
+    renderList(data);
+    if(selected){
+      const s=data.find(d=>d.interventionId===selected.interventionId);
+      if(s){ selected=s; renderEditor(s); }
+      const el=document.getElementById('item-'+selected.interventionId);
+      if(el) el.classList.add('active');
+    }
   }).catch(()=>{});
 }
 </script>

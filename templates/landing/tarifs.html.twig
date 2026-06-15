@@ -10,15 +10,15 @@
 
     /* ── HERO ── */
     .tr-hero {
-      background: #F2FBFF;
+      background: #F1FAF9;
       text-align: center;
       padding: 72px 48px 56px;
     }
     .tr-hero-tag {
       display: inline-block;
       font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: #2CA7CB;
-      background: rgba(44,167,203,0.10); border-radius: 50px;
+      text-transform: uppercase; color: #41A096;
+      background: rgba(65,160,150,0.10); border-radius: 50px;
       padding: 5px 14px; margin-bottom: 20px;
     }
     .tr-hero h1 {
@@ -32,77 +32,64 @@
     }
     @media (max-width: 768px) { .tr-hero { padding: 52px 24px 40px; } .tr-hero h1 { font-size: 1.8rem; } }
 
-    /* ── PLAN CARDS ── */
+    /* ── PLAN CARDS (identique homepage) ── */
     .tr-plans {
       background: #fff;
-      padding: 48px 48px 64px;
-      border-bottom: 1px solid #eef4f8;
+      padding: 72px 48px;
     }
     .tr-plans-inner {
-      max-width: 980px; margin: 0 auto;
-      display: grid; grid-template-columns: 240px 1fr 1fr;
-      gap: 20px; align-items: start;
-    }
-
-    /* ── Plan cards layout ── */
-    .tr-plans-inner {
-      max-width: 980px; margin: 0 auto;
+      max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px; align-items: stretch;
+      gap: 20px;
     }
+    .plan-card {
+      background: #fff; border-radius: 16px; padding: 32px 28px;
+      border: 1px solid #eef0f8;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(15,0,75,0.10); }
+    .plan-card.featured { background: #0f004b; color: #fff; border-color: #0f004b; }
+    .plan-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a85b0; margin-bottom: 10px; }
+    .plan-card.featured .plan-label { color: rgba(255,255,255,0.45); }
+    .plan-badge-tag { display: inline-block; background: #41A096; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-bottom: 14px; }
+    .plan-range { font-size: 0.88rem; font-weight: 600; color: #0c0052; margin-bottom: 6px; }
+    .plan-card.featured .plan-range { color: #fff; }
+    .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+    .plan-price-big { font-size: 2.8rem; font-weight: 800; color: #0c0052; }
+    .plan-card.featured .plan-price-big { color: #fff; }
+    .plan-price-unit { font-size: 0.88rem; color: #8a85b0; }
+    .plan-card.featured .plan-price-unit { color: rgba(255,255,255,0.5); }
+    .plan-price-alt { font-size: 0.78rem; color: #8a85b0; margin-bottom: 20px; }
+    .plan-card.featured .plan-price-alt { color: rgba(255,255,255,0.45); }
+    .plan-feature-row { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #3a357f; margin-bottom: 10px; }
+    .plan-card.featured .plan-feature-row { color: rgba(255,255,255,0.85); }
+    .plan-feature-check { width: 18px; height: 18px; border-radius: 50%; background: #41A096; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .plan-cta { margin-top: auto; padding-top: 20px; }
+    .plan-btn {
+      display: block; width: 100%; padding: 13px; text-align: center;
+      border-radius: 10px; font-size: 0.88rem; font-weight: 700;
+      border: 1.5px solid #41A096; color: #41A096;
+      transition: all 0.15s;
+    }
+    .plan-btn:hover { background: #41A096; color: #fff; }
+    .plan-btn.primary { background: #41A096; border-color: #41A096; color: #fff; }
+    .plan-btn.primary:hover { opacity: 0.88; }
+    .plan-btn.pink { background: #ff91fd; border-color: #ff91fd; color: #0f004b; }
+    .plan-btn.pink:hover { opacity: 0.88; }
     input[type=range].tr-slider {
       -webkit-appearance: none; appearance: none;
       width: 100%; height: 4px; border-radius: 4px; outline: none;
-      margin: 12px 0 6px; cursor: pointer;
-      background: linear-gradient(to right, #2CA7CB 0%, #2CA7CB 0%, #d4eef8 0%, #d4eef8 100%);
+      margin: 12px 0 8px; cursor: pointer;
+      background: linear-gradient(to right, #41A096 0%, #41A096 0%, #d4eef8 0%, #d4eef8 100%);
     }
     input[type=range].tr-slider::-webkit-slider-thumb {
       -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-      background: #2CA7CB; cursor: pointer; box-shadow: 0 2px 8px rgba(44,167,203,0.4);
+      background: #41A096; cursor: pointer; box-shadow: 0 2px 8px rgba(65,160,150,0.4);
     }
     input[type=range].tr-slider::-moz-range-thumb {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #2CA7CB; cursor: pointer; border: none;
+      width: 18px; height: 18px; border-radius: 50%; background: #41A096; cursor: pointer; border: none;
     }
-
-    /* Carte gauche : gratuit */
-    .tr-card {
-      border: 1.5px solid #e0edf5; border-radius: 16px; padding: 32px 28px 28px;
-      background: #fff; display: flex; flex-direction: column;
-    }
-    .tr-card-tag {
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; color: #2CA7CB; margin-bottom: 12px;
-    }
-    .tr-card-desc {
-      font-size: 0.88rem; font-weight: 600; color: #0c0052;
-      line-height: 1.45; margin-bottom: 20px;
-    }
-    .tr-card-price-row {
-      display: flex; align-items: baseline; gap: 2px; margin-bottom: 4px;
-    }
-    .tr-card-amount {
-      font-size: 2.8rem; font-weight: 800; color: #0c0052; line-height: 1;
-    }
-    .tr-card-currency { font-size: 1.4rem; font-weight: 800; color: #0c0052; }
-    .tr-card-period { font-size: 0.85rem; color: #8a85b0; margin-left: 4px; }
-    .tr-card-sub {
-      font-size: 0.80rem; color: #8a85b0; margin-bottom: 20px;
-    }
-    .tr-card-feature {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.84rem; color: #3a357f; font-weight: 500;
-      margin-bottom: 24px; margin-top: auto;
-    }
-    .tr-card-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
-    .tr-card-btn-outline {
-      display: block; text-align: center;
-      padding: 13px 24px; border-radius: 10px;
-      font-size: 0.88rem; font-weight: 700;
-      border: 2px solid #2CA7CB; color: #2CA7CB;
-      transition: background 0.15s;
-    }
-    .tr-card-btn-outline:hover { background: rgba(44,167,203,0.06); }
 
     /* Carte centrale : annuel navy */
     .tr-card-annual {
@@ -114,7 +101,7 @@
     .tr-card-annual-badge {
       display: inline-block; align-self: flex-start;
       font-size: 0.72rem; font-weight: 700;
-      background: #2CA7CB; color: #fff;
+      background: #41A096; color: #fff;
       padding: 5px 14px; border-radius: 20px;
       margin-bottom: 14px;
     }
@@ -143,7 +130,7 @@
       font-size: 0.84rem; color: rgba(255,255,255,0.80); font-weight: 500;
       margin-bottom: 28px; margin-top: auto;
     }
-    .tr-card-annual-feature svg { stroke: #2CA7CB; flex-shrink: 0; }
+    .tr-card-annual-feature svg { stroke: #41A096; flex-shrink: 0; }
     .tr-card-btn-pink {
       display: block; text-align: center;
       padding: 13px 24px; border-radius: 10px;
@@ -161,7 +148,7 @@
       border: 2px solid #e2ddf0; color: #0c0052;
       transition: border-color 0.15s, background 0.15s;
     }
-    .tr-card-btn:hover { border-color: #2CA7CB; background: rgba(44,167,203,0.06); }
+    .tr-card-btn:hover { border-color: #41A096; background: rgba(65,160,150,0.06); }
     .tr-card-btn-pink {
       display: inline-block; text-align: center;
       padding: 12px 24px; border-radius: 10px;
@@ -177,7 +164,7 @@
     }
 
     /* ── COMPARE TABLE ── */
-    .tr-compare { background: #F2FBFF; padding: 0 48px 80px; }
+    .tr-compare { background: #fff; padding: 0 48px 80px; }
     .tr-compare-inner { max-width: 860px; margin: 0 auto; }
     .tr-compare-title { text-align: center; padding: 64px 0 40px; }
 
@@ -188,7 +175,7 @@
       position: sticky;
       top: 68px;
       z-index: 200;
-      background: #F2FBFF;
+      background: #fff;
     }
     .tr-sticky th {
       padding: 0; text-align: center;
@@ -208,7 +195,7 @@
     .tr-th-offert-badge {
       display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; color: #fff;
-      background: #2CA7CB; border-radius: 20px; padding: 2px 9px; margin-bottom: 4px;
+      background: #41A096; border-radius: 20px; padding: 2px 9px; margin-bottom: 4px;
     }
     .tr-th-pro-badge {
       display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
@@ -220,7 +207,7 @@
     .tr-th-pro  .tr-th-price { color: #fff; }
     .tr-th-btn-teal {
       display: inline-block; padding: 9px 18px; border-radius: 10px;
-      background: #2CA7CB; color: #fff;
+      background: #41A096; color: #fff;
       font-size: 0.82rem; font-weight: 700; margin-top: 8px; white-space: nowrap;
       transition: opacity 0.15s;
     }
@@ -242,12 +229,12 @@
     .tr-cat td {
       padding: 18px 20px 6px;
       font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: #2CA7CB;
+      text-transform: uppercase; color: #41A096;
     }
 
     /* Feature rows */
     .tr-row { border-bottom: 1px solid #dde9f5; }
-    .tr-row:hover { background: rgba(44,167,203,0.04); }
+    .tr-row:hover { background: rgba(65,160,150,0.04); }
     .tr-row td {
       padding: 13px 20px; font-size: 0.86rem;
       text-align: center; color: #3a357f;
@@ -263,7 +250,7 @@
     .ic-yes {
       display: inline-flex; align-items: center; justify-content: center;
       width: 20px; height: 20px; border-radius: 50%;
-      background: #2CA7CB;
+      background: #41A096;
     }
     .ic-yes svg { width: 11px; height: 11px; }
     .ic-no {
@@ -274,7 +261,7 @@
     .ic-soon {
       display: inline-block; font-size: 0.62rem; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
-      background: rgba(44,167,203,0.12); color: #2CA7CB;
+      background: rgba(65,160,150,0.12); color: #41A096;
       padding: 2px 9px; border-radius: 20px;
     }
     .ic-label {
@@ -309,55 +296,49 @@
 <section class="tr-plans">
   <div class="tr-plans-inner">
 
-    <!-- Carte slider -->
-    <div class="tr-card reveal">
-      <div class="tr-card-tag">Bénéficiaires</div>
-      <p class="tr-card-desc">Sélectionnez votre nombre de bénéficiaires pour connaître le tarif le plus adapté.</p>
-      <div class="tr-card-price-row">
-        <span class="tr-card-amount" id="tr-price">49</span>
-        <span class="tr-card-currency">€</span>
-        <span class="tr-card-period">/mois</span>
-      </div>
-      <div class="tr-card-sub" id="tr-range">Jusqu'à 50 bénéficiaires</div>
-      <input type="range" class="tr-slider" id="tr-slider" min="0" max="4" value="0" step="1">
-      <div class="tr-card-feature" style="margin-top:auto">
-        <svg width="18" height="18" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
+    <!-- Carte bénéficiaires (slider) -->
+    <div class="plan-card reveal">
+      <div class="plan-label">Bénéficiaires</div>
+      <p style="font-size:0.95rem;font-weight:700;color:#0c0052;line-height:1.4;margin-bottom:16px">Sélectionnez votre nombre de bénéficiaire requis</p>
+      <input type="range" class="tr-slider" id="tr-slider" min="0" max="6" value="0" step="1">
+      <div class="plan-price-alt" id="tr-range" style="margin-bottom:16px">Jusqu'à 50 bénéficiaires</div>
+      <div class="plan-feature-row">
+        <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <a href="/inscription" class="tr-card-btn-outline">Démarrer gratuitement</a>
+      <div class="plan-cta"><a href="/inscription?plan=gratuit" class="plan-btn primary" data-devis-btn>Demander un devis gratuit</a></div>
     </div>
 
     <!-- Carte annuel (navy) -->
-    <div class="tr-card-annual reveal" style="transition-delay:0.08s">
-      <span class="tr-card-annual-badge">Tarif annuel</span>
-      <div class="tr-card-annual-range" id="annual-range">Jusqu'à 50 bénéficiaires</div>
-      <div class="tr-card-annual-price-row">
-        <span class="tr-card-annual-amount" id="annual-price">539</span>
-        <span class="tr-card-annual-currency">€</span>
-        <span class="tr-card-annual-slash" style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin:0 4px;align-self:center">TTC / an</span>
+    <div class="plan-card reveal" style="transition-delay:0.1s">
+      <div class="plan-badge-tag">Tarif annuel</div>
+      <div class="plan-range" id="annual-range">Jusqu'à 50 bénéficiaires</div>
+      <div class="plan-price-row">
+        <span class="plan-price-big" id="annual-price">539€</span>
+        <span class="plan-price-unit">TTC / an</span>
       </div>
-      <div class="tr-card-annual-sub" id="annual-yearly">Économisez 45€ par an</div>
-      <div class="tr-card-annual-feature" style="margin-top:auto">
-        <svg width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
+      <div class="plan-price-alt" id="annual-yearly">Économisez 49€ par an</div>
+      <div class="plan-feature-row">
+        <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <a href="/inscription" class="tr-card-btn-pink">Choisir le forfait</a>
+      <div class="plan-cta"><a href="/inscription?plan=annuel" class="plan-btn primary" data-devis-btn>Demander un devis</a></div>
     </div>
 
-    <!-- Carte premium (mensuel) -->
-    <div class="tr-card reveal" style="transition-delay:0.16s">
-      <div class="tr-card-tag">Forfait mensuel</div>
-      <div class="tr-card-price-row">
-        <span class="tr-card-amount" id="monthly-price">49</span>
-        <span class="tr-card-currency">€</span>
-        <span class="tr-card-period">/mois</span>
+    <!-- Carte mensuelle -->
+    <div class="plan-card reveal" style="transition-delay:0.2s">
+      <div class="plan-label">Forfait mensuel</div>
+      <div class="plan-range" id="monthly-range">Jusqu'à 50 bénéficiaires</div>
+      <div class="plan-price-row">
+        <span class="plan-price-big" id="monthly-price">49€</span>
+        <span class="plan-price-unit">/mois</span>
       </div>
-      <div class="tr-card-sub" id="monthly-annual">ou 539€ / an</div>
-      <div class="tr-card-feature" style="margin-top:auto">
-        <svg width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2CA7CB" stroke="none"/><polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5"/></svg>
+      <div class="plan-price-alt" id="monthly-annual">ou 539€ / an</div>
+      <div class="plan-feature-row">
+        <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <a href="/inscription" class="tr-card-btn-outline">Choisir le forfait</a>
+      <div class="plan-cta"><a href="/inscription?plan=mensuel" class="plan-btn" data-devis-btn>Demander un devis</a></div>
     </div>
 
   </div>
@@ -381,14 +362,14 @@
             <div class="tr-th-inner">
               <div class="tr-th-offert-badge">OFFERT</div>
               <div class="tr-th-price">Gratuit</div>
-              <a href="/inscription" class="tr-th-btn-teal">Démarrer gratuitement</a>
+              <a href="/inscription?plan=gratuit" class="tr-th-btn-teal" data-devis-btn>Demander un devis</a>
             </div>
           </th>
           <th class="tr-th-pro">
             <div class="tr-th-inner">
               <div class="tr-th-pro-badge">PRO</div>
               <div class="tr-th-price">Premium</div>
-              <a href="/tarifs" class="tr-th-btn-outline">Simuler mon tarif</a>
+              <a href="/inscription?plan=annuel" class="tr-th-btn-outline" data-devis-btn>Demander un devis</a>
             </div>
           </th>
         </tr>
@@ -490,19 +471,28 @@ document.addEventListener('DOMContentLoaded', () => {
     { range: 'Entre 101 et 150 bénéficiaires',  monthly: 129, annual: 1419, economy: 129 },
     { range: 'Entre 151 et 200 bénéficiaires',  monthly: 169, annual: 1859, economy: 169 },
     { range: 'Entre 201 et 350 bénéficiaires',  monthly: 209, annual: 2299, economy: 209 },
+    { range: 'Entre 351 et 500 bénéficiaires',  monthly: 249, annual: 2739, economy: 249 },
+    { range: 'Plus de 500 bénéficiaires',       monthly: 289, annual: 3179, economy: 289 },
   ];
   const trSlider = document.getElementById('tr-slider');
   function trUpdate() {
-    const t = trTiers[+trSlider.value];
-    const pct = (+trSlider.value / 4) * 100;
-    trSlider.style.background = `linear-gradient(to right,#2CA7CB 0%,#2CA7CB ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
-    document.getElementById('tr-price').textContent       = t.monthly;
+    const idx = +trSlider.value;
+    const t   = trTiers[idx];
+    const pct = (idx / 6) * 100;
+    trSlider.style.background = `linear-gradient(to right,#41A096 0%,#41A096 ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
     document.getElementById('tr-range').textContent       = t.range;
     document.getElementById('annual-range').textContent   = t.range;
-    document.getElementById('annual-price').textContent   = t.annual;
+    document.getElementById('annual-price').textContent   = t.annual + '€';
     document.getElementById('annual-yearly').textContent  = 'Économisez ' + t.economy + '€ par an';
-    document.getElementById('monthly-price').textContent  = t.monthly;
+    document.getElementById('monthly-range').textContent  = t.range;
+    document.getElementById('monthly-price').textContent  = t.monthly + '€';
     document.getElementById('monthly-annual').textContent = 'ou ' + t.annual + '€ / an';
+    // Mettre à jour les liens CTA avec la tranche sélectionnée
+    document.querySelectorAll('a[data-devis-btn]').forEach(a => {
+      const url = new URL(a.href, window.location.href);
+      url.searchParams.set('beneficiaires', idx);
+      a.href = url.toString();
+    });
   }
   trSlider?.addEventListener('input', trUpdate);
   trUpdate();

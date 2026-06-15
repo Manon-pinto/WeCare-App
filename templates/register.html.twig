@@ -3,270 +3,408 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inscription – WeCare</title>
+  <title>Demande de devis – WeCare</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Variables thèmes ── */
-    body[data-plan="gratuit"] {
-      --bg-page:    #F1FAF9;
-      --bg-form:    #F1FAF9;
-      --text-label: #3a357f;
-      --text-sub:   #7d6b9e;
-      --input-bg:   #f9f8ff;
-      --input-border: #e2ddf0;
-      --input-color: #0c0052;
-      --placeholder: #b0a8cc;
-      --btn-bg:     #3fcdc0;
-      --btn-color:  #fff;
-      --btn-text:   "S'inscrire";
-      --logo-src:   url('/images/Logo-fond-clair.png');
-      --toggle-active-bg:   #3fcdc0;
-      --toggle-active-text: #fff;
-      --toggle-inactive-bg: transparent;
-      --toggle-inactive-text: #7d6b9e;
-      --toggle-wrap-bg: #e2ddf0;
-      --link-color: #3fcdc0;
-      --check-color: #7d6b9e;
-    }
-    body[data-plan="premium"] {
-      --bg-page:    #0f004b;
-      --bg-form:    #0f004b;
-      --text-label: #e0d8ff;
-      --text-sub:   #a89bc8;
-      --input-bg:   #1a0e5e;
-      --input-border: #2e1f7a;
-      --input-color: #ffffff;
-      --placeholder: #6a5fa0;
-      --btn-bg:     #CC75CA;
-      --btn-color:  #fff;
-      --toggle-active-bg:   #CC75CA;
-      --toggle-active-text: #fff;
-      --toggle-inactive-bg: transparent;
-      --toggle-inactive-text: #a89bc8;
-      --toggle-wrap-bg: #1a0e5e;
-      --link-color: #CC75CA;
-      --check-color: #a89bc8;
-    }
-
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--bg-page);
+      background: #F1FAF9;
       min-height: 100vh;
       display: flex;
-      transition: background 0.3s;
     }
 
     .split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; width: 100%; }
 
+    /* ── Colonne gauche : formulaire ── */
     .split-form {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 48px 56px; background: var(--bg-form); transition: background 0.3s;
+      padding: 48px 56px; background: #fff;
+      overflow-y: auto;
     }
-    .form-inner { width: 100%; max-width: 380px; }
+    .form-inner { width: 100%; max-width: 420px; }
 
-    .split-img {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 0; position: relative; overflow: hidden;
-    }
-    .split-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .logo { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .logo img { width: 160px; height: auto; }
 
-    /* ── Logo ── */
-    .logo { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-    .logo img { width: 180px; height: auto; }
-
-    /* ── Toggle Gratuit / Premium ── */
-    .plan-toggle {
-      display: flex; align-items: center;
-      background: var(--toggle-wrap-bg);
-      border-radius: 50px; padding: 4px;
-      margin-bottom: 28px; width: 100%; transition: background 0.3s;
+    .form-pretitle {
+      text-align: center; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #41A096; margin-bottom: 6px;
     }
-    .plan-btn {
-      flex: 1; padding: 9px 0; border: none; border-radius: 50px;
-      font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      background: var(--toggle-inactive-bg);
-      color: var(--toggle-inactive-text);
+    .form-title {
+      text-align: center; font-size: 1.5rem; font-weight: 800;
+      color: #0c0052; line-height: 1.25; margin-bottom: 6px;
     }
-    .plan-btn.active {
-      background: var(--toggle-active-bg);
-      color: var(--toggle-active-text);
+    .form-subtitle {
+      text-align: center; font-size: 0.80rem; color: #9a95b8;
+      line-height: 1.6; margin-bottom: 28px;
     }
 
-    /* ── Formulaire ── */
-    .form-group { margin-bottom: 14px; }
+    /* Badge plan sélectionné */
+    .plan-badge {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #F1FAF9; border: 1.5px solid #b8ede9;
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 24px;
+    }
+    .plan-badge-left { display: flex; align-items: center; gap: 10px; }
+    .plan-badge-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #41A096; flex-shrink: 0;
+    }
+    .plan-badge-name { font-size: 0.86rem; font-weight: 700; color: #0c0052; }
+    .plan-badge-change { font-size: 0.76rem; color: #41A096; font-weight: 600; text-decoration: underline; cursor: pointer; }
+
+    /* Séparateur section */
+    .form-section-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #b0a8cc;
+      margin: 18px 0 12px;
+    }
+
+    .form-group { margin-bottom: 12px; }
     .form-label {
       display: block; font-size: 0.78rem; font-weight: 600;
-      color: var(--text-label); margin-bottom: 5px; transition: color 0.3s;
+      color: #3a357f; margin-bottom: 5px;
     }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .input-wrap { position: relative; }
     .form-input {
-      width: 100%; padding: 11px 14px; border: 1.5px solid var(--input-border);
-      border-radius: 10px; font-family: inherit; font-size: 0.88rem;
-      color: var(--input-color); background: var(--input-bg);
-      outline: none; transition: border-color 0.15s, background 0.3s, color 0.3s;
+      width: 100%; padding: 11px 14px; border: 1.5px solid #e2ddf0;
+      border-radius: 10px; font-family: inherit; font-size: 0.86rem;
+      color: #0c0052; background: #faf9fd;
+      outline: none; transition: border-color 0.15s;
     }
-    .form-input:focus { border-color: var(--btn-bg); }
-    .form-input::placeholder { color: var(--placeholder); }
-    .eye-btn {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; color: var(--placeholder);
+    .form-input:focus { border-color: #41A096; background: #fff; }
+    .form-input::placeholder { color: #b0a8cc; }
+    select.form-input { cursor: pointer; appearance: none; }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-top-color: #b0a8cc;
+      pointer-events: none;
     }
+    textarea.form-input { resize: vertical; min-height: 88px; }
 
-    .form-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .check-label { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--check-color); cursor: pointer; }
-    .check-label input { accent-color: var(--btn-bg); width: 15px; height: 15px; }
-    .link { font-size: 0.78rem; color: var(--link-color); font-weight: 600; text-decoration: none; }
-    .link:hover { text-decoration: underline; }
+    .form-check {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 0.76rem; color: #7a75a0; line-height: 1.5;
+      margin: 16px 0 20px;
+    }
+    .form-check input { accent-color: #41A096; width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; }
+    .form-check a { color: #41A096; font-weight: 600; }
 
     .btn-submit {
-      width: 100%; padding: 13px; background: var(--btn-bg); color: var(--btn-color);
+      width: 100%; padding: 14px; background: #41A096; color: #fff;
       border: none; border-radius: 10px; font-family: inherit; font-size: 0.92rem;
-      font-weight: 700; cursor: pointer; transition: opacity 0.15s, background 0.3s;
+      font-weight: 700; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
     }
-    .btn-submit:hover { opacity: 0.88; }
-    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .form-login-link {
+      text-align: center; margin-top: 18px;
+      font-size: 0.78rem; color: #9a95b8;
+    }
+    .form-login-link a { color: #41A096; font-weight: 600; text-decoration: none; }
+    .form-login-link a:hover { text-decoration: underline; }
 
     .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 14px; display: none; }
-    .alert-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .alert-danger  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     .alert-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 
-    /* ── Logo selon thème ── */
-    .logo-clair  { display: block; }
-    .logo-dark   { display: none; }
-    body[data-plan="premium"] .logo-clair { display: none; }
-    body[data-plan="premium"] .logo-dark  { display: block; }
+    /* ── Colonne droite ── */
+    .split-right {
+      background: #0c0052;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 48px; position: relative; overflow: hidden;
+    }
+    .split-right::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(65,160,150,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .split-right-title {
+      font-size: 1.7rem; font-weight: 800; color: #fff;
+      line-height: 1.25; margin-bottom: 12px; text-align: center; position: relative;
+    }
+    .split-right-title span { color: #5be8dc; }
+    .split-right-sub {
+      font-size: 0.84rem; color: rgba(255,255,255,0.55);
+      text-align: center; line-height: 1.7; margin-bottom: 40px; position: relative;
+    }
+    .split-steps {
+      display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 340px; position: relative;
+    }
+    .split-step {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .split-step-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(65,160,150,0.2); border: 1.5px solid #41A096;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 800; color: #5be8dc; flex-shrink: 0;
+    }
+    .split-step-text { padding-top: 6px; }
+    .split-step-title { font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .split-step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
 
-    @media (max-width: 768px) {
+    .split-right-img {
+      margin-top: 40px; border-radius: 16px; overflow: hidden;
+      width: 100%; max-width: 340px; position: relative;
+    }
+    .split-right-img img { width: 100%; display: block; border-radius: 16px; }
+
+    @media (max-width: 900px) {
       .split { grid-template-columns: 1fr; }
-      .split-img { display: none; }
+      .split-right { display: none; }
       .split-form { padding: 40px 24px; justify-content: flex-start; padding-top: 60px; }
     }
   </style>
 </head>
-<body data-plan="gratuit">
+<body>
 <div class="split">
+
+  {# ── Formulaire ── #}
   <div class="split-form">
     <div class="form-inner">
 
       <div class="logo">
-        <img class="logo-clair" src="/images/Logo-fond-clair.png" alt="WeCare">
-        <img class="logo-dark"  src="/images/Logo-fond-nuit.png" alt="WeCare">
+        <a href="/"><img src="/images/Logo-fond-clair.png" alt="WeCare"></a>
       </div>
 
-      <div class="plan-toggle">
-        <button class="plan-btn active" id="btn-gratuit" onclick="setPlan('gratuit')">Gratuit</button>
-        <button class="plan-btn"        id="btn-premium" onclick="setPlan('premium')">Premium</button>
-      </div>
+      <p class="form-pretitle">Demande de devis</p>
+      <h1 class="form-title">Commençons ensemble</h1>
+      <p class="form-subtitle">Remplissez ce formulaire, notre équipe vous envoie votre devis personnalisé sous 24h.</p>
 
-      <div class="alert alert-danger" id="err"></div>
+      {# Badge plan #}
+      <div class="plan-badge" id="plan-badge">
+        <div class="plan-badge-left">
+          <div class="plan-badge-dot"></div>
+          <span class="plan-badge-name" id="plan-badge-name">Forfait Gratuit</span>
+        </div>
+        <a href="/tarifs" class="plan-badge-change">Changer de plan</a>
+      </div>
+      <input type="hidden" id="plan-input" name="plan" value="gratuit">
+
+      <div class="alert alert-danger"  id="err"></div>
       <div class="alert alert-success" id="ok"></div>
 
-      <div class="form-group">
-        <label class="form-label">Nom complet</label>
-        <input type="text" class="form-input" id="nom" placeholder="Entrez votre nom complet" autocomplete="name">
-      </div>
+      {# ── Votre structure ── #}
+      <div class="form-section-label">Votre structure</div>
 
-      <div class="form-group">
-        <label class="form-label">Adresse mail</label>
-        <input type="email" class="form-input" id="email" placeholder="Entrez votre adresse mail" autocomplete="email">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Mot de passe</label>
-        <div class="input-wrap">
-          <input type="password" class="form-input" id="mdp" placeholder="Entrez votre mot de passe">
-          <button class="eye-btn" type="button" onclick="togglePwd('mdp')">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Prénom *</label>
+          <input type="text" class="form-input" id="prenom" placeholder="Prénom" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input type="text" class="form-input" id="nom" placeholder="Nom" autocomplete="family-name">
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Confirmez votre mot de passe</label>
-        <div class="input-wrap">
-          <input type="password" class="form-input" id="mdp2" placeholder="Entrez votre mot de passe">
-          <button class="eye-btn" type="button" onclick="togglePwd('mdp2')">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+        <label class="form-label">Nom de la structure *</label>
+        <input type="text" class="form-input" id="structure" placeholder="Ex : SAAD Les Lilas" autocomplete="organization">
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Type de structure *</label>
+          <div class="select-wrap">
+            <select class="form-input" id="type-structure">
+              <option value="">Sélectionner…</option>
+              <option value="saad">SAAD</option>
+              <option value="ssiad">SSIAD</option>
+              <option value="ehpad">EHPAD</option>
+              <option value="crt">CRT</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nb d'intervenants</label>
+          <div class="select-wrap">
+            <select class="form-input" id="nb-intervenants">
+              <option value="">Sélectionner…</option>
+              <option value="1-10">1 – 10</option>
+              <option value="11-30">11 – 30</option>
+              <option value="31-50">31 – 50</option>
+              <option value="51-100">51 – 100</option>
+              <option value="100+">100+</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Établissement</label>
-        <input type="text" class="form-input" id="etablissement" placeholder="Entrez votre établissement">
+        <label class="form-label">Nb de bénéficiaires</label>
+        <div class="select-wrap">
+          <select class="form-input" id="nb-beneficiaires">
+            <option value="">Sélectionner…</option>
+            <option value="0" data-tier="0">Jusqu'à 50 bénéficiaires</option>
+            <option value="1" data-tier="1">Entre 51 et 100 bénéficiaires</option>
+            <option value="2" data-tier="2">Entre 101 et 150 bénéficiaires</option>
+            <option value="3" data-tier="3">Entre 151 et 200 bénéficiaires</option>
+            <option value="4" data-tier="4">Entre 201 et 350 bénéficiaires</option>
+            <option value="5" data-tier="5">Entre 351 et 500 bénéficiaires</option>
+            <option value="6" data-tier="6">Plus de 500 bénéficiaires</option>
+          </select>
+        </div>
       </div>
 
-      <div class="form-row">
-        <label class="check-label"><input type="checkbox"> Se souvenir de moi</label>
-        <a href="/login" class="link">Vous avez déjà un compte ?</a>
+      {# ── Contact ── #}
+      <div class="form-section-label">Contact</div>
+
+      <div class="form-group">
+        <label class="form-label">Email professionnel *</label>
+        <input type="email" class="form-input" id="email" placeholder="vous@structure.fr" autocomplete="email">
       </div>
 
-      <button class="btn-submit" id="register-btn" onclick="doRegister()">S'inscrire</button>
+      <div class="form-group">
+        <label class="form-label">Téléphone *</label>
+        <input type="tel" class="form-input" id="telephone" placeholder="06 XX XX XX XX" autocomplete="tel">
+      </div>
+
+      {# ── Message optionnel ── #}
+      <div class="form-section-label">Message (optionnel)</div>
+      <div class="form-group">
+        <textarea class="form-input" id="message" placeholder="Décrivez vos besoins, contraintes particulières, date souhaitée de démarrage…"></textarea>
+      </div>
+
+      <div class="form-check">
+        <input type="checkbox" id="rgpd">
+        <label for="rgpd">J'accepte que WeCare utilise mes données pour me recontacter et établir un devis. Voir notre <a href="/mentions-legales">politique de confidentialité</a>.</label>
+      </div>
+
+      <button class="btn-submit" id="submit-btn" onclick="doDevis()">Envoyer ma demande de devis</button>
+
+      <p class="form-login-link">Déjà client ? <a href="/login">Se connecter</a></p>
+
     </div>
   </div>
 
-  <div class="split-img">
-    <img src="/images/image-inscription.png" alt="WeCare">
+  {# ── Côté droit ── #}
+  <div class="split-right">
+    <h2 class="split-right-title">Votre devis en<br><span>moins de 24h</span></h2>
+    <p class="split-right-sub">Notre équipe étudie votre demande et vous propose un devis sur-mesure adapté à votre structure.</p>
+
+    <div class="split-steps">
+      <div class="split-step">
+        <div class="split-step-num">1</div>
+        <div class="split-step-text">
+          <div class="split-step-title">Vous envoyez votre demande</div>
+          <div class="split-step-desc">Remplissez le formulaire en 2 minutes</div>
+        </div>
+      </div>
+      <div class="split-step">
+        <div class="split-step-num">2</div>
+        <div class="split-step-text">
+          <div class="split-step-title">Nous préparons votre devis</div>
+          <div class="split-step-desc">Notre équipe l'adapte à votre structure sous 24h</div>
+        </div>
+      </div>
+      <div class="split-step">
+        <div class="split-step-num">3</div>
+        <div class="split-step-text">
+          <div class="split-step-title">Vous le signez en ligne</div>
+          <div class="split-step-desc">Signature électronique, accès immédiat à la plateforme</div>
+        </div>
+      </div>
+      <div class="split-step">
+        <div class="split-step-num">4</div>
+        <div class="split-step-text">
+          <div class="split-step-title">Onboarding personnalisé</div>
+          <div class="split-step-desc">Un chargé de compte vous accompagne à la prise en main</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="split-right-img">
+      <img src="/images/mckup-db-int.png" alt="Dashboard WeCare" onerror="this.style.display='none'">
+    </div>
   </div>
+
 </div>
 
 <script>
-function setPlan(plan) {
-  document.body.setAttribute('data-plan', plan);
-  document.getElementById('btn-gratuit').classList.toggle('active', plan === 'gratuit');
-  document.getElementById('btn-premium').classList.toggle('active', plan === 'premium');
-  const btn = document.getElementById('register-btn');
-  btn.textContent = plan === 'premium' ? 'Suivant' : "S'inscrire";
-}
+// Pré-remplir le plan et les bénéficiaires depuis l'URL
+(function() {
+  const params = new URLSearchParams(window.location.search);
 
-function togglePwd(id) {
-  const inp = document.getElementById(id);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
+  const plan = params.get('plan') || 'gratuit';
+  document.getElementById('plan-input').value = plan;
+  const labels = { gratuit: 'Forfait Gratuit', mensuel: 'Forfait Mensuel', annuel: 'Forfait Annuel' };
+  document.getElementById('plan-badge-name').textContent = labels[plan] || 'Forfait Gratuit';
 
-async function doRegister() {
-  const plan = document.body.getAttribute('data-plan');
-  const nom = document.getElementById('nom').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const mdp = document.getElementById('mdp').value;
-  const mdp2 = document.getElementById('mdp2').value;
-  const etablissement = document.getElementById('etablissement').value.trim();
+  const tier = params.get('beneficiaires');
+  if (tier !== null) {
+    const sel = document.getElementById('nb-beneficiaires');
+    const opt = sel.querySelector('option[value="' + tier + '"]');
+    if (opt) {
+      opt.selected = true;
+      // Légère animation pour signaler que la valeur vient du simulateur
+      sel.closest('.select-wrap').parentElement.style.background = 'linear-gradient(90deg,rgba(65,160,150,0.08),transparent)';
+      sel.closest('.select-wrap').parentElement.style.borderRadius = '10px';
+      sel.closest('.select-wrap').parentElement.style.transition = 'background 1.5s';
+      setTimeout(() => { sel.closest('.select-wrap').parentElement.style.background = ''; }, 2000);
+    }
+  }
+})();
+
+async function doDevis() {
+  const prenom   = document.getElementById('prenom').value.trim();
+  const nom      = document.getElementById('nom').value.trim();
+  const structure = document.getElementById('structure').value.trim();
+  const typeStr  = document.getElementById('type-structure').value;
+  const email    = document.getElementById('email').value.trim();
+  const telephone = document.getElementById('telephone').value.trim();
+  const message  = document.getElementById('message').value.trim();
+  const plan     = document.getElementById('plan-input').value;
+  const nbInter  = document.getElementById('nb-intervenants').value;
+  const nbBenef  = document.getElementById('nb-beneficiaires').value;
+  const rgpd     = document.getElementById('rgpd').checked;
   const err = document.getElementById('err');
-  const ok = document.getElementById('ok');
-  const btn = document.getElementById('register-btn');
+  const ok  = document.getElementById('ok');
+  const btn = document.getElementById('submit-btn');
 
   err.style.display = 'none';
-  ok.style.display = 'none';
+  ok.style.display  = 'none';
 
-  if (!nom || !email || !mdp || !mdp2) { err.textContent = 'Veuillez remplir tous les champs obligatoires.'; err.style.display = 'block'; return; }
-  if (mdp !== mdp2) { err.textContent = 'Les mots de passe ne correspondent pas.'; err.style.display = 'block'; return; }
-  if (mdp.length < 6) { err.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; err.style.display = 'block'; return; }
+  if (!prenom || !nom)        { err.textContent = 'Veuillez renseigner votre prénom et nom.'; err.style.display = 'block'; return; }
+  if (!structure)             { err.textContent = 'Veuillez renseigner le nom de votre structure.'; err.style.display = 'block'; return; }
+  if (!typeStr)               { err.textContent = 'Veuillez sélectionner le type de structure.'; err.style.display = 'block'; return; }
+  if (!email)                 { err.textContent = 'Veuillez renseigner votre email.'; err.style.display = 'block'; return; }
+  if (!telephone)             { err.textContent = 'Veuillez renseigner votre téléphone.'; err.style.display = 'block'; return; }
+  if (!rgpd)                  { err.textContent = 'Veuillez accepter la politique de confidentialité.'; err.style.display = 'block'; return; }
 
-  btn.disabled = true; btn.textContent = 'Inscription…';
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+
   try {
-    const r = await fetch('/api/inscription', {
+    const r = await fetch('/api/devis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom, email, motDePasse: mdp, etablissement, plan })
+      body: JSON.stringify({ prenom, nom, structure, typeStructure: typeStr, nbIntervenants: nbInter, nbBeneficiaires: nbBenef, email, telephone, message, plan })
     });
     const data = await r.json().catch(() => ({}));
     if (r.ok) {
-      ok.textContent = 'Compte créé ! Redirection…';
-      ok.style.display = 'block';
-      setTimeout(() => window.location.href = '/login', 1500);
+      window.location.href = '/devis-envoye?plan=' + plan;
     } else {
-      err.textContent = data.error || 'Une erreur est survenue.';
+      err.textContent = data.error || 'Une erreur est survenue. Veuillez réessayer.';
       err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Envoyer ma demande de devis';
     }
   } catch {
-    err.textContent = 'Impossible de créer le compte. Vérifiez votre connexion.';
+    err.textContent = 'Impossible d\'envoyer la demande. Vérifiez votre connexion.';
     err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma demande de devis';
   }
-  btn.disabled = false;
-  btn.textContent = plan === 'premium' ? 'Suivant' : "S'inscrire";
 }
 </script>
 </body>

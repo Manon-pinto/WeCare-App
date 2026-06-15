@@ -14,7 +14,7 @@
     .hero-fade-in-right { animation: fadeInRight 0.6s ease 0.15s both; }
 
     /* ── Hero ── */
-    .hero-wrap { background: linear-gradient(135deg, #f8f5ff 0%, #F1FAF9 100%); overflow: hidden; }
+    .hero-wrap { background: #F1FAF9; overflow: hidden; }
     .hero {
       max-width: 1200px; margin: 0 auto; padding: 80px 48px 0;
       display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
@@ -22,14 +22,15 @@
     .hero h1 { font-size: 2.8rem; font-weight: 400; color: #0c0052; line-height: 1.15; margin-bottom: 20px; }
     .hero h1 strong { font-weight: 800; }
     .hero-quote { display: flex; align-items: flex-start; gap: 6px; margin: 0 0 28px; }
-    .hero-quote-mark { font-size: 2rem; font-weight: 800; color: #0db8a6; line-height: 1; margin-top: -4px; flex-shrink: 0; }
+    .hero-quote-mark { font-size: 2rem; font-weight: 800; color: #41A096; line-height: 1; margin-top: -4px; flex-shrink: 0; }
     .hero-quote em { font-style: italic; font-size: 0.92rem; color: #0c0052; font-weight: 600; line-height: 1.6; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
     .hero-img { position: relative; }
-    .hero-img .lp-img { height: 480px; border-radius: 16px 16px 0 0; }
+    .hero-img .lp-img { height: 480px; border-radius: 16px 16px 0 0; background: transparent; }
+    .hero-img .lp-img img { border-radius: 16px 16px 0 0; }
 
     /* ── Stats + Tabs ── */
-    .stats-wrap { background: #fff; padding: 64px 48px 0; text-align: center; }
+    .stats-wrap { background: #F1FAF9; padding: 64px 48px 0; text-align: center; }
     .stats-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; }
     .stats-dot { width: 10px; height: 10px; border-radius: 50%; }
     .stats-title { font-size: 2rem; font-weight: 800; color: #0c0052; margin-bottom: 6px; }
@@ -47,11 +48,11 @@
       margin-bottom: -1.5px; white-space: nowrap;
     }
     .tab-pill:hover { color: #0c0052; }
-    .tab-pill.active { background: #0db8a6; color: #fff; border-bottom: 1.5px solid #0db8a6; }
+    .tab-pill.active { background: #2CA7CB; color: #fff; border-bottom: 1.5px solid #2CA7CB; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    .tab-content-wrap { background: #fff; padding: 0 48px 72px; }
+    .tab-content-wrap { background: #F1FAF9; padding: 0 48px 72px; }
     .tab-content {
       max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: 1fr 1fr;
@@ -60,12 +61,12 @@
     .tab-text-title {
       font-size: 1.8rem; font-weight: 800; color: #0c0052;
       line-height: 1.25; margin-bottom: 16px;
-      border-left: 4px solid #0db8a6; padding-left: 16px;
+      border-left: 4px solid #2CA7CB; padding-left: 16px;
     }
     .tab-text-desc { font-size: 0.92rem; color: #8a85b0; line-height: 1.7; margin-bottom: 20px; }
     .tab-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-    .tab-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; color: #0db8a6; }
-    .tab-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #0db8a6; flex-shrink: 0; }
+    .tab-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; color: #2CA7CB; }
+    .tab-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #2CA7CB; flex-shrink: 0; }
     .tab-cta {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 11px 24px; border: 1.5px solid #0c0052;
@@ -87,17 +88,17 @@
       transition: transform 0.5s cubic-bezier(.4,0,.2,1);
     }
     .carousel-card {
-      min-width: 300px; flex-shrink: 0; border-radius: 16px; overflow: hidden;
+      min-width: 300px; max-width: 300px; flex-shrink: 0; border-radius: 16px; overflow: hidden;
       position: relative; cursor: pointer;
       transition: transform 0.25s, box-shadow 0.25s;
     }
     .carousel-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(15,0,75,0.14); }
     .carousel-card-img {
-      width: 100%; height: 220px; object-fit: cover; display: block;
-      background: #e4f5f3;
+      width: 100%; height: 220px; object-fit: cover; object-position: center top; display: block;
+      background: #e8f4f8;
     }
     .carousel-card-body { padding: 18px 20px; background: #fff; border: 1px solid #f0eef8; border-top: none; border-radius: 0 0 16px 16px; }
-    .carousel-card-tag  { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0db8a6; background: #e4f5f3; border-radius: 20px; padding: 2px 10px; margin-bottom: 8px; }
+    .carousel-card-tag  { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #41A096; background: rgba(65,160,150,0.10); border-radius: 20px; padding: 2px 10px; margin-bottom: 8px; }
     .carousel-card-title { font-size: 0.92rem; font-weight: 700; color: #0c0052; margin-bottom: 6px; line-height: 1.3; }
     .carousel-card-desc  { font-size: 0.78rem; color: #8a85b0; line-height: 1.5; }
     .carousel-nav { display: flex; gap: 10px; padding: 24px 48px 0; }
@@ -106,96 +107,93 @@
       background: #fff; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.15s; color: #0c0052;
     }
-    .carousel-btn:hover { background: #0db8a6; border-color: #0db8a6; color: #fff; }
+    .carousel-btn:hover { background: #41A096; border-color: #41A096; color: #fff; }
 
     /* ── Pricing ── */
-    .pricing-section { background: linear-gradient(135deg, #f8f5ff 0%, #F1FAF9 100%); padding: 72px 48px; }
+    .pricing-section { background: #fff; padding: 72px 48px; }
     .pricing-inner { max-width: 1100px; margin: 0 auto; }
     .pricing-header { text-align: center; margin-bottom: 48px; }
+    .pricing-header-bar { width: 40px; height: 3px; background: #41A096; border-radius: 2px; margin: 0 auto 20px; }
     .pricing-header h2 { font-size: 2rem; font-weight: 800; color: #0c0052; margin-bottom: 10px; }
-    .pricing-header p  { font-size: 0.9rem; color: #8a85b0; max-width: 540px; margin: 0 auto; line-height: 1.7; }
+    .pricing-header p  { font-size: 0.9rem; color: #8a85b0; font-style: italic; max-width: 540px; margin: 0 auto; line-height: 1.7; }
     .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
     .plan-card {
-      background: #fff; border-radius: 20px; padding: 32px 28px;
-      box-shadow: 0 4px 24px rgba(15,0,75,0.07);
+      background: #fff; border-radius: 16px; padding: 32px 28px;
+      border: 1px solid #eef0f8;
       transition: transform 0.2s, box-shadow 0.2s;
       display: flex; flex-direction: column;
     }
-    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(15,0,75,0.12); }
-    .plan-card.featured { background: #0f004b; color: #fff; }
-    .plan-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a85b0; margin-bottom: 6px; }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(15,0,75,0.10); }
+    .plan-card.featured { background: #0f004b; color: #fff; border-color: #0f004b; }
+    .plan-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a85b0; margin-bottom: 10px; }
     .plan-card.featured .plan-label { color: rgba(255,255,255,0.45); }
-    .plan-badge-tag { display: inline-block; background: #0db8a6; color: #fff; font-size: 0.62rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .plan-badge-tag { display: inline-block; background: #41A096; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-bottom: 14px; }
     .plan-range { font-size: 0.88rem; font-weight: 600; color: #0c0052; margin-bottom: 6px; }
     .plan-card.featured .plan-range { color: #fff; }
     .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
-    .plan-price-big { font-size: 2.6rem; font-weight: 800; color: #0c0052; }
+    .plan-price-big { font-size: 2.8rem; font-weight: 800; color: #0c0052; }
     .plan-card.featured .plan-price-big { color: #fff; }
     .plan-price-unit { font-size: 0.88rem; color: #8a85b0; }
     .plan-card.featured .plan-price-unit { color: rgba(255,255,255,0.5); }
     .plan-price-alt { font-size: 0.78rem; color: #8a85b0; margin-bottom: 20px; }
     .plan-card.featured .plan-price-alt { color: rgba(255,255,255,0.45); }
     .plan-feature-row { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #3a357f; margin-bottom: 10px; }
-    .plan-card.featured .plan-feature-row { color: rgba(255,255,255,0.8); }
-    .plan-feature-check { width: 16px; height: 16px; border-radius: 50%; background: #0db8a6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    #hp-slider::-webkit-slider-thumb { -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#2CA7CB;cursor:pointer;box-shadow:0 2px 8px rgba(44,167,203,0.4); }
-    #hp-slider::-moz-range-thumb { width:18px;height:18px;border-radius:50%;background:#2CA7CB;cursor:pointer;border:none; }
+    .plan-card.featured .plan-feature-row { color: rgba(255,255,255,0.85); }
+    .plan-feature-check { width: 18px; height: 18px; border-radius: 50%; background: #41A096; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #hp-slider::-webkit-slider-thumb { -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#41A096;cursor:pointer;box-shadow:0 2px 8px rgba(65,160,150,0.4); }
+    #hp-slider::-moz-range-thumb { width:18px;height:18px;border-radius:50%;background:#41A096;cursor:pointer;border:none; }
     .plan-cta { margin-top: auto; padding-top: 20px; }
     .plan-btn {
-      display: block; width: 100%; padding: 12px; text-align: center;
+      display: block; width: 100%; padding: 13px; text-align: center;
       border-radius: 10px; font-size: 0.88rem; font-weight: 700;
-      border: 1.5px solid #0db8a6; color: #0db8a6;
+      border: 1.5px solid #41A096; color: #41A096;
       transition: all 0.15s;
     }
-    .plan-btn:hover { background: #0db8a6; color: #fff; }
+    .plan-btn:hover { background: #41A096; color: #fff; }
     .plan-btn.primary { background: #ff91fd; border-color: #ff91fd; color: #0f004b; }
     .plan-btn.primary:hover { opacity: 0.88; }
 
     /* ── FAQ ── */
     .faq-section { background: #fff; }
-    .faq-inner { max-width: 820px; margin: 0 auto; padding: 72px 48px; }
+    .faq-inner { max-width: 860px; margin: 0 auto; padding: 72px 48px; }
     .faq-header { text-align: center; margin-bottom: 40px; }
-    .faq-header h2 { font-size: 1.8rem; font-weight: 800; color: #0c0052; margin-bottom: 8px; }
-    .faq-header p  { font-size: 0.88rem; color: #8a85b0; }
-    .faq-item { border-bottom: 1px solid #f0eef8; }
-    .faq-q { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; cursor: pointer; font-size: 0.92rem; font-weight: 600; color: #0c0052; list-style: none; }
-    .faq-q:hover { color: #0db8a6; }
-    .faq-icon { font-size: 1.2rem; transition: transform 0.2s; color: #8a85b0; flex-shrink: 0; }
-    .faq-item.open .faq-icon { transform: rotate(45deg); }
-    .faq-a { display: none; padding: 0 0 18px; font-size: 0.86rem; color: #8a85b0; line-height: 1.7; }
+    .faq-header-bar { width: 32px; height: 3px; background: #41A096; border-radius: 2px; margin: 0 auto 16px; }
+    .faq-header h2 { font-size: 1.9rem; font-weight: 800; color: #2CA7CB; margin-bottom: 10px; }
+    .faq-header p  { font-size: 0.88rem; color: #2CA7CB; font-style: italic; }
+    .faq-item { border-top: 1px solid #ddeaf5; }
+    .faq-item:last-child { border-bottom: 1px solid #ddeaf5; }
+    .faq-q { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; cursor: pointer; font-size: 0.92rem; font-weight: 600; color: #0c0052; gap: 16px; }
+    .faq-q:hover { color: #2CA7CB; }
+    .faq-icon { flex-shrink: 0; color: #2CA7CB; transition: transform 0.2s; }
+    .faq-item.open .faq-icon { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 0 20px; font-size: 0.86rem; color: #8a85b0; line-height: 1.7; }
     .faq-item.open .faq-a { display: block; }
 
     /* ── CTA Final ── */
     .cta-section {
-      background: #F2FBFF;
-      padding: 72px 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 420px; overflow: hidden;
     }
-    .cta-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 420px;
-      gap: 56px; align-items: center;
+    .cta-img-side { overflow: hidden; }
+    .cta-img-side img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .cta-text-side {
+      background: #F1FAF9;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 64px 56px;
     }
-    .cta-content h2 { font-size: 2rem; font-weight: 800; color: #0c0052; margin-bottom: 12px; line-height: 1.25; }
-    .cta-content h2 span { color: #ff91fd; }
-    .cta-content p { color: #8a85b0; font-size: 0.92rem; margin-bottom: 28px; line-height: 1.7; }
     .cta-tag {
       display: inline-block; font-size: 0.68rem; font-weight: 700;
       letter-spacing: 0.12em; text-transform: uppercase;
-      color: #2CA7CB; background: rgba(44,167,203,0.10);
-      border-radius: 50px; padding: 5px 14px; margin-bottom: 18px;
+      color: #41A096; background: rgba(65,160,150,0.10);
+      border-radius: 50px; padding: 5px 14px; margin-bottom: 20px; width: fit-content;
     }
-    .cta-img {
-      border-radius: 20px; overflow: hidden;
-      aspect-ratio: 4/3;
-      box-shadow: 0 16px 48px rgba(15,0,75,0.12);
-    }
-    .cta-img img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
+    .cta-text-side h2 { font-size: 2rem; font-weight: 800; color: #0c0052; margin-bottom: 12px; line-height: 1.25; }
+    .cta-text-side h2 span { color: #ff91fd; }
+    .cta-text-side p { color: #8a85b0; font-size: 0.92rem; margin-bottom: 28px; line-height: 1.7; }
     @media (max-width: 900px) {
-      .cta-inner { grid-template-columns: 1fr; }
-      .cta-img { max-width: 480px; }
-      .cta-section { padding: 56px 24px; }
+      .cta-section { grid-template-columns: 1fr; }
+      .cta-img-side { min-height: 260px; }
+      .cta-text-side { padding: 48px 24px; }
     }
 
     /* ── Responsive ── */
@@ -226,7 +224,7 @@
 <div class="hero-wrap">
   <div class="hero">
     <div class="hero-fade-in">
-      <h1>Le <strong>logiciel de gestion</strong> pour les <strong>services à la personne</strong> et l'autonomie</h1>
+      <h1>Le <strong>logiciel de gestion</strong><br>pour les <strong style="color:#41A096">services à la personne</strong><br>et l'autonomie</h1>
       <blockquote class="hero-quote">
         <span class="hero-quote-mark">"</span>
         <em>Vous prenez soin de nos familles,<br>à nous de prendre soin de vous.</em>
@@ -239,8 +237,8 @@
     <div class="hero-img hero-fade-in-right">
       {# → /public/images/lp/hero.jpg #}
       <div class="lp-img" style="height:480px;border-radius:16px 16px 0 0">
-        <img src="/images/lp/hero.jpg" alt="WeCare" onerror="this.style.display='none'">
-        <span class="lp-img-icon">🖼️</span><span>hero.jpg</span>
+        <img src="/images/ADV_emploi_aide_a_dom_bloc1_13cb6117ce.jpg" alt="WeCare aide à domicile" onerror="this.style.display='none'">
+        <span class="lp-img-icon" style="display:none"></span><span style="display:none"></span>
       </div>
     </div>
   </div>
@@ -263,9 +261,9 @@
 <!-- ── STATS + TABS ── -->
 <div class="stats-wrap">
   <div class="stats-dots reveal">
-    <span class="stats-dot" style="background:#0db8a6"></span>
+    <span class="stats-dot" style="background:#2CA7CB"></span>
     <span class="stats-dot" style="background:#ff91fd"></span>
-    <span class="stats-dot" style="background:#0db8a6"></span>
+    <span class="stats-dot" style="background:#2CA7CB"></span>
   </div>
   <div class="stats-title reveal">WeCare, s'occupe de tout le monde</div>
   <div class="stats-sub reveal">3 utilisateurs ; 3 espaces distincts</div>
@@ -292,8 +290,8 @@
       </div>
       <div class="tab-img-placeholder lp-img">
         {# → /public/images/lp/feature-responsable.jpg #}
-        <img src="/images/lp/feature-responsable.jpg" alt="Responsable de secteur" onerror="this.style.display='none'">
-        <span class="lp-img-icon">🖼️</span><span>feature-responsable.jpg</span>
+        <img src="/images/Gemini_Generated_Image_11u53q11u53q11u5.png" alt="Responsable de secteur" onerror="this.style.display='none'">
+        <span class="lp-img-icon" style="display:none"></span><span style="display:none"></span>
       </div>
     </div>
   </div>
@@ -311,8 +309,8 @@
       </div>
       <div class="tab-img-placeholder lp-img">
         {# → /public/images/lp/feature-aidant.jpg #}
-        <img src="/images/lp/feature-aidant.jpg" alt="Aidant bénéficiaire" onerror="this.style.display='none'">
-        <span class="lp-img-icon">🖼️</span><span>feature-aidant.jpg</span>
+        <img src="/images/Gemini_Generated_Image_eb0lyweb0lyweb0l-clean.png" alt="Aidant bénéficiaire" onerror="this.style.display='none'">
+        <span class="lp-img-icon" style="display:none"></span><span style="display:none"></span>
       </div>
     </div>
   </div>
@@ -330,8 +328,8 @@
       </div>
       <div class="tab-img-placeholder lp-img">
         {# → /public/images/lp/feature-intervenant.jpg #}
-        <img src="/images/lp/feature-intervenant.jpg" alt="Intervenant" onerror="this.style.display='none'">
-        <span class="lp-img-icon">🖼️</span><span>feature-intervenant.jpg</span>
+        <img src="/images/Gemini_Generated_Image_60bpzs60bpzs60bp-clean.png" alt="Intervenant" onerror="this.style.display='none'">
+        <span class="lp-img-icon" style="display:none"></span><span style="display:none"></span>
       </div>
     </div>
   </div>
@@ -346,16 +344,21 @@
   <div class="carousel-track-wrap">
     <div class="carousel-track" id="carousel-track">
       {% set carouselCards = [
-        {tag:'SAP',   img:'carousel-sap.jpg',         title:'Les Services d\'Aides à Domicile',                                                sub:'WeCare accompagne les SAAD dans la coordination quotidienne des soins, le suivi des patients et la gestion quotidienne des interventions.'},
-        {tag:'SSIAD', img:'carousel-seniors.jpg',      title:'Pour les Services de Soins Infirmiers à Domicile',                              sub:'Vous coordonnez les soins à fin tête et les soins à domicile, WeCare simplifie la coordination de son équipe.'},
-        {tag:'SPASAD',img:'carousel-paramedical.jpg',  title:'Pour les Services Polyvalents d\'Aides et de Soins à Domicile',                 sub:'Vous coordonnez la bonne information et des interventions et assurez la coordination de son équipe.'},
-        {tag:'CCAS',  img:'carousel-ccas.jpg',         title:'Pour les Centre Communaux d\'Action Sociale, étudiants et Santé Social',        sub:'Les structures WeCare amplifier la coordination des informations médicales et assurent une gestion optimale.'},
+        {tag:'SAP',    img:'/images/service-daide-a-la-personne.jpg',           title:'Les Services d\'Aides à Domicile',                                    sub:'WeCare accompagne les SAAD dans la coordination quotidienne des soins, le suivi des patients et la gestion des interventions.'},
+        {tag:'SSIAD',  img:'/images/aide-a-domicile-seniors.jpg',               title:'Pour les Services de Soins Infirmiers à Domicile',                    sub:'Vous coordonnez les soins à domicile, WeCare simplifie la coordination de votre équipe et le suivi des patients.'},
+        {tag:'SPASAD', img:'/images/Gemini_Generated_Image_rmbi14rmbi14rmbi.png',title:'Pour les Services Polyvalents d\'Aides et de Soins à Domicile',      sub:'Coordonnez à la fois l\'aide et les soins à domicile depuis une seule plateforme centralisée.'},
+        {tag:'CCAS & CIAS', img:'/images/ADV_emploi_aide_a_dom_bloc1_13cb6117ce.jpg', title:'Pour les Centres Communaux d\'Action Sociale',                  sub:'Pilotez l\'action sociale de votre territoire, WeCare simplifie l\'information médicale et la coordination.'},
+        {tag:'Mandataire', img:'/images/Gemini_Generated_Image_eb0lyweb0lyweb0l-clean.png', title:'Pour les Services Mandataires',                            sub:'Gérez vos intervenants mandatés, suivez les plannings et produisez les comptes rendus en toute simplicité.'},
+        {tag:'Prestataire', img:'/images/Gemini_Generated_Image_60bpzs60bpzs60bp-clean.png', title:'Pour les Services Prestataires',                          sub:'Centralisez la gestion de vos bénéficiaires, coordonnez vos équipes terrain et optimisez vos tournées.'},
+        {tag:'Résidence',   img:'/images/alternative_maison_de_retraite_1200.jpg',                        title:'Pour les Résidences Services et EHPAD',         sub:'Assurez le suivi des résidents, planifiez les interventions et facilitez la communication avec les familles.'},
+        {tag:'Autonomie',   img:'/images/Jai-besoin-dune-aide-a-domicile-pour-la-premiere-fois-comment-faire-2-1024x683.jpg', title:'Pour les Services d\'Aide à l\'Autonomie',      sub:'Accompagnez les personnes en perte d\'autonomie avec des outils adaptés au maintien à domicile.'},
+        {tag:'Handicap',    img:'/images/Gemini_Generated_Image_11u53q11u53q11u5.png',                  title:'Pour les Services d\'Aide aux Personnes Handicapées', sub:'Gérez les accompagnements spécialisés, coordonnez les aidants et suivez chaque bénéficiaire individuellement.'},
+        {tag:'Portage repas', img:'/images/Gemini_Generated_Image_uo3711uo3711uo37.png',                title:'Pour les Services de Portage de Repas',             sub:'Planifiez les tournées de livraison, gérez les régimes alimentaires et assurez le lien social avec les bénéficiaires.'},
       ] %}
       {% for c in carouselCards %}
       <div class="carousel-card">
-        <div class="carousel-card-img lp-img" style="height:220px;border-radius:16px 16px 0 0">
-          <img src="/images/lp/{{ c.img }}" alt="{{ c.title }}" onerror="this.style.display='none'">
-          <span class="lp-img-icon" style="font-size:1.4rem">🖼️</span><span>{{ c.img }}</span>
+        <div class="carousel-card-img" style="border-radius:16px 16px 0 0;overflow:hidden">
+          <img src="{{ c.img }}" alt="{{ c.title }}" style="width:100%;height:300px;object-fit:cover;object-position:center;display:block">
         </div>
         <div class="carousel-card-body">
           <span class="carousel-card-tag">{{ c.tag }}</span>
@@ -376,6 +379,7 @@
 <div class="pricing-section">
   <div class="pricing-inner">
     <div class="pricing-header reveal">
+      <div class="pricing-header-bar"></div>
       <h2>Tarifs WeCare, commencez gratuitement</h2>
       <p>Commencez avec l'abonnement gratuit de WeCare, suivez vos interventions, gérez l'information et optimisez votre temps effectif sans frais.</p>
     </div>
@@ -383,17 +387,13 @@
       <!-- Carte slider -->
       <div class="plan-card reveal">
         <div class="plan-label">Bénéficiaires</div>
-        <p style="font-size:0.85rem;font-weight:600;color:#0c0052;line-height:1.4;margin-bottom:16px">Sélectionnez votre nombre de bénéficiaires pour connaître le tarif le plus adapté.</p>
-        <div class="plan-price-row">
-          <span class="plan-price-big" id="hp-price">49€</span>
-          <span class="plan-price-unit">/mois</span>
-        </div>
-        <div class="plan-price-alt" id="hp-range">Jusqu'à 50 bénéficiaires</div>
-        <input type="range" id="hp-slider" min="0" max="4" value="0" step="1" style="-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;outline:none;margin:12px 0 20px;background:linear-gradient(to right,#2CA7CB 0%,#2CA7CB 0%,#d4eef8 0%,#d4eef8 100%);cursor:pointer">
+        <p style="font-size:0.95rem;font-weight:700;color:#0c0052;line-height:1.4;margin-bottom:16px">Sélectionnez votre nombre de bénéficiaire requis</p>
+        <input type="range" id="hp-slider" min="0" max="6" value="0" step="1" style="-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;outline:none;margin:12px 0 8px;background:linear-gradient(to right,#41A096 0%,#41A096 0%,#d4eef8 0%,#d4eef8 100%);cursor:pointer">
+        <div class="plan-price-alt" id="hp-range" style="margin-bottom:16px">Jusqu'à 50 bénéficiaires</div>
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
-        <div class="plan-cta"><a href="/inscription" class="plan-btn">Démarrer gratuitement</a></div>
+        <div class="plan-cta"><a href="/inscription" class="plan-btn" style="background:#41A096;color:#fff;border-color:#41A096">Démarrer gratuitement</a></div>
       </div>
-      <div class="plan-card featured reveal" style="transition-delay:0.1s">
+      <div class="plan-card reveal" style="transition-delay:0.1s">
         <div class="plan-badge-tag">Tarif annuel</div>
         <div class="plan-range" id="hp-annual-range">Jusqu'à 50 bénéficiaires</div>
         <div class="plan-price-row">
@@ -402,7 +402,7 @@
         </div>
         <div class="plan-price-alt" id="hp-annual-yearly">Économisez 49€ par an</div>
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
-        <div class="plan-cta"><a href="/tarifs" class="plan-btn primary">Choisir le forfait</a></div>
+        <div class="plan-cta"><a href="/tarifs" class="plan-btn" style="background:#41A096;color:#fff;border-color:#41A096">Choisir ce forfait</a></div>
       </div>
       <div class="plan-card reveal" style="transition-delay:0.2s">
         <div class="plan-label">Forfait mensuel</div>
@@ -423,6 +423,7 @@
 <div class="faq-section">
   <div class="faq-inner">
     <div class="faq-header reveal">
+      <div class="faq-header-bar"></div>
       <h2>Une question ?</h2>
       <p>Nous vous avons compilé une liste de réponses aux questions les plus courantes</p>
     </div>
@@ -435,7 +436,8 @@
     {% for item in faqs %}
     <div class="faq-item reveal">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        {{ item.q }} <span class="faq-icon">+</span>
+        {{ item.q }}
+        <svg class="faq-icon" width="16" height="16" fill="none" stroke="#2CA7CB" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="faq-a">{{ item.a }}</div>
     </div>
@@ -445,19 +447,17 @@
 
 <!-- ── CTA FINAL ── -->
 <div class="cta-section">
-  <div class="cta-inner">
-    <div class="cta-content reveal">
-      <div class="cta-tag">Offre limitée</div>
-      <h2>Commencez <span>gratuitement</span><br>dès maintenant</h2>
-      <p>Plus que 12 mois pour profiter de cette offre gratuite.</p>
-      <a href="/inscription" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#ff91fd;color:#0f004b;border-radius:10px;font-weight:700;font-size:0.92rem;transition:opacity 0.15s">
-        Essai gratuit
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </a>
-    </div>
-    <div class="cta-img reveal-right">
-      <img src="/images/lp/cta-bottom.jpg" alt="WeCare aide à domicile" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#e4f5f3,#d4eef8)'">
-    </div>
+  <div class="cta-img-side">
+    <img src="/images/Welcome-WeCare-RF.webp" alt="WeCare aide à domicile">
+  </div>
+  <div class="cta-text-side reveal">
+    <div class="cta-tag">Offre limitée</div>
+    <h2>Commencez <span>gratuitement</span><br>dès maintenant</h2>
+    <p>Plus que 12 mois pour profiter de cette offre gratuite.</p>
+    <a href="/inscription" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#ff91fd;color:#0f004b;border-radius:10px;font-weight:700;font-size:0.92rem;transition:opacity 0.15s;width:fit-content">
+      Essai gratuit
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
   </div>
 </div>
 
@@ -490,13 +490,15 @@ const hpTiers = [
   { range: 'Entre 101 et 150 bénéficiaires',  monthly: 129, annual: 1419, economy: 129 },
   { range: 'Entre 151 et 200 bénéficiaires',  monthly: 169, annual: 1859, economy: 169 },
   { range: 'Entre 201 et 350 bénéficiaires',  monthly: 209, annual: 2299, economy: 209 },
+  { range: 'Entre 351 et 500 bénéficiaires',  monthly: 249, annual: 2739, economy: 249 },
+  { range: 'Plus de 500 bénéficiaires',       monthly: 289, annual: 3179, economy: 289 },
 ];
 const hpSlider = document.getElementById('hp-slider');
 function hpUpdate() {
   const t = hpTiers[+hpSlider.value];
-  const pct = (+hpSlider.value / 4) * 100;
-  hpSlider.style.background = `linear-gradient(to right,#2CA7CB 0%,#2CA7CB ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
-  document.getElementById('hp-price').textContent         = t.monthly + '€';
+  const pct = (+hpSlider.value / 6) * 100;
+  hpSlider.style.background = `linear-gradient(to right,#41A096 0%,#41A096 ${pct}%,#d4eef8 ${pct}%,#d4eef8 100%)`;
+  const hpPriceEl = document.getElementById('hp-price'); if(hpPriceEl) hpPriceEl.textContent = t.monthly + '€';
   document.getElementById('hp-range').textContent         = t.range;
   document.getElementById('hp-annual-range').textContent  = t.range;
   document.getElementById('hp-annual-price').textContent  = t.annual + '€';
