@@ -22,6 +22,41 @@ class InterventionRepository extends ServiceEntityRepository
 
     // ── Admin dashboard ──────────────────────────────────────────────────────
 
+    /** Interventions terminées sans compte rendu (toutes dates, filtrées par intervenants de l'admin) */
+    public function countSansCompteRendu(?array $ivIds = null): int
+    {
+        if ($ivIds !== null && count($ivIds) === 0) return 0;
+
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->leftJoin('i.compteRendu', 'cr')
+            ->andWhere('i.statut = :statut')
+            ->andWhere('cr.id IS NULL')
+            ->setParameter('statut', StatutIntervention::Terminee);
+
+        if ($ivIds !== null) {
+            $qb->join('i.intervenant', 'iv')
+               ->andWhere('iv.id IN (:ivIds)')
+               ->setParameter('ivIds', $ivIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countSansCompteRenduByIntervenant(\App\Entity\Intervenant $intervenant): int
+    {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->leftJoin('i.compteRendu', 'cr')
+            ->andWhere('i.intervenant = :intervenant')
+            ->andWhere('i.dateDebut < :now')
+            ->andWhere('cr.id IS NULL')
+            ->setParameter('intervenant', $intervenant)
+            ->setParameter('now', new \DateTime())
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /** @return Intervention[] */
     public function findForDate(\DateTimeInterface $date, ?array $ivIds = null): array
     {

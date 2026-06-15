@@ -7,6 +7,12 @@
   <nav class="sidebar-nav">
     {% set route = app.request.attributes.get('_route') %}
 
+    <a href="{{ path('admin_devis_index') }}" class="nav-item {{ route starts with 'admin_devis' ? 'active' : '' }}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+      Devis
+      {% set nb_attente = 0 %}{# TODO: injecter le vrai count #}
+    </a>
+
     <a href="{{ path('admin_dashboard') }}" class="nav-item {{ route == 'admin_dashboard' ? 'active' : '' }}">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard

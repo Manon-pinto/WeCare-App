@@ -31,6 +31,10 @@ security:
             logout:
                 path: app_logout
                 target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800  # 7 jours
+                always_remember_me: true
 
     # Règles d'accès par rôle
     access_control:
@@ -38,6 +42,7 @@ security:
         - { path: ^/inscription,      roles: PUBLIC_ACCESS }
         - { path: ^/api/login,        roles: PUBLIC_ACCESS }
         - { path: ^/api/inscription,  roles: PUBLIC_ACCESS }
+        - { path: ^/api/devis,        roles: PUBLIC_ACCESS }
         - { path: ^/admin,            roles: ROLE_ADMINISTRATEUR }
         - { path: ^/intervenant,      roles: ROLE_INTERVENANT }
         - { path: ^/beneficiaire,     roles: ROLE_BENEFICIAIRE }
