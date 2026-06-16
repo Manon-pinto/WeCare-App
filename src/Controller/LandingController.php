@@ -3,7 +3,11 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 class LandingController extends AbstractController
@@ -71,5 +75,47 @@ class LandingController extends AbstractController
     public function devisEnvoye(): Response
     {
         return $this->render('landing/devis-envoye.html.twig');
+    }
+
+    #[Route('/api/devis', name: 'api_devis', methods: ['POST'])]
+    public function apiDevis(Request $request, MailerInterface $mailer): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $prenom        = $data['prenom']          ?? '';
+        $nom           = $data['nom']             ?? '';
+        $structure     = $data['structure']       ?? '';
+        $typeStructure = $data['typeStructure']   ?? '';
+        $email         = $data['email']           ?? '';
+        $telephone     = $data['telephone']       ?? '';
+        $plan          = $data['plan']            ?? '';
+        $nbInter       = $data['nbIntervenants']  ?? '';
+        $nbBenef       = $data['nbBeneficiaires'] ?? '';
+        $message       = $data['message']         ?? '';
+
+        if (!$prenom || !$nom || !$email || !$structure) {
+            return new JsonResponse(['error' => 'Champs obligatoires manquants.'], 400);
+        }
+
+        $corps = "Nouvelle demande d'inscription WeCare\n\n"
+            . "Nom : $prenom $nom\n"
+            . "Structure : $structure ($typeStructure)\n"
+            . "Email : $email\n"
+            . "Téléphone : $telephone\n"
+            . "Plan souhaité : $plan\n"
+            . "Nb intervenants : $nbInter\n"
+            . "Nb bénéficiaires : $nbBenef\n"
+            . "Message : $message\n";
+
+        $emailMsg = (new Email())
+            ->from('noreply@wecare.fr')
+            ->to('contact@wecare.fr')
+            ->replyTo($email)
+            ->subject("Nouvelle demande – $prenom $nom ($structure)")
+            ->text($corps);
+
+        $mailer->send($emailMsg);
+
+        return new JsonResponse(['success' => true]);
     }
 }

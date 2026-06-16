@@ -54,7 +54,6 @@ class DashboardController extends AbstractController
             $interventionsJour,
             fn($i) => $i->getStatut() === StatutIntervention::Terminee
         ));
-        $nbCrRestants    = $interventionRepo->countSansCompteRendu($myIvIds);
 
         // ── Données pour la modale "Nouvelle intervention" ────────────────
         $patients  = array_map(fn($b) => ['id' => $b->getId(), 'nom' => $b->getUtilisateur()->getNom()],
@@ -141,7 +140,6 @@ class DashboardController extends AbstractController
                 ['icon' => 'users',     'label' => 'Intervenants',     'value' => $nbIntervenants,  'suffix' => 'actifs',          'sub' => null],
                 ['icon' => 'heart',     'label' => 'Patients suivis',  'value' => $nbBeneficiaires, 'suffix' => 'dossiers actifs', 'sub' => null],
                 ['icon' => 'clipboard', 'label' => 'Interventions',    'value' => $nbAujourdhui,    'suffix' => "aujourd'hui",     'sub' => 'dont ' . $nbTerminees . ' effectuées'],
-                ['icon' => 'clipboard', 'label' => 'Comptes rendus',   'value' => $nbCrRestants,    'suffix' => $nbCrRestants <= 1 ? 'restant' : 'restants', 'sub' => 'toutes périodes confondues'],
             ],
             'alertes'              => $alertes,
             'patients'             => $patients,
