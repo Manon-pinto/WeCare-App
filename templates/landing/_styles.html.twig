@@ -20,7 +20,7 @@ body { font-family: 'Poppins', sans-serif; color: #0c0052; background: #F1FAF9; 
   border-bottom: 1px solid rgba(65,160,150,0.2);
 }
 .nav-logo img { height: 36px; width: auto; }
-.nav-links { display: flex; gap: 2px; list-style: none; margin: 0 auto; }
+.nav-links { display: flex; gap: 2px; list-style: none; margin: 0 auto; align-items: center; }
 .nav-link {
   padding: 7px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
   color: #3a357f; transition: background 0.15s, color 0.15s;
@@ -28,8 +28,8 @@ body { font-family: 'Poppins', sans-serif; color: #0c0052; background: #F1FAF9; 
 .nav-link:hover { background: rgba(65,160,150,0.08); color: #0f004b; }
 .nav-link.active { background: rgba(65,160,150,0.12); color: #0c0052; font-weight: 600; }
 /* ── Dropdown Ressources ── */
-.nav-dropdown-wrap { position: relative; list-style: none; }
-.nav-dropdown-trigger { display: flex; align-items: center; cursor: pointer; }
+.nav-dropdown-wrap { position: relative; list-style: none; display: flex; align-items: center; }
+.nav-dropdown-trigger { display: flex; align-items: center; cursor: pointer; line-height: 1; }
 .nav-dropdown {
   display: none;
   position: absolute; top: calc(100% + 8px); left: 50%;

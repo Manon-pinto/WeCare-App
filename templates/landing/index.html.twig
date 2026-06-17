@@ -37,35 +37,42 @@
     .stats-sub   { font-size: 0.88rem; color: #8a85b0; margin-bottom: 40px; }
 
     /* Tabs */
-    .tabs-bar {
-      display: flex; gap: 0; border-bottom: 1.5px solid #e8e4f0;
+    .tabs-section-wrap { background: #F1FAF9; padding: 0 48px 72px; }
+    .tabs-card {
       max-width: 1100px; margin: 0 auto;
+      background: #fff;
+      border: 1.5px solid #d4cef0;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .tabs-bar {
+      display: flex; gap: 6px; align-items: center;
+      border-bottom: 1px solid #ede9f8;
+      padding: 20px 24px;
     }
     .tab-pill {
-      padding: 10px 28px; border: none; background: none; cursor: pointer;
-      font-family: 'Poppins', sans-serif; font-size: 0.88rem; font-weight: 600;
-      color: #8a85b0; border-radius: 8px 8px 0 0; transition: all 0.15s;
-      margin-bottom: -1.5px; white-space: nowrap;
+      padding: 9px 20px; border: none; background: transparent; cursor: pointer;
+      font-family: 'Poppins', sans-serif; font-size: 0.84rem; font-weight: 600;
+      color: #9b94c5; border-radius: 50px; transition: all 0.15s;
+      white-space: nowrap;
     }
     .tab-pill:hover { color: #0c0052; }
-    .tab-pill.active { background: #2CA7CB; color: #fff; border-bottom: 1.5px solid #2CA7CB; }
+    .tab-pill.active { background: #2CA7CB; color: #fff; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    .tab-content-wrap { background: #F1FAF9; padding: 0 48px 72px; }
     .tab-content {
-      max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 64px; align-items: center; padding-top: 48px;
+      gap: 56px; align-items: center; padding: 40px 40px;
     }
     .tab-text-title {
-      font-size: 1.8rem; font-weight: 800; color: #0c0052;
+      font-size: 1.7rem; font-weight: 800; color: #0c0052;
       line-height: 1.25; margin-bottom: 16px;
       border-left: 4px solid #2CA7CB; padding-left: 16px;
     }
     .tab-text-desc { font-size: 0.92rem; color: #8a85b0; line-height: 1.7; margin-bottom: 20px; }
     .tab-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-    .tab-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; color: #2CA7CB; }
+    .tab-list li { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; font-weight: 600; color: #2CA7CB; }
     .tab-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #2CA7CB; flex-shrink: 0; }
     .tab-cta {
       display: inline-flex; align-items: center; gap: 8px;
@@ -74,7 +81,7 @@
       color: #0c0052; transition: background 0.15s, color 0.15s;
     }
     .tab-cta:hover { background: #0c0052; color: #fff; }
-    .tab-img-placeholder { height: 380px; border-radius: 16px; }
+    .tab-img-placeholder { height: 360px; border-radius: 12px; }
 
     /* ── Carousel "WeCare conçu pour votre structure" ── */
     .carousel-section { background: #fff; padding: 72px 0 64px; }
@@ -89,10 +96,8 @@
     }
     .carousel-card {
       min-width: 300px; max-width: 300px; flex-shrink: 0; border-radius: 16px; overflow: hidden;
-      position: relative; cursor: pointer;
-      transition: transform 0.25s, box-shadow 0.25s;
+      position: relative;
     }
-    .carousel-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(15,0,75,0.14); }
     .carousel-card-img {
       width: 100%; height: 220px; object-fit: cover; object-position: center top; display: block;
       background: #e8f4f8;
@@ -101,13 +106,19 @@
     .carousel-card-tag  { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #41A096; background: rgba(65,160,150,0.10); border-radius: 20px; padding: 2px 10px; margin-bottom: 8px; }
     .carousel-card-title { font-size: 0.92rem; font-weight: 700; color: #0c0052; margin-bottom: 6px; line-height: 1.3; }
     .carousel-card-desc  { font-size: 0.78rem; color: #8a85b0; line-height: 1.5; }
-    .carousel-nav { display: flex; gap: 10px; padding: 24px 48px 0; }
+    .carousel-nav { display: none; }
+    .carousel-outer { position: relative; }
     .carousel-btn {
-      width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #e2ddf0;
-      background: #fff; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.15s; color: #0c0052;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 52px; height: 52px; border-radius: 50%; border: none;
+      background: #fff; box-shadow: 0 4px 20px rgba(15,0,75,0.14);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.15s, box-shadow 0.15s, color 0.15s;
+      color: #0c0052; z-index: 10;
     }
-    .carousel-btn:hover { background: #41A096; border-color: #41A096; color: #fff; }
+    .carousel-btn:hover { background: #41A096; color: #fff; box-shadow: 0 6px 28px rgba(65,160,150,0.32); }
+    #carousel-prev { left: 14px; }
+    #carousel-next { right: 14px; }
 
     /* ── Pricing ── */
     .pricing-section { background: #fff; padding: 72px 48px; }
@@ -178,8 +189,8 @@
     .cta-img-side img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
     .cta-text-side {
       background: #F1FAF9;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 64px 56px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 64px 56px; text-align: center;
     }
     .cta-tag {
       display: inline-block; font-size: 0.68rem; font-weight: 700;
@@ -207,8 +218,10 @@
       .carousel-nav { padding: 20px 24px 0; }
       .faq-inner { padding: 56px 24px; }
       .stats-wrap { padding: 56px 24px 0; }
+      .tabs-section-wrap { padding: 0 16px 56px; background: #F1FAF9; }
       .tabs-bar { overflow-x: auto; scrollbar-width: none; }
       .tabs-bar::-webkit-scrollbar { display: none; }
+      .tab-content { grid-template-columns: 1fr; padding: 24px; gap: 28px; }
     }
     @media (max-width: 600px) {
       .hero h1 { font-size: 1.6rem; }
@@ -263,19 +276,20 @@
   <div class="stats-dots reveal">
     <span class="stats-dot" style="background:#2CA7CB"></span>
     <span class="stats-dot" style="background:#ff91fd"></span>
-    <span class="stats-dot" style="background:#2CA7CB"></span>
+    <span class="stats-dot" style="background:#41A096"></span>
   </div>
   <div class="stats-title reveal">WeCare, s'occupe de tout le monde</div>
   <div class="stats-sub reveal">3 utilisateurs ; 3 espaces distincts</div>
 
-  <div class="tabs-bar reveal">
-    <button class="tab-pill active" onclick="switchTab(0,this)">Responsable de secteur</button>
-    <button class="tab-pill"        onclick="switchTab(1,this)">Aidant &amp; bénéficiaire</button>
-    <button class="tab-pill"        onclick="switchTab(2,this)">Intervenant</button>
-  </div>
 </div>
 
-<div class="tab-content-wrap">
+<div class="tabs-section-wrap">
+  <div class="tabs-card reveal">
+    <div class="tabs-bar">
+      <button class="tab-pill active" onclick="switchTab(0,this)">Responsable de secteur</button>
+      <button class="tab-pill"        onclick="switchTab(1,this)">Aidant &amp; bénéficiaire</button>
+      <button class="tab-pill"        onclick="switchTab(2,this)">Intervenant</button>
+    </div>
   <div class="tab-panel active" id="tab-0">
     <div class="tab-content">
       <div>
@@ -333,7 +347,8 @@
       </div>
     </div>
   </div>
-</div>
+  </div>{# /tabs-card #}
+</div>{# /tabs-section-wrap #}
 
 <!-- ── CAROUSEL ── -->
 <div class="carousel-section">
@@ -341,19 +356,19 @@
     <h2>WeCare conçu pour votre structure</h2>
     <p>Le logiciel de gestion pour les services à la personne et l'autonomie</p>
   </div>
+  <div class="carousel-outer">
+    <button class="carousel-btn" id="carousel-prev"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="carousel-btn" id="carousel-next"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="carousel-track-wrap">
     <div class="carousel-track" id="carousel-track">
       {% set carouselCards = [
-        {tag:'SAP',    img:'/images/service-daide-a-la-personne.jpg',           title:'Les Services d\'Aides à Domicile',                                    sub:'WeCare accompagne les SAAD dans la coordination quotidienne des soins, le suivi des patients et la gestion des interventions.'},
-        {tag:'SSIAD',  img:'/images/aide-a-domicile-seniors.jpg',               title:'Pour les Services de Soins Infirmiers à Domicile',                    sub:'Vous coordonnez les soins à domicile, WeCare simplifie la coordination de votre équipe et le suivi des patients.'},
-        {tag:'SPASAD', img:'/images/Gemini_Generated_Image_rmbi14rmbi14rmbi.png',title:'Pour les Services Polyvalents d\'Aides et de Soins à Domicile',      sub:'Coordonnez à la fois l\'aide et les soins à domicile depuis une seule plateforme centralisée.'},
-        {tag:'CCAS & CIAS', img:'/images/ADV_emploi_aide_a_dom_bloc1_13cb6117ce.jpg', title:'Pour les Centres Communaux d\'Action Sociale',                  sub:'Pilotez l\'action sociale de votre territoire, WeCare simplifie l\'information médicale et la coordination.'},
-        {tag:'Mandataire', img:'/images/Gemini_Generated_Image_eb0lyweb0lyweb0l-clean.png', title:'Pour les Services Mandataires',                            sub:'Gérez vos intervenants mandatés, suivez les plannings et produisez les comptes rendus en toute simplicité.'},
-        {tag:'Prestataire', img:'/images/Gemini_Generated_Image_60bpzs60bpzs60bp-clean.png', title:'Pour les Services Prestataires',                          sub:'Centralisez la gestion de vos bénéficiaires, coordonnez vos équipes terrain et optimisez vos tournées.'},
-        {tag:'Résidence',   img:'/images/alternative_maison_de_retraite_1200.jpg',                        title:'Pour les Résidences Services et EHPAD',         sub:'Assurez le suivi des résidents, planifiez les interventions et facilitez la communication avec les familles.'},
-        {tag:'Autonomie',   img:'/images/Jai-besoin-dune-aide-a-domicile-pour-la-premiere-fois-comment-faire-2-1024x683.jpg', title:'Pour les Services d\'Aide à l\'Autonomie',      sub:'Accompagnez les personnes en perte d\'autonomie avec des outils adaptés au maintien à domicile.'},
-        {tag:'Handicap',    img:'/images/Gemini_Generated_Image_11u53q11u53q11u5.png',                  title:'Pour les Services d\'Aide aux Personnes Handicapées', sub:'Gérez les accompagnements spécialisés, coordonnez les aidants et suivez chaque bénéficiaire individuellement.'},
-        {tag:'Portage repas', img:'/images/Gemini_Generated_Image_uo3711uo3711uo37.png',                title:'Pour les Services de Portage de Repas',             sub:'Planifiez les tournées de livraison, gérez les régimes alimentaires et assurez le lien social avec les bénéficiaires.'},
+        {tag:'SAP',           img:'/images/service-daide-a-la-personne.jpg',                                                        title:'Les Services d\'Aides à Domicile',                        sub:'WeCare accompagne les SAAD dans la coordination quotidienne des soins, le suivi des patients et la gestion des interventions.'},
+        {tag:'SSIAD',         img:'/images/aide-a-domicile-seniors.jpg',                                                            title:'Pour les Services de Soins Infirmiers à Domicile',        sub:'Vous coordonnez les soins à domicile, WeCare simplifie la coordination de votre équipe et le suivi des patients.'},
+        {tag:'SPASAD',        img:'/images/Gemini_Generated_Image_rmbi14rmbi14rmbi.png',                                            title:'Pour les Services Polyvalents d\'Aides et de Soins',      sub:'Coordonnez à la fois l\'aide et les soins à domicile depuis une seule plateforme centralisée.'},
+        {tag:'CCAS & CIAS',   img:'/images/ADV_emploi_aide_a_dom_bloc1_13cb6117ce.jpg',                                            title:'Pour les Centres Communaux d\'Action Sociale',            sub:'Pilotez l\'action sociale de votre territoire, WeCare simplifie l\'information médicale et la coordination.'},
+        {tag:'Mandataire',    img:'/images/Gemini_Generated_Image_eb0lyweb0lyweb0l-clean.png',                                      title:'Pour les Services Mandataires',                           sub:'Gérez vos intervenants mandatés, suivez les plannings et produisez les comptes rendus en toute simplicité.'},
+        {tag:'Prestataire',   img:'/images/Gemini_Generated_Image_60bpzs60bpzs60bp-clean.png',                                     title:'Pour les Services Prestataires',                          sub:'Centralisez la gestion de vos bénéficiaires, coordonnez vos équipes terrain et optimisez vos tournées.'},
+        {tag:'Handicap',      img:'/images/Gemini_Generated_Image_11u53q11u53q11u5.png',                                           title:'Pour les Services d\'Aide aux Personnes Handicapées',     sub:'Gérez les accompagnements spécialisés, coordonnez les aidants et suivez chaque bénéficiaire individuellement.'},
       ] %}
       {% for c in carouselCards %}
       <div class="carousel-card">
@@ -369,9 +384,6 @@
       {% endfor %}
     </div>
   </div>
-  <div class="carousel-nav reveal">
-    <button class="carousel-btn" id="carousel-prev"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <button class="carousel-btn" id="carousel-next"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
   </div>
 </div>
 
@@ -391,7 +403,10 @@
         <input type="range" id="hp-slider" min="0" max="6" value="0" step="1" style="-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;outline:none;margin:12px 0 8px;background:linear-gradient(to right,#41A096 0%,#41A096 0%,#d4eef8 0%,#d4eef8 100%);cursor:pointer">
         <div class="plan-price-alt" id="hp-range" style="margin-bottom:16px">Jusqu'à 50 bénéficiaires</div>
         <div class="plan-feature-row"><div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Toutes les fonctionnalités disponibles</div>
-        <div class="plan-cta"><a href="/inscription" class="plan-btn" style="background:#41A096;color:#fff;border-color:#41A096">Démarrer gratuitement</a></div>
+        <div class="plan-cta">
+          <a href="/inscription" id="hp-btn-gratuit" class="plan-btn" style="background:#41A096;color:#fff;border-color:#41A096">Démarrer gratuitement</a>
+          <a href="/contact"     id="hp-btn-devis"   class="plan-btn" style="background:#41A096;color:#fff;border-color:#41A096;display:none">Demander un devis</a>
+        </div>
       </div>
       <div class="plan-card reveal" style="transition-delay:0.1s">
         <div class="plan-badge-tag">Tarif annuel</div>
@@ -448,7 +463,7 @@
 <!-- ── CTA FINAL ── -->
 <div class="cta-section">
   <div class="cta-img-side">
-    <img src="/images/Welcome-WeCare-RF.webp" alt="WeCare aide à domicile">
+    <img src="/images/Welcome-WeCare-RF.webp" alt="WeCare aide à domicile" style="transform:scaleX(-1)">
   </div>
   <div class="cta-text-side reveal">
     <div class="cta-tag">Offre limitée</div>
@@ -470,18 +485,49 @@ function switchTab(idx, btn) {
   document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i === idx));
 }
 
-// Carousel
-const track   = document.getElementById('carousel-track');
-const prevBtn = document.getElementById('carousel-prev');
-const nextBtn = document.getElementById('carousel-next');
-let carouselIdx = 0;
+// Carousel infini
+(function() {
+  const track = document.getElementById('carousel-track');
+  if (!track) return;
 
-function cardW() { const c = track?.querySelector('.carousel-card'); return c ? c.offsetWidth + 20 : 320; }
-function maxIdx(){ return Math.max(0, (track?.children.length || 0) - Math.floor((track?.parentElement.offsetWidth || 900) / cardW())); }
-function updateCarousel() { if(track) track.style.transform = `translateX(-${carouselIdx * cardW()}px)`; }
+  // Clone toutes les cartes pour la boucle
+  const origCards = Array.from(track.children);
+  origCards.forEach(c => track.appendChild(c.cloneNode(true)));
+  origCards.forEach(c => track.insertBefore(c.cloneNode(true), track.firstChild));
 
-prevBtn?.addEventListener('click', () => { carouselIdx = Math.max(0, carouselIdx-1); updateCarousel(); });
-nextBtn?.addEventListener('click', () => { carouselIdx = Math.min(maxIdx(), carouselIdx+1); updateCarousel(); });
+  const total = track.children.length;
+  const perPage = origCards.length;
+  let idx = perPage; // démarre sur le vrai premier
+  let autoTimer;
+
+  function cardW() {
+    const c = track.querySelector('.carousel-card');
+    return c ? c.offsetWidth + 20 : 320;
+  }
+
+  function goTo(i, animated) {
+    track.style.transition = animated === false ? 'none' : 'transform 0.5s cubic-bezier(.4,0,.2,1)';
+    track.style.transform = `translateX(-${i * cardW()}px)`;
+    idx = i;
+  }
+
+  track.addEventListener('transitionend', () => {
+    if (idx >= perPage * 2) goTo(perPage, false);
+    if (idx < perPage)      goTo(perPage * 2 - 1, false);
+  });
+
+  function next() { goTo(idx + 1, true); }
+  function prev() { goTo(idx - 1, true); }
+
+  document.getElementById('carousel-next')?.addEventListener('click', () => { resetAuto(); next(); });
+  document.getElementById('carousel-prev')?.addEventListener('click', () => { resetAuto(); prev(); });
+
+  function startAuto() { autoTimer = setInterval(next, 3500); }
+  function resetAuto()  { clearInterval(autoTimer); startAuto(); }
+
+  goTo(idx, false);
+  startAuto();
+})();
 
 // ── Pricing slider (homepage) ──
 const hpTiers = [
@@ -506,6 +552,10 @@ function hpUpdate() {
   document.getElementById('hp-monthly-range').textContent = t.range;
   document.getElementById('hp-monthly-price').textContent = t.monthly + '€';
   document.getElementById('hp-monthly-yearly').textContent= 'ou ' + t.annual + '€ / an';
+
+  const isPlus500 = +hpSlider.value === 6;
+  document.getElementById('hp-btn-gratuit').style.display = isPlus500 ? 'none'  : 'block';
+  document.getElementById('hp-btn-devis').style.display   = isPlus500 ? 'block' : 'none';
 }
 hpSlider?.addEventListener('input', hpUpdate);
 hpUpdate();

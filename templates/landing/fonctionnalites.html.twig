@@ -49,32 +49,41 @@
 
     /* ── TABS SECTION ── */
     .fn-tabs-section {
-      background: #F1FAF9;
-      padding: 64px 0 72px;
+      background: #fff;
+      padding: 64px 48px 72px;
+    }
+    .fn-tabs-card {
+      max-width: 1100px; margin: 0 auto;
+      background: #fff;
+      border: 1.5px solid #d4cef0;
+      border-radius: 20px;
+      overflow: hidden;
     }
     .fn-tabs-nav {
-      display: flex; justify-content: center; gap: 8px;
-      margin-bottom: 52px; padding: 0 24px; flex-wrap: wrap;
+      display: flex; gap: 6px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #ede9f8;
+      flex-wrap: wrap;
     }
     .fn-tab-btn {
-      padding: 10px 22px; border-radius: 50px;
-      font-size: 0.86rem; font-weight: 600;
+      padding: 9px 20px; border-radius: 50px;
+      font-size: 0.84rem; font-weight: 600;
       border: none; cursor: pointer;
-      background: #ede9f8; color: #6b63a8;
+      background: transparent; color: #9b94c5;
       transition: background 0.2s, color 0.2s;
     }
-    .fn-tab-btn:hover { background: #ddd8f5; color: #0c0052; }
+    .fn-tab-btn:hover { color: #0c0052; }
     .fn-tab-btn.active { background: #41A096; color: #fff; }
 
     .fn-tab-content { display: none; }
     .fn-tab-content.active { display: block; }
 
     .fn-tab-inner {
-      max-width: 1100px; margin: 0 auto; padding: 0 48px;
+      padding: 36px 40px;
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 56px; align-items: center;
+      gap: 48px; align-items: center;
     }
-    .fn-checklist { display: flex; flex-direction: column; gap: 12px; }
+    .fn-checklist { display: flex; flex-direction: column; gap: 11px; }
     .fn-check-item {
       display: flex; align-items: flex-start; gap: 10px;
       font-size: 0.875rem; color: #3a357f; font-weight: 500;
@@ -88,24 +97,25 @@
     .fn-check-icon svg { width: 10px; height: 10px; }
     .fn-badge-bientot {
       display: inline-block;
-      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #fff;
-      background: #41A096; border-radius: 4px;
+      font-size: 0.60rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #3a357f;
+      background: #ede9f8; border-radius: 4px;
       padding: 2px 7px; margin-left: 8px;
       vertical-align: middle;
     }
     .fn-tab-visual {
-      border-radius: 16px; overflow: hidden;
+      border-radius: 12px; overflow: hidden;
       background: linear-gradient(135deg, #F2FBFF 0%, #ede9f8 100%);
     }
-    .fn-tab-visual .lp-img { height: 360px; border-radius: 16px; }
+    .fn-tab-visual .lp-img { height: 340px; border-radius: 12px; }
     .fn-tabs-cta {
-      text-align: center; margin-top: 52px;
+      text-align: center; margin-top: 36px;
     }
 
     @media (max-width: 900px) {
-      .fn-tab-inner { grid-template-columns: 1fr; padding: 0 24px; gap: 32px; }
-      .fn-tab-visual .lp-img { height: 240px; }
+      .fn-tabs-section { padding: 48px 16px 56px; }
+      .fn-tab-inner { grid-template-columns: 1fr; padding: 24px; gap: 28px; }
+      .fn-tab-visual .lp-img { height: 220px; }
     }
 
     /* ── COMING SOON INTRO ── */
@@ -146,9 +156,7 @@
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 56px; align-items: center;
       box-shadow: 0 2px 16px rgba(15,0,75,0.04);
-      transition: box-shadow 0.2s;
     }
-    .fn-soon-card:hover { box-shadow: 0 8px 32px rgba(15,0,75,0.08); }
     .fn-feature-tag-bientot {
       display: inline-block;
       font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
@@ -255,7 +263,8 @@
 
 <!-- ── TABS ── -->
 <section class="fn-tabs-section">
-  <div class="fn-tabs-nav reveal">
+  <div class="fn-tabs-card reveal">
+  <div class="fn-tabs-nav">
     <button class="fn-tab-btn active" data-tab="planning">Planification Intelligente</button>
     <button class="fn-tab-btn" data-tab="multi">Plateforme multi-utilisateurs</button>
     <button class="fn-tab-btn" data-tab="intervention">Gestion d'Intervention</button>
@@ -267,15 +276,16 @@
       <div class="fn-checklist reveal-left">
         {% set items_planning = [
           {text: 'Planning en temps réel', soon: false},
-          {text: 'Gestion et validation des tâches', soon: false},
-          {text: 'Gérez les compétences des intervenants', soon: false},
-          {text: 'Planification intelligente des numéros', soon: false},
-          {text: 'Suivi des traçeurs (Localgo, et infos manuelles, …)', soon: false},
-          {text: 'Optimisation des kms et du temps de trajet', soon: false},
-          {text: 'Automatisation des interventions', soon: false},
-          {text: 'Gestion des incidents Bénéficiaire (Hospitalisation, réhabilitation, …)', soon: false},
+          {text: 'Gestion et allocation des tâches', soon: false},
+          {text: 'Gestion des compétences des intervenants', soon: false},
+          {text: 'Planification intelligente des tournées', soon: false},
+          {text: 'Gestion des secteurs et zones d\'interventions', soon: false},
+          {text: 'Gestion des absences (congés, arrêts maladies…)', soon: false},
+          {text: 'Optimisation des km et des temps de trajets', soon: false},
+          {text: 'Géolocalisation des interventions', soon: false},
+          {text: 'Gestion des incidents bénéficiaire (hospitalisation, absences…)', soon: false},
           {text: 'Détection de conflits de planning', soon: false},
-          {text: 'Notifications et alertes vérification nécessaires', soon: false},
+          {text: 'Notifications d\'actions de planification nécessaires', soon: false},
           {text: 'Assistant de planification IA', soon: true},
         ] %}
         {% for item in items_planning %}
@@ -360,8 +370,9 @@
     </div>
   </div>
 
+  </div>{# /fn-tabs-card #}
   <div class="fn-tabs-cta reveal">
-    <a href="/inscription" class="btn-teal">S'inscrire gratuitement</a>
+    <a href="/inscription" class="btn-teal">Démarrer gratuitement</a>
   </div>
 </section>
 

@@ -306,10 +306,13 @@
         <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <div class="plan-cta"><a href="/inscription?plan=gratuit" class="plan-btn primary" data-devis-btn>Demander un devis gratuit</a></div>
+      <div class="plan-cta">
+        <a href="/inscription" id="tr-btn-gratuit" class="plan-btn primary">Démarrer gratuitement</a>
+        <a href="/contact"     id="tr-btn-devis-left" class="plan-btn primary" style="display:none">Demander un devis gratuit</a>
+      </div>
     </div>
 
-    <!-- Carte annuel (navy) -->
+    <!-- Carte annuel -->
     <div class="plan-card reveal" style="transition-delay:0.1s">
       <div class="plan-badge-tag">Tarif annuel</div>
       <div class="plan-range" id="annual-range">Jusqu'à 50 bénéficiaires</div>
@@ -322,7 +325,10 @@
         <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <div class="plan-cta"><a href="/inscription?plan=annuel" class="plan-btn primary" data-devis-btn>Demander un devis</a></div>
+      <div class="plan-cta">
+        <a href="/tarifs"  id="tr-btn-annual" class="plan-btn primary">Choisir ce forfait</a>
+        <a href="/contact" id="tr-btn-devis-annual" class="plan-btn primary" style="display:none">Demander un devis</a>
+      </div>
     </div>
 
     <!-- Carte mensuelle -->
@@ -338,7 +344,10 @@
         <div class="plan-feature-check"><svg width="9" height="9" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         Toutes les fonctionnalités disponibles
       </div>
-      <div class="plan-cta"><a href="/inscription?plan=mensuel" class="plan-btn" data-devis-btn>Demander un devis</a></div>
+      <div class="plan-cta">
+        <a href="/tarifs"  id="tr-btn-monthly" class="plan-btn">Choisir le forfait</a>
+        <a href="/contact" id="tr-btn-devis-monthly" class="plan-btn" style="display:none">Demander un devis</a>
+      </div>
     </div>
 
   </div>
@@ -487,12 +496,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('monthly-range').textContent  = t.range;
     document.getElementById('monthly-price').textContent  = t.monthly + '€';
     document.getElementById('monthly-annual').textContent = 'ou ' + t.annual + '€ / an';
-    // Mettre à jour les liens CTA avec la tranche sélectionnée
-    document.querySelectorAll('a[data-devis-btn]').forEach(a => {
-      const url = new URL(a.href, window.location.href);
-      url.searchParams.set('beneficiaires', idx);
-      a.href = url.toString();
-    });
+
+    const isPlus500 = idx === 6;
+    document.getElementById('tr-btn-gratuit').style.display      = isPlus500 ? 'none'  : 'block';
+    document.getElementById('tr-btn-devis-left').style.display   = isPlus500 ? 'block' : 'none';
+    document.getElementById('tr-btn-annual').style.display       = isPlus500 ? 'none'  : 'block';
+    document.getElementById('tr-btn-devis-annual').style.display = isPlus500 ? 'block' : 'none';
+    document.getElementById('tr-btn-monthly').style.display      = isPlus500 ? 'none'  : 'block';
+    document.getElementById('tr-btn-devis-monthly').style.display= isPlus500 ? 'block' : 'none';
   }
   trSlider?.addEventListener('input', trUpdate);
   trUpdate();
